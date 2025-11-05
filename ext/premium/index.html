@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Premium Go URL Shortener(ext)</title>
+    <link rel="stylesheet" href="/ext/styles.css" />
+  </head>
+  <body>
+  <header class="classification">EXTERNAL</header>
+    <main class="container">
+      <h1>Welcome to the Go.junseo.ng(ext) Custom Link Shortener</h1>
+
+      <label class="url-row">
+        <p class="url-label">URL to shorten</p>
+        <input id="urlInput" type="url" placeholder="https://learn.microsoft.com/en-us/answers/" />
+        <button id="clearUrl" title="Clear URL">Clear</button>
+      </label>
+
+      <label class="id-row">
+        <span class="prefix">go.junseo.ng/ext/</span>
+        <input id="idInput" type="text" inputmode="text" autocomplete="off" placeholder="Enter your slug" />
+        <button id="clearId" title="Clear saved ID">Check availability</button>
+      </label>
+
+      <nav class="action" aria-label="Action">
+        <button id="generate" disabled>Generate</button>
+      </nav>
+
+      <br>
+
+      <section class="result" aria-live="polite" hidden>
+        <p class="result-label">Generated URL</p>
+        <p class="site-entry"><a id="siteAnchor" class="site-anchor" href="#" target="_blank" rel="noopener noreferrer"></a></p>
+        <textarea id="output" readonly rows="3"></textarea>
+        <footer class="copy-row">
+          <span id="copied" class="copied">Copied!</span>
+          <button id="copy">Copy</button>
+        </footer>
+      </section>
+
+  <footer class="classification">EXTERNAL</footer>
+
+      <aside class="notes">
+        <strong>Notes</strong>
+        <ul>
+          <li>Sample<code>/en-us/</code>.</li>
+        </ul>
+      </aside>
+      
+      <br>
+
+      <section class="feedback" aria-label="Feedback">
+        <a href="/ext" style="text-decoration:none"><button id="feedback" title="Go URL Shortener(ext)">Go to standard shortener</button></a>
+      </section>
+      <section class="feedback" aria-label="Feedback">
+        <a href="https://github.com/junsungE/go.junseo.ng" style="text-decoration:none"><button id="feedback" title="Give feedback">Feedback</button></a>
+      </section>
+    </main>
+
+    <script src="/ext/script.js"></script>
+
+  </body>
+</html>

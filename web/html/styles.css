@@ -207,9 +207,10 @@ h1,
 }
 
 /* Responsive adjustments */
-@media (max-width: 600px) {
+@media /*(min-width: 48rem) and*/ (max-width: 600px) {
   .container {
     padding: 14px;
+    /*grid-template-columns: repeat(4,minmax(0,1fr)); */
   }
 
   /* Stack rows vertically on narrow screens */

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart URL Shortener</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-sans p-4">
+  <header class="mb-6">
+    <h1 class="text-2xl font-bold">Smart URL Shortener</h1>
+    <nav class="mt-2 space-x-4">
+      <a href="#" class="text-blue-600">Home</a>
+      <a href="/new" class="text-blue-600">Create Internal</a>
+      <a href="/dashboard" class="text-blue-600">Dashboard</a>
+      <a href="/ext" class="text-blue-600">External Free</a>
+      <a href="/ext/premium" class="text-blue-600">Premium</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2 class="text-xl font-semibold">Welcome!</h2>
+    <p>Create and manage your shortened URLs easily.</p>
+
+    <section class="mt-4">
+      <h3 class="text-lg font-semibold">Features:</h3>
+      <ul class="list-disc list-inside">
+        <li>Internal links: custom slugs, conditional redirects, password-protected or private links</li>
+        <li>External free links: random slugs, visit limits, expiry dates</li>
+        <li>External premium links: custom slugs, analytics, sign-in required</li>
+        <li>Case sensitivity toggle for all shortened URLs</li>
+      </ul>
+    </section>
+
+    <section class="mt-4">
+      <h3 class="text-lg font-semibold">Getting Started:</h3>
+      <ol class="list-decimal list-inside">
+        <li>Go to <a href="/new" class="text-blue-600">Create Internal</a> (login required)</li>
+        <li>Use <a href="/ext" class="text-blue-600">External Free</a> to shorten random links</li>
+        <li>Request premium account at <a href="/ext/premium" class="text-blue-600">Premium</a></li>
+        <li>View analytics at <a href="/dashboard" class="text-blue-600">Dashboard</a> (login required)</li>
+      </ol>
+    </section>
+  </main>
+</body>
+</html>

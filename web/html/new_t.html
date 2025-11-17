@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Internal URL</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-sans p-4">
+  <header class="mb-6">
+    <h1 class="text-2xl font-bold">Create Internal URL</h1>
+    <nav class="mt-2 space-x-4">
+      <a href="/" class="text-blue-600">Home</a>
+      <a href="/dashboard" class="text-blue-600">Dashboard</a>
+      <a href="/new" class="text-blue-600">Create Internal</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2 class="text-xl font-semibold mb-2">Internal URL Form</h2>
+    <form id="createForm" class="space-y-3">
+      <label>
+        Target URL:
+        <input type="url" name="targetUrl" required class="w-full border p-1">
+      </label>
+
+      <label>
+        Custom Slug (optional):
+        <input type="text" name="slug" class="w-full border p-1">
+      </label>
+
+      <label>
+        Mode:
+        <select name="mode" class="ml-2 border p-1">
+          <option value="public">Public</option>
+          <option value="protected">Protected</option>
+          <option value="private">Private</option>
+        </select>
+      </label>
+
+      <label>
+        Password (for protected mode):
+        <input type="text" name="password" class="w-full border p-1">
+      </label>
+
+      <label>
+        Case Sensitive:
+        <input type="checkbox" name="isCaseSensitive" class="ml-2">
+      </label>
+
+      <label>
+        Expiry Date (optional):
+        <input type="date" name="expiryDate" class="w-full border p-1">
+      </label>
+
+      <label>
+        Visit Limit (optional):
+        <input type="number" name="visitLimit" class="w-full border p-1">
+      </label>
+
+      <label>
+        Title (optional, for notes):
+        <input type="text" name="title" class="w-full border p-1">
+      </label>
+
+      <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded">Create</button>
+    </form>
+
+    <p id="message" class="mt-2"></p>
+
+    <script>
+      const form = document.getElementById("createForm");
+      const msg = document.getElementById("message");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(form).entries());
+        data.isCaseSensitive = form.isCaseSensitive.checked;
+        data.type = "internal";
+
+        const res = await fetch("/api/createLink", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        const result = await res.json();
+        msg.textContent = res.ok ? `Success! URL: ${result.fullUrl}` : `Error: ${result.error}`;
+      });
+    </script>
+  </main>
+</body>
+</html>

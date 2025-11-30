@@ -29,6 +29,10 @@ body {
   padding-bottom: calc(24px + 32px);
 }
 
+main {
+  display: grid;
+}
+
 .classification {
   display: block;
   unicode-bidi: isolate;
@@ -100,15 +104,10 @@ h1,
 
 .feedback {
   margin-top: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
-  flex-direction: column;
 }
 
 .feedback button {
   width: 100%;
-  justify-content: center;
   background: #e5e7eb;
   color: #111;
   border: 1px solid #d1d5db;
@@ -116,10 +115,27 @@ h1,
 
 /* Desktop / wider screens: place container to the right and keep buttons matching container width */
 @media (min-width: 48rem) {
+    main {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
   .container {
     /* make sure container doesn't grow too wide but can be pushed to the right */
     width: min(760px, 94%);
-    margin-right: 48px;
-    /*grid-template-columns: repeat(4,minmax(0,1fr)); */
+    grid-column: 3/5;        /* or use negative indices: grid-column: -2 / -1; */
   }
 }
+
+/*
+@media (min-width: 64rem) {
+  main {
+    max-width: 64rem;
+  }
+}
+
+@media (min-width: 40rem) {
+  main {
+    max-width: 40rem;
+  }
+}
+*/

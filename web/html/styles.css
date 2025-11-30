@@ -58,7 +58,7 @@ footer.classification { bottom: 0 }
   max-width: 760px;
   margin: 0 auto;
   background: var(--card);
-  padding: 20px;
+  padding: calc(var(--spacing)*4);
   border-radius: 10px;
   box-shadow: 0 6px 20px rgba(2, 6, 23, 0.06);
 }
@@ -68,57 +68,6 @@ h1 {
   font-size: 20px;
 }
 
-.id-row, .url-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.prefix {
-  background: #f0f3f7;
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid #e6eef9;
-  color: var(--muted);
-  font-weight: 600;
-  flex: 0 0 auto;
-  min-width: 0;
-}
-
-input[type="text"],
-input[type="url"],
-textarea {
-  flex: 1;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  min-width: 0;
-}
-
-textarea#output {
-  font-family: inherit;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-  width: 100%;
-}
-
-.url-label {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 6px;
-}
-
-.action {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-  justify-content: flex-end;
-}
-
 button {
   background: var(--accent);
   color: #fff;
@@ -126,61 +75,6 @@ button {
   padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
-}
-
-button[disabled] {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Clear buttons (ID and URL) share the same styles */
-#clearId,
-#clearUrl {
-  background: #e5e7eb;
-  color: #111;
-  padding: 10px;
-  border-radius: 6px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.result {
-  margin-top: 6px;
-}
-
-.result-label {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 6px;
-}
-
-.site-entry .site-anchor {
-  font-weight: 600;
-  color: var(--accent);
-  text-decoration: underline;
-  display: block;
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
-textarea {
-  width: 100%;
-  resize: vertical;
-}
-
-.copy-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-  justify-content: flex-end;
-}
-
-.copied {
-  color: var(--accent);
-  opacity: 0;
-  transition: opacity 0.2s;
 }
 
 .notes {
@@ -197,91 +91,35 @@ textarea {
 
 /* Prevent horizontal overflow on narrow screens */
 h1,
-.prefix,
-.notes,
-.url-label {
+.notes {
   word-break: break-word;
   overflow-wrap: anywhere;
   hyphens: auto;
   min-width: 0;
 }
 
-/* Responsive adjustments */
-@media /*(min-width: 48rem) and*/ (max-width: 600px) {
-  .container {
-    padding: 14px;
-    /*grid-template-columns: repeat(4,minmax(0,1fr)); */
-  }
-
-  /* Stack rows vertically on narrow screens */
-  .id-row,
-  .url-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
- .prefix,
- .url-label {
-    width: 100%;
-    margin-bottom: 6px;
-  }
-
-  .id-row input,
-  .url-row input,
-  textarea {
-    width: 100%;
-  }
-
-  /* Make action buttons span full width and flow under inputs */
-  .action {
-    justify-content: flex-start;
-  }
-
-  /* Slightly smaller clear buttons on narrow screens */
-  #clearId,
-  #clearUrl {
-    padding: 6px 8px;
-  }
-
-  button {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-  }
-
-  .copy-row,
-  .feedback {
-    justify-content: flex-start;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
-  }
-
-  /* keep the "Copied!" feedback aligned to the right on narrow screens */
-  .copied {
-    align-self: flex-end;
-    text-align: right;
-    width: auto;
-  }
-}
-
-/* ensure prefix and clear button don't force overflow in horizontal layouts */
-.prefix,
-#clearId,
-#clearUrl {
-  flex: 0 0 auto;
-}
-
 .feedback {
   margin-top: 12px;
   display: flex;
   justify-content: center;
+  align-items: stretch;
+  flex-direction: column;
 }
 
 .feedback button {
+  width: 100%;
+  justify-content: center;
   background: #e5e7eb;
   color: #111;
   border: 1px solid #d1d5db;
+}
+
+/* Desktop / wider screens: place container to the right and keep buttons matching container width */
+@media (min-width: 48rem) {
+  .container {
+    /* make sure container doesn't grow too wide but can be pushed to the right */
+    width: min(760px, 94%);
+    margin-right: 48px;
+    /*grid-template-columns: repeat(4,minmax(0,1fr)); */
+  }
 }

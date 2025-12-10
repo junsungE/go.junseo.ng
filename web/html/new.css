@@ -18,6 +18,11 @@ body{
   -moz-osx-font-smoothing:grayscale;
   padding:24px;
 }
+/* target only h2 elements that are direct children of main */
+main > h2{
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
 
 .classification {
   display: block;

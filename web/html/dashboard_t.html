@@ -4,40 +4,42 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/web/html/dashboard_t.css">
 </head>
-<body class="bg-gray-50 font-sans p-4">
-  <header class="mb-6">
-    <h1 class="text-2xl font-bold">Dashboard / Analytics</h1>
-    <nav class="mt-2 space-x-4">
-      <a href="/" class="text-blue-600">Home</a>
-      <a href="/new" class="text-blue-600">Create Internal</a>
-      <a href="/dashboard" class="text-blue-600">Dashboard</a>
-    </nav>
+<body>
+  <header class="classification">
+    INTERNAL
   </header>
 
+  <h1>Dashboard / Analytics</h1>
+
+  <nav>
+      <a href="/">Home</a>
+      <a href="/new">Create Internal</a>
+  </nav>
+
   <main>
-    <h2 class="text-xl font-semibold mb-2">Fetch Stats</h2>
-    <form id="fetchForm" class="mb-4 space-x-2">
+    <h2>Fetch Stats</h2>
+    <form id="fetchForm">
       <label>
         Slug:
-        <input type="text" name="slug" required class="border p-1">
+        <input type="text" name="slug" required>
       </label>
 
       <label>
         Type:
-        <select name="type" class="border p-1">
+        <select name="type">
           <option value="internal">Internal</option>
           <option value="premium">Premium</option>
         </select>
       </label>
 
-      <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded">Fetch</button>
+      <button type="submit">Fetch</button>
     </form>
 
-    <p id="error" class="text-red-600"></p>
+    <p id="error"></p>
 
-    <section id="statsSection" class="mt-4"></section>
+    <section id="statsSection"></section>
 
     <script>
       const form = document.getElementById("fetchForm");
@@ -53,14 +55,14 @@
         const result = await res.json();
         if (res.ok) {
           const table = document.createElement("table");
-          table.className = "w-full border";
+          table.className = "stats-table";
           const thead = document.createElement("thead");
           thead.innerHTML = `
-            <tr class="bg-gray-100">
-              <th class="border px-2 py-1">Timestamp</th>
-              <th class="border px-2 py-1">IP</th>
-              <th class="border px-2 py-1">User Agent</th>
-              <th class="border px-2 py-1">Country</th>
+            <tr>
+              <th>Timestamp</th>
+              <th>IP</th>
+              <th>User Agent</th>
+              <th>Country</th>
             </tr>`;
           table.appendChild(thead);
 
@@ -68,10 +70,10 @@
           result.visits.forEach(v => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
-              <td class="border px-2 py-1">${v.timestamp}</td>
-              <td class="border px-2 py-1">${v.ip}</td>
-              <td class="border px-2 py-1">${v.userAgent}</td>
-              <td class="border px-2 py-1">${v.country}</td>`;
+              <td>${v.timestamp}</td>
+              <td>${v.ip}</td>
+              <td>${v.userAgent}</td>
+              <td>${v.country}</td>`;
             tbody.appendChild(tr);
           });
           table.appendChild(tbody);
@@ -83,5 +85,9 @@
       });
     </script>
   </main>
+
+  <footer class="classification">
+    INTERNAL
+  </footer>
 </body>
 </html>

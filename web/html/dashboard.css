@@ -11,7 +11,6 @@
   --gap: 12px;
 }
 *{box-sizing:border-box}
-html,body{height:100%}
 body{
   margin:0;
   font-family: Inter, ui-sans-serif, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -20,6 +19,7 @@ body{
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
   padding:24px;
+  padding-bottom: calc(24px + 32px);
 }
 /* target only h1 elements that are direct children of body */
 body > h1{
@@ -79,7 +79,6 @@ table.stats-table th, table.stats-table td{border:1px solid var(--border);paddin
 #error{margin-top:8px;color:#c62828}
 /* Responsive adjustments */
 @media (max-width:450px){
-  body{padding:16px}
   main{padding:14px}
   /* Stack nav vertically on narrow screens */
   nav{flex-direction:column;align-items:stretch;gap:8px}

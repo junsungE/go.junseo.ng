@@ -4,73 +4,94 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Internal URL</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.3/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/web/html/new_t.css">
 </head>
-<body class="bg-gray-50 font-sans p-4">
-  <header class="mb-6">
-    <h1 class="text-2xl font-bold">Create Internal URL</h1>
-    <nav class="mt-2 space-x-4">
-      <a href="/" class="text-blue-600">Home</a>
-      <a href="/dashboard" class="text-blue-600">Dashboard</a>
-      <a href="/new" class="text-blue-600">Create Internal</a>
-    </nav>
+<body>
+  <header class="classification">
+    INTERNAL
   </header>
 
+  <nav aria-label="Primary navigation">
+    <a href="/">Home</a>
+    <a href="/dashboard">Dashboard</a>
+  </nav>
+
   <main>
-    <h2 class="text-xl font-semibold mb-2">Internal URL Form</h2>
+    <h2>Go URL Shortener</h2>
     <form id="createForm" class="space-y-3">
       <label>
         Target URL:
-        <input type="url" name="targetUrl" required class="w-full border p-1">
+        <input type="url" name="targetUrl" required>
       </label>
 
       <label>
         Custom Slug (optional):
-        <input type="text" name="slug" class="w-full border p-1">
+        <input type="text" name="slug">
       </label>
 
       <label>
         Mode:
-        <select name="mode" class="ml-2 border p-1">
+        <select name="mode">
           <option value="public">Public</option>
           <option value="protected">Protected</option>
           <option value="private">Private</option>
         </select>
       </label>
 
-      <label>
+      <label id="passwordRow" style="display:none">
         Password (for protected mode):
-        <input type="text" name="password" class="w-full border p-1">
+        <input id="passwordInput" type="text" name="password">
       </label>
 
       <label>
         Case Sensitive:
-        <input type="checkbox" name="isCaseSensitive" class="ml-2">
+        <input type="checkbox" name="isCaseSensitive">
       </label>
 
       <label>
         Expiry Date (optional):
-        <input type="date" name="expiryDate" class="w-full border p-1">
+        <input type="date" name="expiryDate">
       </label>
 
       <label>
         Visit Limit (optional):
-        <input type="number" name="visitLimit" class="w-full border p-1">
+        <input type="number" name="visitLimit">
       </label>
 
       <label>
         Title (optional, for notes):
-        <input type="text" name="title" class="w-full border p-1">
+        <input type="text" name="title">
       </label>
 
-      <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded">Create</button>
+      <button type="submit">Create</button>
     </form>
 
-    <p id="message" class="mt-2"></p>
+    <p id="message"></p>
 
     <script>
       const form = document.getElementById("createForm");
       const msg = document.getElementById("message");
+
+      // Toggle password field when Mode is changed
+      const modeSelect = form.mode; // <select name="mode">
+      const passwordRow = document.getElementById('passwordRow');
+      const passwordInput = document.getElementById('passwordInput');
+
+      function togglePasswordRow() {
+        if (!modeSelect) return;
+        if (modeSelect.value === 'protected') {
+          passwordRow.style.display = '';
+          passwordInput.required = true;
+        } else {
+          passwordRow.style.display = 'none';
+          passwordInput.required = false;
+          passwordInput.value = '';
+        }
+      }
+
+      // initialize visibility on load
+      togglePasswordRow();
+      modeSelect && modeSelect.addEventListener('change', togglePasswordRow);
 
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -89,5 +110,9 @@
       });
     </script>
   </main>
+
+  <footer class="classification">
+    INTERNAL
+  </footer>
 </body>
 </html>

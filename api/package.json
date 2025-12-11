@@ -1,0 +1,11 @@
+{
+  "name": "go-junseo-ng-api",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@azure/data-tables": "^13.0.0",
+    "uuid": "^9.0.0",
+    "ua-parser-js": "^1.0.2"
+  }
+}

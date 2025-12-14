@@ -5,7 +5,7 @@ try {
   try { console.error('[debug_ping] module-load error', String(e)); } catch (_) {}
 }
 
-export default async function (context, req) {
+module.exports = async function (context, req) {
   console.log('[debug_ping] handler invoked');
   try {
     const now = new Date().toISOString();
@@ -31,4 +31,4 @@ export default async function (context, req) {
       body: JSON.stringify({ ok: false, error: message })
     };
   }
-}
+};

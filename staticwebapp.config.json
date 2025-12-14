@@ -5,20 +5,12 @@
       "allowedRoles": ["anonymous"]
     },
     {
-      "route": "/new.html",
-      "rewrite": "/web/html/new.html"
-    },
-    {
       "route": "/new",
-      "rewrite": "/web/html/new.html"
-    },
-    {
-      "route": "/dashboard.html",
-      "rewrite": "/web/html/dashboard.html"
+      "rewrite": "/new.html"
     },
     {
       "route": "/dashboard",
-      "rewrite": "/web/html/dashboard.html"
+      "rewrite": "/dashboard.html"
     },
     {
       "route": "/ext/*",
@@ -59,7 +51,7 @@
   },
   "navigationFallback": {
     "rewrite": "/api/redirect?scope=internal",
-    "exclude": ["/api/*", "/web/*", "/*.html", "/*.css", "/*.js", "/*.ico", "/media/*", "/.auth/*"]
+    "exclude": ["/api/*", "/*.html", "/*.css", "/*.js", "/*.ico", "/media/*", "/.auth/*"]
   },
   "responseOverrides": {
     "401": {

@@ -5,20 +5,16 @@
       "allowedRoles": ["anonymous"]
     },
     {
+      "route": "/",
+      "rewrite": "/index.html"
+    },
+    {
       "route": "/new",
       "rewrite": "/new.html"
     },
     {
       "route": "/dashboard",
       "rewrite": "/dashboard.html"
-    },
-    {
-      "route": "/ext/*",
-      "rewrite": "/api/redirect"
-    },
-    {
-      "route": "/*",
-      "rewrite": "/api/redirect"
     }
   ],
   "auth": {
@@ -54,8 +50,24 @@
     "apiRuntime": "node:20"
   },
   "navigationFallback": {
-    "rewrite": "/api/redirect?scope=internal",
-    "exclude": ["/api/*", "/*.html", "/*.css", "/*.js", "/*.ico", "/media/*", "/.auth/*"]
+    "rewrite": "/api/redirect",
+    "exclude": [
+      "/",
+      "/api/*",
+      "/*.html",
+      "/*.css",
+      "/*.js",
+      "/*.ico",
+      "/*.png",
+      "/*.jpg",
+      "/*.svg",
+      "/media/*",
+      "/ext/*.html",
+      "/ext/*.css",
+      "/ext/*.js",
+      "/ext/premium/*",
+      "/.auth/*"
+    ]
   },
   "responseOverrides": {
     "401": {

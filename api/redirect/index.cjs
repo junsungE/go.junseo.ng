@@ -1,8 +1,23 @@
 const { getTableClient, isLinkActive, recordVisit, incrementVisit, normalizeSlug } = require("../shared.cjs");
 
 module.exports = async function (context, req) {
-  const slug = req.query.slug;
-  const scope = req.query.scope || "external";
+  // Extract slug from query param OR from the original URL path
+  let slug = req.query.slug;
+  const scope = req.query.scope || "internal";
+  
+  // If no slug in query, try to extract from the original request URL
+  if (!slug) {
+    // Azure SWA passes the original URL in x-ms-original-url header
+    const originalUrl = req.headers["x-ms-original-url"] || req.url || "";
+    const urlPath = originalUrl.replace(/^https?:\/\/[^\/]+/, ""); // Remove protocol+host
+    
+    if (scope === "external" && urlPath.startsWith("/ext/")) {
+      slug = urlPath.replace("/ext/", "").split("?")[0];
+    } else {
+      slug = urlPath.replace(/^\//, "").split("?")[0];
+    }
+  }
+  
   const ua = req.headers["user-agent"] || "Unknown";
   const ip = req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].split(",")[0] : "Hidden";
 

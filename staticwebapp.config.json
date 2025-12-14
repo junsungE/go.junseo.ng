@@ -17,12 +17,12 @@
       "rewrite": "/web/html/dashboard.html"
     },
     {
-      "route": "/ext/:slug",
-      "rewrite": "/api/redirect?slug={slug}&scope=external"
+      "route": "/ext/*",
+      "rewrite": "/api/redirect?scope=external"
     },
     {
-      "route": "/:slug",
-      "rewrite": "/api/redirect?slug={slug}&scope=internal"
+      "route": "/*",
+      "rewrite": "/api/redirect?scope=internal"
     }
   ],
   "auth": {

@@ -1,6 +1,10 @@
 {
   "routes": [
     {
+      "route": "/api/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
       "route": "/new.html",
       "rewrite": "/web/html/new.html"
     },

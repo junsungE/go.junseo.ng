@@ -107,8 +107,25 @@
           body: JSON.stringify(data)
         });
 
-        const result = await res.json();
-        msg.textContent = res.ok ? `Success! URL: ${result.fullUrl}` : `Error: ${result.error}`;
+        let result = null;
+        try {
+          const ct = res.headers.get("content-type") || "";
+          if (ct.includes("application/json")) {
+            result = await res.json();
+          } else {
+            const text = await res.text();
+            try { result = JSON.parse(text); } catch { result = { error: text || `HTTP ${res.status}` }; }
+          }
+        } catch (err) {
+          result = { error: "Invalid server response" };
+        }
+
+        if (res.ok) {
+          const url = result && (result.fullUrl || result.url || result.slug) ? (result.fullUrl || result.url || result.slug) : 'created';
+          msg.textContent = `Success! URL: ${url}`;
+        } else {
+          msg.textContent = `Error: ${result && result.error ? result.error : 'Server error'}`;
+        }
       });
     </script>
   </main>

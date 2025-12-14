@@ -19,11 +19,15 @@ jobs:
         with:
           submodules: true
           lfs: false
-      - name: Install API dependencies
-        if: ${{ exists('api/package.json') }}
+      - name: Install API dependencies (if present)
         run: |
-          cd api
-          npm ci --prefer-offline --no-audit --progress=false
+          if [ -f api/package.json ]; then
+            echo "api/package.json found — installing dependencies"
+            cd api
+            npm ci --prefer-offline --no-audit --progress=false
+          else
+            echo "No api/package.json; skipping API dependency install"
+          fi
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1

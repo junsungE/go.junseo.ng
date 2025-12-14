@@ -1,6 +1,22 @@
 const { getTableClient, isLinkActive, recordVisit, incrementVisit, normalizeSlug } = require("../shared.cjs");
 
 module.exports = async function (context, req) {
+  // Debug mode - return request info
+  if (req.query.debug === "1") {
+    context.res = {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: req.query,
+        url: req.url,
+        originalUrl: req.headers["x-ms-original-url"] || null,
+        headers: Object.keys(req.headers),
+        method: req.method
+      }, null, 2)
+    };
+    return;
+  }
+  
   // Extract slug from query param OR from the original URL path
   let slug = req.query.slug;
   const scope = req.query.scope || "internal";

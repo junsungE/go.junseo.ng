@@ -66,9 +66,8 @@
       "/*.svg",
       "/*.gif",
       "/media/*",
-      "/media/**",
       "/ext/*",
-      "/ext/**",
+      "/ext/premium/*",
       "/.auth/*"
     ]
   },

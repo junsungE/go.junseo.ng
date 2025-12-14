@@ -1,6 +1,6 @@
-import { getTableClient } from "../shared.js";
+const { getTableClient } = require("../shared.js");
 
-export default async function (context, req) {
+module.exports = async function (context, req) {
   try {
     const table = getTableClient("InternalLinks");
     const id = `debug-test-${Date.now()}`;

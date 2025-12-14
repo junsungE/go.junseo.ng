@@ -1,7 +1,7 @@
-import { getTableClient } from "../shared.js";
+const { getTableClient } = require("../shared.js");
 
 // Temporary verbose debug endpoint. Returns caught error details (stack included).
-export default async function (context, req) {
+module.exports = async function (context, req) {
   try {
     const table = getTableClient("InternalLinks");
     const id = `trace-${Date.now()}`;

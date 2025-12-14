@@ -6,8 +6,7 @@
       "direction": "in",
       "name": "req",
       "methods": [ "get" ],
-      "route": "debug/ping",
-      "scriptFile": "index.cjs"
+      "route": "debug/ping"
     },
     {
       "type": "http",

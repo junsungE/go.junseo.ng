@@ -1,6 +1,6 @@
-import { getTableClient, isLinkActive, recordVisit, incrementVisit, normalizeSlug } from "../shared.js";
+const { getTableClient, isLinkActive, recordVisit, incrementVisit, normalizeSlug } = require("../shared.js");
 
-export default async function (context, req) {
+module.exports = async function (context, req) {
   const slug = req.query.slug;
   const scope = req.query.scope || "external";
   const ua = req.headers["user-agent"] || "Unknown";

@@ -1,10 +1,10 @@
 // Shared utility for all Azure Functions
-import { TableClient, AzureNamedKeyCredential } from "@azure/data-tables";
-import { v4 as uuidv4 } from "uuid";
-import UAParser from "ua-parser-js";
+const { TableClient, AzureNamedKeyCredential } = require("@azure/data-tables");
+const { v4: uuidv4 } = require("uuid");
+const UAParser = require("ua-parser-js");
 
 // Utility to get TableClient
-export function getTableClient(tableName) {
+function getTableClient(tableName) {
   const storageConn = process.env.STORAGE_CONN || "";
   if (!storageConn) {
     throw new Error("STORAGE_CONN is not set in environment");
@@ -25,7 +25,7 @@ export function getTableClient(tableName) {
 }
 
 // Parse user agent to identify device/platform
-export function parseUserAgent(uaString) {
+function parseUserAgent(uaString) {
   const parser = new UAParser(uaString);
   const result = parser.getResult();
   return {
@@ -36,7 +36,7 @@ export function parseUserAgent(uaString) {
 }
 
 // Store a visit record
-export async function recordVisit(slug, ip, uaString, country = "Unknown") {
+async function recordVisit(slug, ip, uaString, country = "Unknown") {
   try {
     const visitsTable = getTableClient("Visits");
     const visitId = uuidv4();
@@ -57,7 +57,7 @@ export async function recordVisit(slug, ip, uaString, country = "Unknown") {
 }
 
 // Increment visit counter in target table
-export async function incrementVisit(tableName, slug) {
+async function incrementVisit(tableName, slug) {
   const table = getTableClient(tableName);
   try {
     const entity = await table.getEntity(
@@ -73,7 +73,7 @@ export async function incrementVisit(tableName, slug) {
 }
 
 // Common helper to validate expiry or start date
-export function isLinkActive(entity) {
+function isLinkActive(entity) {
   const now = new Date();
   if (entity.startDate && new Date(entity.startDate) > now) return false;
   if (entity.expiryDate && new Date(entity.expiryDate) < now) return false;
@@ -82,18 +82,28 @@ export function isLinkActive(entity) {
 }
 
 // Case sensitivity helper
-export function normalizeSlug(slug, isCaseSensitive) {
+function normalizeSlug(slug, isCaseSensitive) {
   return isCaseSensitive ? slug : slug.toLowerCase();
 }
 
 // Generic JSON response
-export function jsonResponse(status, data) {
+function jsonResponse(status, data) {
   return {
     status,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
   };
 }
+
+module.exports = {
+  getTableClient,
+  parseUserAgent,
+  recordVisit,
+  incrementVisit,
+  isLinkActive,
+  normalizeSlug,
+  jsonResponse
+};
 
 
 /*

@@ -1,7 +1,7 @@
-import { getTableClient, normalizeSlug, jsonResponse } from "../shared.js";
-import { v4 as uuidv4 } from "uuid";
+const { getTableClient, normalizeSlug, jsonResponse } = require("../shared.js");
+const { v4: uuidv4 } = require("uuid");
 
-export default async function (context, req) {
+module.exports = async function (context, req) {
   const body = req.body || {};
   context.log && context.log.info && context.log.info('createLink request body:', JSON.stringify(req.body));
 

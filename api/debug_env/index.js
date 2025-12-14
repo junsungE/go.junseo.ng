@@ -1,4 +1,4 @@
-export default async function (context, req) {
+module.exports = async function (context, req) {
   try {
     const storage = process.env.STORAGE_CONN || null;
     let accountName = null;
@@ -13,9 +13,8 @@ export default async function (context, req) {
     const pkg = {};
     try {
       // attempt to read package.json safely
-      // eslint-disable-next-line no-undef
-      const p = await import('../package.json', { assert: { type: 'json' } }).catch(() => null);
-      if (p && p.default) Object.assign(pkg, { name: p.default.name, version: p.default.version });
+      const p = require('../package.json');
+      if (p) Object.assign(pkg, { name: p.name, version: p.version });
     } catch {}
 
     context.res = {

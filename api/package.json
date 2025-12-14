@@ -1,7 +1,6 @@
 {
   "name": "go-junseo-ng-api",
   "version": "1.0.0",
-  "type": "module",
   "private": true,
   "dependencies": {
     "@azure/data-tables": "^12.0.0",

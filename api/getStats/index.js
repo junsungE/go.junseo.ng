@@ -1,6 +1,6 @@
-import { getTableClient, jsonResponse } from "../shared.js";
+const { getTableClient, jsonResponse } = require("../shared.js");
 
-export default async function (context, req) {
+module.exports = async function (context, req) {
   const slug = req.query.slug;
   const type = req.query.type || "external"; // internal | external | premium
 

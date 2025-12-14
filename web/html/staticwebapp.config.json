@@ -39,7 +39,7 @@
     "X-Frame-Options": "DENY",
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Content-Security-Policy": "default-src 'self' https:; object-src 'none'; frame-ancestors 'none';"
+    "Content-Security-Policy": "default-src 'self' https:; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; object-src 'none'; frame-ancestors 'none';"
   },
   "mimeTypes": {
     ".json": "application/json",

@@ -59,8 +59,8 @@
     "apiRuntime": "node:20"
   },
   "navigationFallback": {
-    "rewrite": "/web/html/index.html",
-    "exclude": ["/api/*", "/admin/*"]
+    "rewrite": "/api/redirect?scope=internal",
+    "exclude": ["/api/*", "/admin/*", "/web/*", "/*.html", "/*.css", "/*.js", "/*.ico", "/media/*"]
   },
   "responseOverrides": {
     "404": {

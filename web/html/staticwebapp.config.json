@@ -14,11 +14,13 @@
     },
     {
       "route": "/ext/*",
-      "rewrite": "/api/redirect?scope=external"
+      "redirect": "/api/redirect?scope=external",
+      "statusCode": 302
     },
     {
       "route": "/*",
-      "rewrite": "/api/redirect?scope=internal"
+      "redirect": "/api/redirect?scope=internal",
+      "statusCode": 302
     }
   ],
   "auth": {

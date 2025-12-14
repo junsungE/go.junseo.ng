@@ -6,7 +6,7 @@
       "direction": "in",
       "name": "req",
       "methods": [ "get", "post" ],
-      "route": "_debug/env"
+      "route": "debug/env"
     },
     {
       "type": "http",

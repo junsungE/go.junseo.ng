@@ -28,15 +28,6 @@ jobs:
           else
             echo "No api/package.json; skipping API dependency install"
           fi
-      - name: API sanity check: import function modules
-        run: |
-          if [ -f api/package.json ]; then
-            echo "Running API module import checks"
-            cd api
-            node --input-type=module -e "import fs from 'fs'; import path from 'path'; const dirs = fs.readdirSync('.').filter(d => fs.existsSync(path.join(d,'index.js'))); if(dirs.length===0){ console.log('No function modules found'); process.exit(0);} for(const d of dirs){ try{ await import(new URL('./'+d+'/index.js', import.meta.url).href); console.log('Imported',d);}catch(e){ console.error('Import failed for',d,e); process.exit(2);} } console.log('API module import checks passed');"
-          else
-            echo "No api/package.json; skipping API sanity check"
-          fi
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1

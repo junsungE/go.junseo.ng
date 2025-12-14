@@ -39,6 +39,14 @@ function parseUserAgent(uaString) {
 async function recordVisit(slug, ip, uaString, country = "Unknown") {
   try {
     const visitsTable = getTableClient("Visits");
+
+    // Ensure the table exists
+    try {
+      await visitsTable.createTable();
+    } catch (e) {
+      // Table may already exist, ignore
+    }
+
     const visitId = uuidv4();
     const now = new Date().toISOString();
     const deviceInfo = parseUserAgent(uaString);

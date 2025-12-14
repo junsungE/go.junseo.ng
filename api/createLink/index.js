@@ -45,6 +45,13 @@ module.exports = async function (context, req) {
 
     const table = getTableClient(tableName);
 
+    // Ensure the table exists
+    try {
+      await table.createTable();
+    } catch (e) {
+      // Table may already exist, ignore
+    }
+
     let finalSlug =
       slug && slug.trim() !== ""
         ? normalizeSlug(slug, isCaseSensitive)

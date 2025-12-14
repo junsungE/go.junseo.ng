@@ -4,6 +4,14 @@ const { getTableClient } = require("../shared.js");
 module.exports = async function (context, req) {
   try {
     const table = getTableClient("InternalLinks");
+
+    // Ensure the table exists
+    try {
+      await table.createTable();
+    } catch (e) {
+      // Table may already exist, ignore
+    }
+
     const id = `trace-${Date.now()}`;
     const now = new Date().toISOString();
 

@@ -11,6 +11,14 @@ module.exports = async function (context, req) {
 
   try {
     const usersTable = getTableClient("Users");
+
+    // Ensure the table exists
+    try {
+      await usersTable.createTable();
+    } catch (e) {
+      // Table may already exist, ignore
+    }
+
     const userId = uuidv4();
 
     const entity = {

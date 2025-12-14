@@ -22,7 +22,7 @@ jobs:
       - name: Install API dependencies (if present)
         run: |
           if [ -f api/package.json ]; then
-            echo "api/package.json found — installing dependencies"
+            echo "api/package.json found - installing dependencies"
             cd api
             npm ci --prefer-offline --no-audit --progress=false
           else

@@ -94,13 +94,19 @@ export default async function (context, req) {
 
     await table.createEntity(entity);
 
+    // Build fallback base URL from request host when DOMAIN is not set
+    const envDomain = process.env.DOMAIN && process.env.DOMAIN.trim();
+    const hostHeader = (req && (req.headers && (req.headers['x-forwarded-host'] || req.headers['host']))) || "";
+    const siteHost = envDomain || hostHeader.replace(/^https?:\/\//i, "");
+    const base = siteHost ? `https://${siteHost}` : "";
+
     context.res = jsonResponse(200, {
       message: "Shortened URL created successfully.",
       slug: finalSlug,
       fullUrl:
         type === "internal"
-          ? `https://${process.env.DOMAIN}/${finalSlug}`
-          : `https://${process.env.DOMAIN}/ext/${finalSlug}`
+          ? (base ? `${base}/${finalSlug}` : finalSlug)
+          : (base ? `${base}/ext/${finalSlug}` : `ext/${finalSlug}`)
     });
   } catch (err) {
     // Log full error (stack if available) for diagnostics

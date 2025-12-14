@@ -1,4 +1,30 @@
 {
+  "routes": [
+    {
+      "route": "/new.html",
+      "rewrite": "/web/html/new.html"
+    },
+    {
+      "route": "/new",
+      "rewrite": "/web/html/new.html"
+    },
+    {
+      "route": "/dashboard.html",
+      "rewrite": "/web/html/dashboard.html"
+    },
+    {
+      "route": "/dashboard",
+      "rewrite": "/web/html/dashboard.html"
+    },
+    {
+      "route": "/ext/:slug",
+      "rewrite": "/api/redirect?slug={slug}&scope=external"
+    },
+    {
+      "route": "/:slug",
+      "rewrite": "/api/redirect?slug={slug}&scope=internal"
+    }
+  ],
   "auth": {
     "rolesSource": "app",
     "identityProviders": {

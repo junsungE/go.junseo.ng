@@ -23,10 +23,6 @@
     {
       "route": "/ext/*",
       "rewrite": "/api/redirect?scope=external"
-    },
-    {
-      "route": "/*",
-      "rewrite": "/api/redirect?scope=internal"
     }
   ],
   "auth": {
@@ -63,13 +59,9 @@
   },
   "navigationFallback": {
     "rewrite": "/api/redirect?scope=internal",
-    "exclude": ["/api/*", "/admin/*", "/web/*", "/*.html", "/*.css", "/*.js", "/*.ico", "/media/*"]
+    "exclude": ["/api/*", "/web/*", "/*.html", "/*.css", "/*.js", "/*.ico", "/media/*", "/.auth/*"]
   },
   "responseOverrides": {
-    "404": {
-      "rewrite": "/web/html/404.html",
-      "statusCode": 404
-    },
     "401": {
       "rewrite": "/web/html/unauthorized.html",
       "statusCode": 401

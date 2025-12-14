@@ -11,6 +11,14 @@
     {
       "route": "/dashboard",
       "rewrite": "/dashboard.html"
+    },
+    {
+      "route": "/ext/*",
+      "rewrite": "/api/redirect"
+    },
+    {
+      "route": "/*",
+      "rewrite": "/api/redirect"
     }
   ],
   "auth": {

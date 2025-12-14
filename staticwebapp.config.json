@@ -18,7 +18,7 @@
     }
   },
   "globalHeaders": {
-    "Access-Control-Allow-Origin": "https://YOUR_DOMAIN.azurestaticapps.net",
+    "Access-Control-Allow-Origin": "https://gentle-bush-0a1f4bd03.3.azurestaticapps.net",
     "X-Frame-Options": "DENY",
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",
@@ -48,19 +48,3 @@
   }
 }
 
-
-{
-  "navigationFallback": {
-    "rewrite": "/index.html",
-    "exclude": ["/api/*"]
-  },
-  "routes": [
-    { "route": "/api/*", "allowedRoles": ["anonymous"] }
-  ],
-  "responseOverrides": {
-    "404": { "rewrite": "/index.html" }
-  },
-  "mimeTypes": {
-    ".html": "text/html"
-  }
-}

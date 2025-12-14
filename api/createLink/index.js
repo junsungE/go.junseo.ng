@@ -103,7 +103,15 @@ export default async function (context, req) {
           : `https://${process.env.DOMAIN}/ext/${finalSlug}`
     });
   } catch (err) {
-    context.log.error("Error creating link:", err.message);
-    context.res = jsonResponse(500, { error: "Server error." });
+    // Log full error (stack if available) for diagnostics
+    if (context && context.log && typeof context.log.error === "function") {
+      context.log.error("Error creating link:", err && (err.stack || err.message || err));
+    } else {
+      console.error("Error creating link:", err && (err.stack || err.message || err));
+    }
+
+    // Return minimal error details to the client to aid debugging (remove in production)
+    const detail = err && err.message ? err.message : "Unknown server error";
+    context.res = jsonResponse(500, { error: "Server error.", details: detail });
   }
 }

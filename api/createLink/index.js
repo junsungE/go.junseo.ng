@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 
 export default async function (context, req) {
   const body = req.body || {};
+  context.log && context.log.info && context.log.info('createLink request body:', JSON.stringify(req.body));
 
   const {
     type = "external", // internal | external | premium
@@ -79,6 +80,17 @@ export default async function (context, req) {
       title,
       isCaseSensitive
     };
+
+    // Table storage doesn't accept complex objects; serialize maps to JSON strings
+    if (entity.platformRedirects && typeof entity.platformRedirects === 'object') {
+      entity.platformRedirects = JSON.stringify(entity.platformRedirects);
+    }
+    if (entity.geoMap && typeof entity.geoMap === 'object') {
+      entity.geoMap = JSON.stringify(entity.geoMap);
+    }
+    if (entity.langMap && typeof entity.langMap === 'object') {
+      entity.langMap = JSON.stringify(entity.langMap);
+    }
 
     await table.createEntity(entity);
 

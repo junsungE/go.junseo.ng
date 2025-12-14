@@ -3,11 +3,16 @@ import { TableClient, AzureNamedKeyCredential } from "@azure/data-tables";
 import { v4 as uuidv4 } from "uuid";
 import UAParser from "ua-parser-js";
 
-const STORAGE_CONN = process.env.STORAGE_CONN;
-
 // Utility to get TableClient
 export function getTableClient(tableName) {
-  const match = STORAGE_CONN.match(/AccountName=([^;]+);AccountKey=([^;]+)/);
+  const storageConn = process.env.STORAGE_CONN || "";
+  if (!storageConn) {
+    throw new Error("STORAGE_CONN is not set in environment");
+  }
+  const match = storageConn.match(/AccountName=([^;]+);AccountKey=([^;]+)/);
+  if (!match) {
+    throw new Error("Invalid STORAGE_CONN format");
+  }
   const account = match[1];
   const key = match[2];
   const credential = new AzureNamedKeyCredential(account, key);

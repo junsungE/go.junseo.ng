@@ -1,6 +1,19 @@
 const { getTableClient, isLinkActive, recordVisit, incrementVisit, normalizeSlug } = require("../shared.cjs");
 
 module.exports = async function (context, req) {
+  // Get original URL - Azure SWA passes this when using navigationFallback
+  const originalUrl = req.headers["x-ms-original-url"] || req.url || "";
+  
+  // Extract the path from URL
+  let urlPath = "";
+  try {
+    const url = new URL(originalUrl);
+    urlPath = url.pathname;
+  } catch {
+    // Fallback: just remove protocol+host if URL parsing fails
+    urlPath = originalUrl.replace(/^https?:\/\/[^\/]+/, "");
+  }
+  
   // Debug mode - return request info
   if (req.query.debug === "1") {
     context.res = {
@@ -9,7 +22,8 @@ module.exports = async function (context, req) {
       body: JSON.stringify({
         query: req.query,
         url: req.url,
-        originalUrl: req.headers["x-ms-original-url"] || null,
+        originalUrl: originalUrl,
+        urlPath: urlPath,
         headers: Object.keys(req.headers),
         method: req.method
       }, null, 2)
@@ -17,21 +31,25 @@ module.exports = async function (context, req) {
     return;
   }
   
-  // Extract slug from query param OR from the original URL path
-  let slug = req.query.slug;
-  const scope = req.query.scope || "internal";
+  // Determine scope and extract slug from path
+  let scope = "internal";
+  let slug = "";
   
-  // If no slug in query, try to extract from the original request URL
-  if (!slug) {
-    // Azure SWA passes the original URL in x-ms-original-url header
-    const originalUrl = req.headers["x-ms-original-url"] || req.url || "";
-    const urlPath = originalUrl.replace(/^https?:\/\/[^\/]+/, ""); // Remove protocol+host
-    
-    if (scope === "external" && urlPath.startsWith("/ext/")) {
-      slug = urlPath.replace("/ext/", "").split("?")[0];
-    } else {
-      slug = urlPath.replace(/^\//, "").split("?")[0];
-    }
+  // Check if it's an external link (starts with /ext/)
+  if (urlPath.startsWith("/ext/")) {
+    scope = "external";
+    slug = urlPath.replace("/ext/", "").split("?")[0];
+  } else {
+    // Internal link - just remove leading slash
+    slug = urlPath.replace(/^\//, "").split("?")[0];
+  }
+  
+  // Also allow query param override
+  if (req.query.slug) {
+    slug = req.query.slug;
+  }
+  if (req.query.scope) {
+    scope = req.query.scope;
   }
   
   const ua = req.headers["user-agent"] || "Unknown";

@@ -11,14 +11,6 @@
     {
       "route": "/dashboard",
       "rewrite": "/dashboard.html"
-    },
-    {
-      "route": "/ext/*",
-      "rewrite": "/api/redirect?scope=external"
-    },
-    {
-      "route": "/*",
-      "rewrite": "/api/redirect?scope=internal"
     }
   ],
   "auth": {

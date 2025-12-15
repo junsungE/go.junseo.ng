@@ -79,7 +79,12 @@ module.exports = async function (context, req) {
       try {
         entity = await table.getEntity(scope, lowerSlug);
       } catch {
-        context.res = { status: 404, body: "Shortened URL not found." };
+        //context.res = { status: 404, body: "Shortened URL not found." };
+        // Redirect to a friendly error page instead of returning plain text
+        context.res = {
+          status: 302,
+          headers: { Location: "/error" }
+        };
         return;
       }
     }

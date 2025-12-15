@@ -49,9 +49,12 @@ module.exports = async function (context, req) {
         ? normalizeSlug(slug, isCaseSensitive)
         : uuidv4().substring(0, 6);
 
+    // URL-encode slug for Azure Table Storage (RowKey doesn't allow / \ # ?)
+    const encodedSlug = encodeURIComponent(finalSlug);
+
     // Check if slug already exists
     try {
-      await table.getEntity(partitionKey, finalSlug);
+      await table.getEntity(partitionKey, encodedSlug);
       context.res = jsonResponse(409, {
         error: "Slug already exists. Choose another."
       });
@@ -62,7 +65,8 @@ module.exports = async function (context, req) {
 
     const entity = {
       partitionKey,
-      rowKey: finalSlug,
+      rowKey: encodedSlug,
+      originalSlug: finalSlug,
       targetUrl,
       defaultUrl: targetUrl,
       mode,

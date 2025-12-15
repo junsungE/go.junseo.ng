@@ -60,6 +60,9 @@ module.exports = async function (context, req) {
     return;
   }
 
+  // URL-encode slug for Azure Table lookup (stored encoded)
+  const encodedSlug = encodeURIComponent(slug);
+
   try {
     const tableName =
       scope === "internal"
@@ -70,14 +73,15 @@ module.exports = async function (context, req) {
 
     const table = getTableClient(tableName);
 
-    // Try both case-sensitive and insensitive versions
+    // Try both case-sensitive and insensitive versions (using encoded slug)
     let entity;
     try {
-      entity = await table.getEntity(scope, slug);
+      entity = await table.getEntity(scope, encodedSlug);
     } catch {
       const lowerSlug = slug.toLowerCase();
+      const encodedLowerSlug = encodeURIComponent(lowerSlug);
       try {
-        entity = await table.getEntity(scope, lowerSlug);
+        entity = await table.getEntity(scope, encodedLowerSlug);
       } catch {
         //context.res = { status: 404, body: "Shortened URL not found." };
         // Redirect to a friendly error page instead of returning plain text

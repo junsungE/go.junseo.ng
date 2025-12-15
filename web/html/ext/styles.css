@@ -59,7 +59,7 @@ h1 {
   font-size: 20px;
 }
 
-.id-row, .url-row {
+.url-row, .optional-row, .result-row {
   display: flex;
   gap: 8px;
   align-items: center;
@@ -79,6 +79,8 @@ h1 {
 
 input[type="text"],
 input[type="url"],
+input[type="date"],
+input[type="number"],
 textarea {
   flex: 1;
   padding: 10px;
@@ -97,7 +99,7 @@ textarea#output {
   width: 100%;
 }
 
-.url-label {
+.url-label, .expiryDateLabel, .visitLimitLabel {
   font-size: 13px;
   color: var(--muted);
   margin-bottom: 6px;
@@ -124,9 +126,9 @@ button[disabled] {
   cursor: not-allowed;
 }
 
-/* Clear buttons (ID and URL) share the same styles */
-#clearId,
-#clearUrl {
+/* Buttons (Generate and Copy) share the same styles */
+#shortenUrl,
+#copyUrl {
   background: #e5e7eb;
   color: #111;
   padding: 10px;
@@ -190,7 +192,9 @@ textarea {
 h1,
 .prefix,
 .notes,
-.url-label {
+.url-label,
+.expiryDateLabel,
+.visitLimitLabel {
   word-break: break-word;
   overflow-wrap: anywhere;
   hyphens: auto;
@@ -204,20 +208,24 @@ h1,
   }
 
   /* Stack rows vertically on narrow screens */
-  .id-row,
-  .url-row {
+  .url-row,
+  .optional-row,
+  .result-row {
     flex-direction: column;
     align-items: stretch;
   }
 
  .prefix,
- .url-label {
+ .url-label,
+ .expiryDateLabel,
+ .visitLimitLabel {
     width: 100%;
     margin-bottom: 6px;
   }
 
-  .id-row input,
   .url-row input,
+  .optional-row input,
+  .result-row input,
   textarea {
     width: 100%;
   }
@@ -228,8 +236,8 @@ h1,
   }
 
   /* Slightly smaller clear buttons on narrow screens */
-  #clearId,
-  #clearUrl {
+  #shortenUrl,
+  #copyUrl {
     padding: 6px 8px;
   }
 
@@ -259,8 +267,8 @@ h1,
 
 /* ensure prefix and clear button don't force overflow in horizontal layouts */
 .prefix,
-#clearId,
-#clearUrl {
+#shortenUrl,
+#copyUrl {
   flex: 0 0 auto;
 }
 

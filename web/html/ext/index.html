@@ -17,17 +17,28 @@
       <label class="url-row">
         <p class="url-label">URL to shorten</p>
         <input id="urlInput" type="url" placeholder="https://learn.microsoft.com/en-us/answers/" />
-        <button id="clearUrl" title="Clear URL">Generate</button>
+        <button id="shortenUrl" title="Shorten URL">Shorten</button>
       </label>
 
-      <label class="id-row">
-        <span class="prefix">go.junseo.ng/ext/</span>
-        <input id="idInput" type="text" inputmode="text" autocomplete="off" placeholder="Generated URL will be shown here" />
-        <button id="clearId" title="Copy shortened URL">Copy</button>
+      <label class="optional-row">
+        <p class="expiryDateLabel">Expiry Date (optional)</p>
+        <input id="expiryDateInput" type="date" name="expiryDate"  class="w-full border p-1">
+        <p class="visitLimitLabel">Visit Limit (optional)</p>
+        <input id="visitLimitInput" type="number" name="visitLimit"  class="w-full border p-1">
       </label>
+
+      <br>
+
+      <label class="result-row">
+        <span class="prefix">go.junseo.ng/ext/</span>
+        <input id="slugOutput" type="text" inputmode="text" autocomplete="off" placeholder="Generated URL will be shown here" readonly />
+        <button id="copyUrl" title="Copy shortened URL">Copy</button>
+      </label>
+
+      <br>
 
       <nav class="action" aria-label="Action">
-        <button id="generate" disabled>Generate another</button>
+        <button id="shortenAnother" disabled>Shorten another</button>
       </nav>
 
       <br>

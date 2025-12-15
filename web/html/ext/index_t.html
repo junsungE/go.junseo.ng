@@ -34,11 +34,6 @@
         <input type="number" name="visitLimit" class="w-full border p-1">
       </label>
 
-      <label>
-        Case Sensitive:
-        <input type="checkbox" name="isCaseSensitive" class="ml-2">
-      </label>
-
       <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded">Create</button>
     </form>
 
@@ -52,16 +47,42 @@
         e.preventDefault();
         const data = Object.fromEntries(new FormData(form).entries());
         data.type = "external";
-        data.isCaseSensitive = form.isCaseSensitive.checked;
 
-        const res = await fetch("/api/createLink", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
+        msg.textContent = 'Creating...';
 
-        const result = await res.json();
-        msg.textContent = res.ok ? `Success! URL: ${result.fullUrl}` : `Error: ${result.error}`;
+        try {
+          const res = await fetch("/api/createLink", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+          });
+
+          let result = null;
+          try {
+            const ct = res.headers.get('content-type') || '';
+            if (ct.includes('application/json')) {
+              result = await res.json();
+            } else {
+              const text = await res.text();
+              try { result = JSON.parse(text); } catch { result = { error: text || `HTTP ${res.status}` }; }
+            }
+          } catch (err) {
+            result = { error: 'Invalid server response' };
+          }
+
+          if (res.ok) {
+            const url = result && (result.fullUrl || result.url || result.slug) ? (result.fullUrl || result.url || result.slug) : 'created';
+            msg.textContent = `Success! URL: ${url}`;
+          } else {
+            msg.textContent = `Error: ${result && result.error ? result.error : 'Server error'}`;
+          }
+        } catch (err) {
+          msg.textContent = `Network error: ${err && err.message ? err.message : String(err)}`;
+        } finally {
+          if (submitBtn) submitBtn.disabled = false;
+        }
       });
     </script>
   </main>

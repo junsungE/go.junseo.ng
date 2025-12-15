@@ -28,15 +28,7 @@
     </main>
   <footer class="classification">INTERNAL</footer>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        const btn = document.getElementById('internalSignInBtn');
-        if (!btn) return;
-        const go = () => { window.location.assign('/new'); };
-        btn.addEventListener('click', go);
-        btn.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
-      });
-    </script>
+    <script src="script.js"></script>
   
   </body>
 </html>

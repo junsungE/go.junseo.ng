@@ -1,10 +1,10 @@
-const { getTableClient, normalizeSlug, jsonResponse, uuidv4 } = require("../shared.cjs");
+const { getTableClient, normalizeSlug, jsonResponse, uuidv4, generateRandomSlug } = require("../shared.cjs");
 
 module.exports = async function (context, req) {
   const body = req.body || {};
   context.log && context.log.info && context.log.info('createLink request body:', JSON.stringify(req.body));
 
-  const {
+  let {
     type = "external", // internal | external | premium
     slug,
     targetUrl,
@@ -41,13 +41,20 @@ module.exports = async function (context, req) {
         partitionKey = type === "premium" ? "premium" : "free";
         break;
     }
+    
+    // Force case-sensitive for external free URLs
+    if (type === "external" && partitionKey === "free") {
+      isCaseSensitive = true;
+    }
 
     const table = getTableClient(tableName);
 
     let finalSlug =
       slug && slug.trim() !== ""
         ? normalizeSlug(slug, isCaseSensitive)
-        : uuidv4().substring(0, 6);
+        : (type === "external" && partitionKey === "free" 
+            ? generateRandomSlug(5, 7) 
+            : uuidv4().substring(0, 6));
 
     // URL-encode slug for Azure Table Storage (RowKey doesn't allow / \ # ?)
     const encodedSlug = encodeURIComponent(finalSlug);

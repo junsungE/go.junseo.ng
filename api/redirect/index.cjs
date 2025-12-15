@@ -73,23 +73,50 @@ module.exports = async function (context, req) {
 
     const table = getTableClient(tableName);
 
+    // Determine correct partition key for external links
+    let partitionKey = scope === "internal" ? "internal" : "free";
+
     // Try both case-sensitive and insensitive versions (using encoded slug)
     let entity;
     try {
-      entity = await table.getEntity(scope, encodedSlug);
+      entity = await table.getEntity(partitionKey, encodedSlug);
     } catch {
-      const lowerSlug = slug.toLowerCase();
-      const encodedLowerSlug = encodeURIComponent(lowerSlug);
-      try {
-        entity = await table.getEntity(scope, encodedLowerSlug);
-      } catch {
-        //context.res = { status: 404, body: "Shortened URL not found." };
-        // Redirect to a friendly error page instead of returning plain text
-        context.res = {
-          status: 302,
-          headers: { Location: "/error" }
-        };
-        return;
+      // If free tier didn't work, try premium for external links
+      if (scope === "external") {
+        try {
+          entity = await table.getEntity("premium", encodedSlug);
+          partitionKey = "premium";
+        } catch {
+          // Still not found, try lowercase versions
+        }
+      }
+      
+      if (!entity) {
+        const lowerSlug = slug.toLowerCase();
+        const encodedLowerSlug = encodeURIComponent(lowerSlug);
+        try {
+          entity = await table.getEntity(partitionKey, encodedLowerSlug);
+        } catch {
+          // Try premium with lowercase if free didn't work
+          if (scope === "external" && partitionKey === "free") {
+            try {
+              entity = await table.getEntity("premium", encodedLowerSlug);
+            } catch {
+              // Not found anywhere
+              context.res = {
+                status: 302,
+                headers: { Location: "/error" }
+              };
+              return;
+            }
+          } else {
+            context.res = {
+              status: 302,
+              headers: { Location: "/error" }
+            };
+            return;
+          }
+        }
       }
     }
 

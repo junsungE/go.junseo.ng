@@ -46,13 +46,18 @@ module.exports = async function (context, req) {
     if (type === "external" && partitionKey === "free") {
       isCaseSensitive = true;
     }
+    
+    // Force case-sensitive for external premium URLs
+    if (type === "premium" && partitionKey === "premium") {
+      isCaseSensitive = true;
+    }
 
     const table = getTableClient(tableName);
 
     let finalSlug =
       slug && slug.trim() !== ""
         ? normalizeSlug(slug, isCaseSensitive)
-        : (type === "external" && partitionKey === "free" 
+        : ((type === "external" && partitionKey === "free") || (type === "premium" && partitionKey === "premium")
             ? generateRandomSlug(5, 7) 
             : uuidv4().substring(0, 6));
 

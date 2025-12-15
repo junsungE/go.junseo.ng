@@ -6,6 +6,11 @@
     },
     {
       "route": "/",
+      "redirect": "/login",
+      "statusCode": 302
+    },
+    {
+      "route": "/login",
       "rewrite": "/index.html"
     },
     {

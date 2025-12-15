@@ -80,23 +80,12 @@ h1 {
 input[type="text"],
 input[type="url"],
 input[type="date"],
-input[type="number"],
-textarea {
+input[type="number"] {
   flex: 1;
   padding: 10px;
   border-radius: 6px;
   border: 1px solid #d1d5db;
   min-width: 0;
-}
-
-textarea#output {
-  font-family: inherit;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-  width: 100%;
 }
 
 .url-label, .expiryDateLabel, .visitLimitLabel {
@@ -126,8 +115,6 @@ button[disabled] {
   cursor: not-allowed;
 }
 
-/* Buttons (Generate and Copy) share the same styles */
-#copyUrl,
 #copy {
   background: #e5e7eb;
   color: #111;
@@ -138,28 +125,10 @@ button[disabled] {
   justify-content: center;
 }
 
-.result {
-  margin-top: 6px;
-}
-
 .result-label {
   font-size: 13px;
   color: var(--muted);
   margin-bottom: 6px;
-}
-
-.site-entry .site-anchor {
-  font-weight: 600;
-  color: var(--accent);
-  text-decoration: underline;
-  display: block;
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
-textarea {
-  width: 100%;
-  resize: vertical;
 }
 
 .copy-row {
@@ -194,7 +163,8 @@ h1,
 .notes,
 .url-label,
 .expiryDateLabel,
-.visitLimitLabel {
+.visitLimitLabel,
+#copied {
   word-break: break-word;
   overflow-wrap: anywhere;
   hyphens: auto;
@@ -225,8 +195,7 @@ h1,
 
   .url-row input,
   .optional-row input,
-  .result-row input,
-  textarea {
+  .result-row input {
     width: 100%;
   }
 
@@ -236,8 +205,7 @@ h1,
   }
 
   /* Slightly smaller clear buttons on narrow screens */
-  #shortenUrl,
-  #copyUrl {
+  #shortenUrl {
     padding: 6px 8px;
   }
 
@@ -267,8 +235,7 @@ h1,
 
 /* ensure prefix and clear button don't force overflow in horizontal layouts */
 .prefix,
-#shortenUrl,
-#copyUrl {
+#shortenUrl {
   flex: 0 0 auto;
 }
 

@@ -3,11 +3,8 @@ const expiryDateInput = document.getElementById("expiryDateInput");
 const visitLimitInput = document.getElementById("visitLimitInput");
 const shortenUrlBtn = document.getElementById("shortenUrl");
 const slugOutput = document.getElementById("slugOutput");
-const copyUrlBtn = document.getElementById("copyUrl");
 const shortenAnotherBtn = document.getElementById("shortenAnother");
 const resultSection = document.querySelector(".result");
-const siteAnchor = document.getElementById("siteAnchor");
-const outputTextarea = document.getElementById("output");
 const copyBtn = document.getElementById("copy");
 const copiedSpan = document.getElementById("copied");
 
@@ -61,13 +58,9 @@ shortenUrlBtn.addEventListener("click", async () => {
       currentFullUrl = result.fullUrl || `https://go.junseo.ng/ext/${slug}`;
       
       slugOutput.value = slug;
-      siteAnchor.href = currentFullUrl;
-      siteAnchor.textContent = currentFullUrl;
-      outputTextarea.value = currentFullUrl;
       
       resultSection.hidden = false;
       shortenAnotherBtn.hidden = false;
-      copyUrlBtn.disabled = false;
       
       // Disable inputs after successful creation
       urlInput.disabled = true;
@@ -83,21 +76,6 @@ shortenUrlBtn.addEventListener("click", async () => {
     slugOutput.value = "";
     alert(`Network error: ${err && err.message ? err.message : String(err)}`);
     shortenUrlBtn.disabled = false;
-  }
-});
-
-// Copy URL button (top)
-copyUrlBtn.addEventListener("click", () => {
-  if (currentFullUrl) {
-    navigator.clipboard.writeText(currentFullUrl).then(() => {
-      const originalText = copyUrlBtn.textContent;
-      copyUrlBtn.textContent = `${currentFullUrl} copied!`;
-      setTimeout(() => {
-        copyUrlBtn.textContent = originalText;
-      }, 2000);
-    }).catch(err => {
-      alert("Failed to copy URL");
-    });
   }
 });
 
@@ -137,13 +115,11 @@ shortenAnotherBtn.addEventListener("click", () => {
   expiryDateInput.disabled = false;
   visitLimitInput.disabled = false;
   shortenUrlBtn.disabled = false;
-  copyUrlBtn.disabled = true;
   shortenAnotherBtn.hidden = true;
   
   // Focus on URL input
   urlInput.focus();
 });
 
-// Initially disable/hide buttons that need a URL first
-copyUrlBtn.disabled = true;
+// Initially hide buttons that need a URL first
 shortenAnotherBtn.hidden = true;

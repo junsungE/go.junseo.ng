@@ -30,18 +30,15 @@
       <br>
 
       <label class="result-row">
+        <p class="result-label">Shortened URL</p>
         <span class="prefix">go.junseo.ng/ext/</span>
         <input id="slugOutput" type="text" inputmode="text" autocomplete="off" placeholder="Generated URL will be shown here" readonly />
-        <button id="copyUrl" title="Copy shortened URL">Copy</button>
       </label>
 
       <section class="result" aria-live="polite" hidden>
-        <p class="result-label">Shortened URL</p>
-        <p class="site-entry"><a id="siteAnchor" class="site-anchor" href="#" target="_blank" rel="noopener noreferrer"></a></p>
-        <textarea id="output" readonly rows="3"></textarea>
         <footer class="copy-row">
           <span id="copied" class="copied">Copied!</span>
-          <button id="copy">Copy</button>
+          <button id="copy" title="Copy shortened URL">Copy</button>
         </footer>
       </section>
 

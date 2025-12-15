@@ -127,8 +127,8 @@ button[disabled] {
 }
 
 /* Buttons (Generate and Copy) share the same styles */
-#shortenUrl,
-#copyUrl {
+#copyUrl,
+#copy {
   background: #e5e7eb;
   color: #111;
   padding: 10px;

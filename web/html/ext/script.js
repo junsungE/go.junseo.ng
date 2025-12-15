@@ -1,195 +1,149 @@
-// Check if using index_t.html (form-based) or index.html (button-based)
-const form = document.getElementById("createForm");
-const msg = document.getElementById("message");
+const urlInput = document.getElementById("urlInput");
+const expiryDateInput = document.getElementById("expiryDateInput");
+const visitLimitInput = document.getElementById("visitLimitInput");
+const shortenUrlBtn = document.getElementById("shortenUrl");
+const slugOutput = document.getElementById("slugOutput");
+const copyUrlBtn = document.getElementById("copyUrl");
+const shortenAnotherBtn = document.getElementById("shortenAnother");
+const resultSection = document.querySelector(".result");
+const siteAnchor = document.getElementById("siteAnchor");
+const outputTextarea = document.getElementById("output");
+const copyBtn = document.getElementById("copy");
+const copiedSpan = document.getElementById("copied");
 
-if (form && msg) {
-  // index_t.html functionality
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const data = Object.fromEntries(new FormData(form).entries());
-    data.type = "external";
+let currentFullUrl = "";
 
-    const submitBtn = form.querySelector('button[type="submit"]');
-    if (submitBtn) submitBtn.disabled = true;
-    msg.textContent = 'Creating...';
+// Shorten URL button
+shortenUrlBtn.addEventListener("click", async () => {
+  const targetUrl = urlInput.value.trim();
+  if (!targetUrl) {
+    alert("Please enter a URL to shorten");
+    return;
+  }
 
+  shortenUrlBtn.disabled = true;
+  slugOutput.value = "Creating...";
+
+  const data = {
+    type: "external",
+    targetUrl: targetUrl
+  };
+
+  if (expiryDateInput.value) {
+    data.expiryDate = expiryDateInput.value;
+  }
+  if (visitLimitInput.value) {
+    data.visitLimit = visitLimitInput.value;
+  }
+
+  try {
+    const res = await fetch("/api/createLink", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    let result = null;
     try {
-      const res = await fetch("/api/createLink", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-
-      let result = null;
-      try {
-        const ct = res.headers.get('content-type') || '';
-        if (ct.includes('application/json')) {
-          result = await res.json();
-        } else {
-          const text = await res.text();
-          try { result = JSON.parse(text); } catch { result = { error: text || `HTTP ${res.status}` }; }
-        }
-      } catch (err) {
-        result = { error: 'Invalid server response' };
-      }
-
-      if (res.ok) {
-        const url = result && (result.fullUrl || result.url || result.slug) ? (result.fullUrl || result.url || result.slug) : 'created';
-        msg.textContent = `Success! URL: ${url}`;
+      const ct = res.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        result = await res.json();
       } else {
-        msg.textContent = `Error: ${result && result.error ? result.error : 'Server error'}`;
+        const text = await res.text();
+        try { result = JSON.parse(text); } catch { result = { error: text || `HTTP ${res.status}` }; }
       }
     } catch (err) {
-      msg.textContent = `Network error: ${err && err.message ? err.message : String(err)}`;
-    } finally {
-      if (submitBtn) submitBtn.disabled = false;
-    }
-  });
-} else {
-  // index.html functionality
-  const urlInput = document.getElementById("urlInput");
-  const expiryDateInput = document.getElementById("expiryDateInput");
-  const visitLimitInput = document.getElementById("visitLimitInput");
-  const shortenUrlBtn = document.getElementById("shortenUrl");
-  const slugOutput = document.getElementById("slugOutput");
-  const copyUrlBtn = document.getElementById("copyUrl");
-  const shortenAnotherBtn = document.getElementById("shortenAnother");
-  const resultSection = document.querySelector(".result");
-  const siteAnchor = document.getElementById("siteAnchor");
-  const outputTextarea = document.getElementById("output");
-  const copyBtn = document.getElementById("copy");
-  const copiedSpan = document.getElementById("copied");
-
-  let currentFullUrl = "";
-
-  // Shorten URL button
-  shortenUrlBtn.addEventListener("click", async () => {
-    const targetUrl = urlInput.value.trim();
-    if (!targetUrl) {
-      alert("Please enter a URL to shorten");
-      return;
+      result = { error: 'Invalid server response' };
     }
 
-    shortenUrlBtn.disabled = true;
-    slugOutput.value = "Creating...";
-
-    const data = {
-      type: "external",
-      targetUrl: targetUrl
-    };
-
-    if (expiryDateInput.value) {
-      data.expiryDate = expiryDateInput.value;
-    }
-    if (visitLimitInput.value) {
-      data.visitLimit = visitLimitInput.value;
-    }
-
-    try {
-      const res = await fetch("/api/createLink", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-
-      let result = null;
-      try {
-        const ct = res.headers.get('content-type') || '';
-        if (ct.includes('application/json')) {
-          result = await res.json();
-        } else {
-          const text = await res.text();
-          try { result = JSON.parse(text); } catch { result = { error: text || `HTTP ${res.status}` }; }
-        }
-      } catch (err) {
-        result = { error: 'Invalid server response' };
-      }
-
-      if (res.ok) {
-        const slug = result.slug || "";
-        currentFullUrl = result.fullUrl || `https://go.junseo.ng/ext/${slug}`;
-        
-        slugOutput.value = slug;
-        siteAnchor.href = currentFullUrl;
-        siteAnchor.textContent = currentFullUrl;
-        outputTextarea.value = currentFullUrl;
-        
-        resultSection.hidden = false;
-        shortenAnotherBtn.disabled = false;
-        copyUrlBtn.disabled = false;
-        
-        // Disable inputs after successful creation
-        urlInput.disabled = true;
-        expiryDateInput.disabled = true;
-        visitLimitInput.disabled = true;
-        shortenUrlBtn.disabled = true;
-      } else {
-        slugOutput.value = "";
-        alert(`Error: ${result && result.error ? result.error : 'Server error'}`);
-        shortenUrlBtn.disabled = false;
-      }
-    } catch (err) {
+    if (res.ok) {
+      const slug = result.slug || "";
+      currentFullUrl = result.fullUrl || `https://go.junseo.ng/ext/${slug}`;
+      
+      slugOutput.value = slug;
+      siteAnchor.href = currentFullUrl;
+      siteAnchor.textContent = currentFullUrl;
+      outputTextarea.value = currentFullUrl;
+      
+      resultSection.hidden = false;
+      shortenAnotherBtn.hidden = false;
+      copyUrlBtn.disabled = false;
+      
+      // Disable inputs after successful creation
+      urlInput.disabled = true;
+      expiryDateInput.disabled = true;
+      visitLimitInput.disabled = true;
+      shortenUrlBtn.disabled = true;
+    } else {
       slugOutput.value = "";
-      alert(`Network error: ${err && err.message ? err.message : String(err)}`);
+      alert(`Error: ${result && result.error ? result.error : 'Server error'}`);
       shortenUrlBtn.disabled = false;
     }
-  });
+  } catch (err) {
+    slugOutput.value = "";
+    alert(`Network error: ${err && err.message ? err.message : String(err)}`);
+    shortenUrlBtn.disabled = false;
+  }
+});
 
-  // Copy URL button (top)
-  copyUrlBtn.addEventListener("click", () => {
+// Copy URL button (top)
+copyUrlBtn.addEventListener("click", () => {
+  if (currentFullUrl) {
+    navigator.clipboard.writeText(currentFullUrl).then(() => {
+      const originalText = copyUrlBtn.textContent;
+      copyUrlBtn.textContent = `${currentFullUrl} copied!`;
+      setTimeout(() => {
+        copyUrlBtn.textContent = originalText;
+      }, 2000);
+    }).catch(err => {
+      alert("Failed to copy URL");
+    });
+  }
+});
+
+// Copy button (bottom in result section)
+if (copyBtn) {
+  copyBtn.addEventListener("click", () => {
     if (currentFullUrl) {
       navigator.clipboard.writeText(currentFullUrl).then(() => {
-        const originalText = copyUrlBtn.textContent;
-        copyUrlBtn.textContent = `${currentFullUrl} copied!`;
+        const originalText = copiedSpan.textContent;
+        copiedSpan.textContent = `${currentFullUrl} copied!`;
+        copiedSpan.style.opacity = "1";
         setTimeout(() => {
-          copyUrlBtn.textContent = originalText;
+          copiedSpan.textContent = originalText;
+          copiedSpan.style.opacity = "0";
         }, 2000);
       }).catch(err => {
         alert("Failed to copy URL");
       });
     }
   });
-
-  // Copy button (bottom in result section)
-  if (copyBtn) {
-    copyBtn.addEventListener("click", () => {
-      if (currentFullUrl) {
-        navigator.clipboard.writeText(currentFullUrl).then(() => {
-          copiedSpan.style.opacity = "1";
-          setTimeout(() => {
-            copiedSpan.style.opacity = "0";
-          }, 2000);
-        }).catch(err => {
-          alert("Failed to copy URL");
-        });
-      }
-    });
-  }
-
-  // Shorten another button
-  shortenAnotherBtn.addEventListener("click", () => {
-    // Reset all inputs
-    urlInput.value = "";
-    expiryDateInput.value = "";
-    visitLimitInput.value = "";
-    slugOutput.value = "";
-    currentFullUrl = "";
-    
-    // Hide result section
-    resultSection.hidden = true;
-    
-    // Re-enable inputs
-    urlInput.disabled = false;
-    expiryDateInput.disabled = false;
-    visitLimitInput.disabled = false;
-    shortenUrlBtn.disabled = false;
-    copyUrlBtn.disabled = true;
-    shortenAnotherBtn.disabled = true;
-    
-    // Focus on URL input
-    urlInput.focus();
-  });
-
-  // Initially disable buttons that need a URL first
-  copyUrlBtn.disabled = true;
 }
+
+// Shorten another button
+shortenAnotherBtn.addEventListener("click", () => {
+  // Reset all inputs
+  urlInput.value = "";
+  expiryDateInput.value = "";
+  visitLimitInput.value = "";
+  slugOutput.value = "";
+  currentFullUrl = "";
+  
+  // Hide result section
+  resultSection.hidden = true;
+  
+  // Re-enable inputs
+  urlInput.disabled = false;
+  expiryDateInput.disabled = false;
+  visitLimitInput.disabled = false;
+  shortenUrlBtn.disabled = false;
+  copyUrlBtn.disabled = true;
+  shortenAnotherBtn.hidden = true;
+  
+  // Focus on URL input
+  urlInput.focus();
+});
+
+// Initially disable/hide buttons that need a URL first
+copyUrlBtn.disabled = true;
+shortenAnotherBtn.hidden = true;

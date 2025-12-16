@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const btn = document.getElementById('internalSignInBtn');
   if (!btn) return;
 
-  const go = () => { window.location.assign('/new'); };
+  const go = () => { window.location.assign('/internal/new'); };
 
   // Primary handling for mouse/tap
   btn.addEventListener('click', go);

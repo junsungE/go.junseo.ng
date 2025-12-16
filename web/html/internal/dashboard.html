@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Dashboard</title>
+    <meta name="description" content="Go Dashboard">
+    <link rel="icon" href="/media/go_favicon.ico?v=2" sizes="48x48" type="image/x-icon">
+    <link rel="shortcut icon" href="/media/go_favicon.ico?v=2" type="image/x-icon">
+    <link rel="stylesheet" href="/internal/dashboard.css">
+  </head>
+  <body>
+    <header class="classification">INTERNAL</header>
+
+      <nav id="logout-nav"></nav>
+
+      <h1>Dashboard / Analytics</h1>
+
+      <nav>
+          <a href="/">Home</a>
+          <a href="/internal/new">Internal URL Shortener</a>
+      </nav>
+
+      <main>
+        <h2>Fetch Stats</h2>
+        <form id="fetchForm">
+          <label>
+            Slug:
+            <input type="text" name="slug" required>
+          </label>
+
+          <label>
+            Type:
+            <select name="type">
+              <option value="internal">Internal</option>
+              <option value="premium">Premium</option>
+            </select>
+          </label>
+
+          <button type="submit">Fetch</button>
+        </form>
+
+        <p id="error"></p>
+
+        <section id="statsSection"></section>
+
+      </main>
+
+    <footer class="classification">INTERNAL</footer>
+
+    <script src="/internal/logout-nav.js"></script>
+    <script src="/internal/dashboard.js"></script>
+
+  </body>
+</html>

@@ -10,62 +10,62 @@
     <link rel="stylesheet" href="/ext/styles.css" />
   </head>
   <body>
-  <header class="classification">EXTERNAL</header>
-    <main class="container">
-      <h1>Welcome to the Go.junseo.ng(ext) Link Shortener</h1>
+    <header class="classification">EXTERNAL</header>
+      <main class="container">
+        <h1>Welcome to the Go.junseo.ng(ext) Link Shortener</h1>
 
-      <label class="url-row">
-        <p class="url-label">URL to shorten</p>
-        <input id="urlInput" type="url" placeholder="https://learn.microsoft.com/en-us/answers/" />
-        <button id="shortenUrl" title="Shorten URL">Shorten</button>
-      </label>
+        <label class="url-row">
+          <p class="url-label">URL to shorten</p>
+          <input id="urlInput" type="url" placeholder="https://learn.microsoft.com/en-us/answers/" />
+          <button id="shortenUrl" title="Shorten URL">Shorten</button>
+        </label>
 
-      <label class="optional-row">
-        <p class="expiryDateLabel">Expiry Date (optional)</p>
-        <input id="expiryDateInput" type="date" name="expiryDate">
-        <p class="visitLimitLabel">Visit Limit (optional)</p>
-        <input id="visitLimitInput" type="number" name="visitLimit">
-      </label>
+        <label class="optional-row">
+          <p class="expiryDateLabel">Expiry Date (optional)</p>
+          <input id="expiryDateInput" type="date" name="expiryDate">
+          <p class="visitLimitLabel">Visit Limit (optional)</p>
+          <input id="visitLimitInput" type="number" name="visitLimit">
+        </label>
 
-      <br>
+        <br>
 
-      <label class="result-row">
-        <span class="prefix">go.junseo.ng/ext/</span>
-        <input id="slugOutput" type="text" inputmode="text" autocomplete="off" placeholder="Shortened slug will be shown here" readonly />
-      </label>
+        <label class="result-row">
+          <span class="prefix">go.junseo.ng/ext/</span>
+          <input id="slugOutput" type="text" inputmode="text" autocomplete="off" placeholder="Shortened slug will be shown here" readonly />
+        </label>
 
-      <section class="result" aria-live="polite" hidden>
-        <footer class="copy-row">
-          <span id="copied" class="copied">Copied!</span>
-          <button id="copyUrl" title="Copy a full shortened URL">Copy URL</button>
-        </footer>
-      </section>
+        <section class="result" aria-live="polite" hidden>
+          <footer class="copy-row">
+            <span id="copied" class="copied">Copied!</span>
+            <button id="copyUrl" title="Copy a full shortened URL">Copy URL</button>
+          </footer>
+        </section>
 
-      <br>
+        <br>
 
-      <nav class="action" aria-label="Action">
-        <button id="shortenAnother">Shorten another</button>
-      </nav>
+        <nav class="action" aria-label="Action">
+          <button id="shortenAnother">Shorten another</button>
+        </nav>
 
-      <aside class="notes">
-        <strong>Notes</strong>
-        <ul>
-          <li>It randomly shortens the given URL.</li>
-          <li>Shortened URL is <b>case sensitive</b>.</li>
-          <li>If the shortened URL is unopened for x months, it will be automatically deleted.</li>
-        </ul>
-      </aside>
-      
-      <br>
+        <aside class="notes">
+          <strong>Notes</strong>
+          <ul>
+            <li>It randomly shortens the given URL.</li>
+            <li>Shortened URL is <b>case sensitive</b>.</li>
+            <li>If the shortened URL is unopened for x months, it will be automatically deleted.</li>
+          </ul>
+        </aside>
+        
+        <br>
 
-      <section class="feedback" aria-label="Feedback">
-        <a href="/ext/premium" style="text-decoration:none"><button id="feedback" title="Try Premium">Need custom link?</button></a>
-      </section>
-      <section class="feedback" aria-label="Feedback">
-        <a href="mailto:junsungE@studentambassadors.com" style="text-decoration:none"><button id="feedback" title="Give feedback">Feedback</button></a>
-      </section>
-    </main>
-  <footer class="classification">EXTERNAL</footer>
+        <section class="feedback" aria-label="Feedback">
+          <a href="/ext/premium" style="text-decoration:none"><button id="feedback" title="Try Premium">Need custom link?</button></a>
+        </section>
+        <section class="feedback" aria-label="Feedback">
+          <a href="mailto:junsungE@studentambassadors.com" style="text-decoration:none"><button id="feedback" title="Give feedback">Feedback</button></a>
+        </section>
+      </main>
+    <footer class="classification">EXTERNAL</footer>
 
     <script src="/ext/script.js"></script>
 

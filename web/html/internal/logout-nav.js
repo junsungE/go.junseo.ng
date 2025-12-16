@@ -6,6 +6,6 @@ fetch("/.auth/me")
     document.getElementById("logout-nav").innerHTML = `
       <span>${d.clientPrincipal.userDetails}</span>
       |
-      <a href="/.auth/logout">Logout</a>
+      <a href="/.auth/logout?post_logout_redirect_uri=/.auth/purge/aad">Logout</a>
     `;
   });

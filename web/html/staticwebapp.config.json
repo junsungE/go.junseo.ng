@@ -1,6 +1,14 @@
 {
   "routes": [
     {
+      "route": "/internal/*.css",
+      "allowedRoles": ["authenticated", "anonymous"]
+    },
+    {
+      "route": "/internal/*.js",
+      "allowedRoles": ["authenticated", "anonymous"]
+    },
+    {
       "route": "/internal/*",
       "allowedRoles": ["internal"]
     },
@@ -24,6 +32,11 @@
     {
       "route": "/error",
       "rewrite": "/error.html"
+    },
+    {
+      "route": "/new",
+      "redirect": "/internal/new",
+      "statusCode": 302
     }
   ],
   "auth": {

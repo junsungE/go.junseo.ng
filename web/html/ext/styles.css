@@ -115,7 +115,7 @@ button[disabled] {
   cursor: not-allowed;
 }
 
-#copy {
+#copyUrl {
   background: #e5e7eb;
   color: #111;
   padding: 10px;

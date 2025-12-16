@@ -5,7 +5,7 @@ const shortenUrlBtn = document.getElementById("shortenUrl");
 const slugOutput = document.getElementById("slugOutput");
 const shortenAnotherBtn = document.getElementById("shortenAnother");
 const resultSection = document.querySelector(".result");
-const copyBtn = document.getElementById("copy");
+const copyUrlBtn = document.getElementById("copyUrl");
 const copiedSpan = document.getElementById("copied");
 
 let currentFullUrl = "";
@@ -79,9 +79,9 @@ shortenUrlBtn.addEventListener("click", async () => {
   }
 });
 
-// Copy button (bottom in result section)
-if (copyBtn) {
-  copyBtn.addEventListener("click", () => {
+// Copy URL button in result section
+if (copyUrlBtn) {
+  copyUrlBtn.addEventListener("click", () => {
     if (currentFullUrl) {
       navigator.clipboard.writeText(currentFullUrl).then(() => {
         const originalText = copiedSpan.textContent;

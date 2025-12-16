@@ -22,44 +22,44 @@
 
       <label class="optional-row">
         <p class="expiryDateLabel">Expiry Date (optional)</p>
-        <input id="expiryDateInput" type="date" name="expiryDate"  class="w-full border p-1">
+        <input id="expiryDateInput" type="date" name="expiryDate">
         <p class="visitLimitLabel">Visit Limit (optional)</p>
-        <input id="visitLimitInput" type="number" name="visitLimit"  class="w-full border p-1">
+        <input id="visitLimitInput" type="number" name="visitLimit">
       </label>
 
       <br>
 
       <label class="result-row">
-        <p class="result-label">Shortened URL</p>
         <span class="prefix">go.junseo.ng/ext/</span>
-        <input id="slugOutput" type="text" inputmode="text" autocomplete="off" placeholder="Generated URL will be shown here" readonly />
+        <input id="slugOutput" type="text" inputmode="text" autocomplete="off" placeholder="Shortened slug will be shown here" readonly />
       </label>
 
       <section class="result" aria-live="polite" hidden>
         <footer class="copy-row">
           <span id="copied" class="copied">Copied!</span>
-          <button id="copy" title="Copy shortened URL">Copy</button>
+          <button id="copyUrl" title="Copy a full shortened URL">Copy URL</button>
         </footer>
       </section>
 
       <br>
 
       <nav class="action" aria-label="Action">
-        <button id="shortenAnother" disabled>Shorten another</button>
+        <button id="shortenAnother">Shorten another</button>
       </nav>
 
       <aside class="notes">
         <strong>Notes</strong>
         <ul>
-          <li>It ramdomly shortens the given url.</li>
-          <li>Shortened url is <b>case sensitive</b>.</li>
+          <li>It randomly shortens the given URL.</li>
+          <li>Shortened URL is <b>case sensitive</b>.</li>
+          <li>If the shortened URL is unopened for x months, it will be automatically deleted.</li>
         </ul>
       </aside>
       
       <br>
 
       <section class="feedback" aria-label="Feedback">
-        <a href="/ext/premium" style="text-decoration:none"><button id="feedback" title="Try premium">Need custom link?</button></a>
+        <a href="/ext/premium" style="text-decoration:none"><button id="feedback" title="Try Premium">Need custom link?</button></a>
       </section>
       <section class="feedback" aria-label="Feedback">
         <a href="mailto:junsungE@studentambassadors.com" style="text-decoration:none"><button id="feedback" title="Give feedback">Feedback</button></a>

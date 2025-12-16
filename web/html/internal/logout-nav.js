@@ -9,7 +9,7 @@ fetch("/.auth/me")
     logoutBtn.onclick = async (e) => {
       e.preventDefault();
       // Step 1: Clear SWA session cookies first
-      // Step 2: Redirect to logout-complete.html which handles Microsoft logout
+      // Step 2: Redirect to logout.html which handles Microsoft logout
       // This ensures both SWA and Azure AD sessions are properly cleared
       window.location.href = '/.auth/logout?post_logout_redirect_uri=/logout.html';
     };

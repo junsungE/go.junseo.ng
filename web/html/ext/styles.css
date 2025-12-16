@@ -11,6 +11,11 @@
   box-sizing: border-box;
 }
 
+/* Ensure hidden attribute is always respected */
+[hidden] {
+  display: none !important;
+}
+
 body {
   font-family: Inter, ui-sans-serif, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background: var(--bg);

@@ -81,7 +81,7 @@ table.stats-table th, table.stats-table td{border:1px solid var(--border);paddin
 @media (max-width:450px){
   main{padding:14px}
   /* Stack nav vertically on narrow screens */
-  nav{flex-direction:column;align-items:stretch;gap:8px}
+  nav{flex-direction:column;gap:8px}
   nav a{display:block;margin-right:0;width:100%;text-align:center}
   form#fetchForm{flex-direction:column;align-items:stretch}
 

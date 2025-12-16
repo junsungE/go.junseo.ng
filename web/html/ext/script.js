@@ -120,6 +120,3 @@ shortenAnotherBtn.addEventListener("click", () => {
   // Focus on URL input
   urlInput.focus();
 });
-
-// Initially hide buttons that need a URL first
-shortenAnotherBtn.hidden = true;

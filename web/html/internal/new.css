@@ -19,7 +19,7 @@ body{
   padding-bottom: calc(24px + 32px);
 }
 /* target only h2 elements that are direct children of main */
-main > h2{
+nav, main > h2{
     word-break: break-word;
     overflow-wrap: anywhere;
 }
@@ -49,7 +49,7 @@ main > h2{
 header.classification { top: 0 }
 footer.classification { bottom: 0 }
 
-nav{display:flex;gap:12px;justify-content:center;margin:12px 0 18px}
+nav{display:flex;gap:12px;justify-content:center;margin:12px 0 18px;align-items: center;}
 nav a{color:var(--accent);text-decoration:none;padding:6px 10px;border-radius:8px;border:1px solid transparent;font-weight:600}
 nav a:hover{background:#f3f7fb;border-color:#e6eef9}
 /* Page container */

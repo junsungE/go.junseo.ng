@@ -1,1 +1,87 @@
-{"routes":[{"route":"/internal/*","allowedRoles":["internal"]},{"route":"/api/*","allowedRoles":["anonymous"]},{"route":"/","redirect":"/login","statusCode":302},{"route":"/login","rewrite":"/index.html"},{"route":"/error","rewrite":"/error.html"}],"globalHeaders":{"Access-Control-Allow-Origin":"https://gentle-bush-0a1f4bd03.3.azurestaticapps.net","X-Frame-Options":"DENY","X-Content-Type-Options":"nosniff","Referrer-Policy":"strict-origin-when-cross-origin","Content-Security-Policy":"default-src 'self' https:; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; object-src 'none'; frame-ancestors 'none';"},"mimeTypes":{".json":"application/json",".js":"text/javascript",".css":"text/css",".webp":"image/webp",".ico":"image/x-icon"},"platform":{"apiRuntime":"node:20"},"navigationFallback":{"rewrite":"/api/redirect","exclude":["/","/internal/*","/api/*","/*.html","/*.css","/*.js","/*.ico","/*.png","/*.jpg","/*.webp","/*.svg","/*.gif","/media/*","/ext/*","/ext/premium/*","/.auth/*"]},"responseOverrides":{"401":{"redirect":"/.auth/login/aad?prompt=select_account","statusCode":302}}}
+{
+  "routes": [
+    {
+      "route": "/internal/*",
+      "allowedRoles": ["internal"]
+    },
+    {
+      "route": "/api/*",
+      "allowedRoles": ["anonymous"]
+    },
+    {
+      "route": "/",
+      "redirect": "/login",
+      "statusCode": 302
+    },
+    {
+      "route": "/login",
+      "rewrite": "/index.html"
+    },
+    {
+      "route": "/error",
+      "rewrite": "/error.html"
+    }
+  ],
+  "auth": {
+    "identityProviders": {
+      "azureActiveDirectory": {
+        "registration": {
+          "openIdIssuer": "",
+          "clientIdSettingName": "",
+          "clientSecretSettingName": ""
+        }
+      },
+      "github": {
+        "registration": {
+          "clientIdSettingName": "",
+          "clientSecretSettingName": ""
+        }
+      }
+    }
+  },
+  "globalHeaders": {
+    "Access-Control-Allow-Origin": "https://gentle-bush-0a1f4bd03.3.azurestaticapps.net",
+    "X-Frame-Options": "DENY",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Content-Security-Policy": "default-src 'self' https:; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; object-src 'none'; frame-ancestors 'none';"
+  },
+  "mimeTypes": {
+    ".json": "application/json",
+    ".js": "text/javascript",
+    ".css": "text/css",
+    ".webp": "image/webp",
+    ".ico": "image/x-icon"
+  },
+  "platform": {
+    "apiRuntime": "node:20"
+  },
+  "navigationFallback": {
+    "rewrite": "/api/redirect",
+    "exclude": [
+      "/",
+      "/internal/*",
+      "/api/*",
+      "/logout.html",
+      "/*.html",
+      "/*.css",
+      "/*.js",
+      "/*.ico",
+      "/*.png",
+      "/*.jpg",
+      "/*.webp",
+      "/*.svg",
+      "/*.gif",
+      "/media/*",
+      "/ext/*",
+      "/ext/premium/*",
+      "/.auth/*"
+    ]
+  },
+  "responseOverrides": {
+    "401": {
+      "redirect": "/.auth/login/aad?prompt=select_account",
+      "statusCode": 302
+    }
+  }
+}

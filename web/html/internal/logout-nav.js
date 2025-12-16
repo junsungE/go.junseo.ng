@@ -8,8 +8,10 @@ fetch("/.auth/me")
     logoutBtn.textContent = 'Logout';
     logoutBtn.onclick = async (e) => {
       e.preventDefault();
-      // Logout from SWA and redirect to Microsoft logout endpoint
-      window.location.href = 'https://login.microsoftonline.com/common/oauth2/v2.0/logout?post_logout_redirect_uri=' + encodeURIComponent(window.location.origin + '/.auth/logout?post_logout_redirect_uri=/');
+      // Step 1: Clear SWA session cookies first
+      // Step 2: Redirect to logout-complete.html which handles Microsoft logout
+      // This ensures both SWA and Azure AD sessions are properly cleared
+      window.location.href = '/.auth/logout?post_logout_redirect_uri=/logout.html';
     };
 
     const nav = document.getElementById("logout-nav");

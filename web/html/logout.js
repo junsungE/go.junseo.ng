@@ -8,6 +8,6 @@ setTimeout(() => {
   // The user can then manually navigate back to the site.
   // Note: You should register https://your-domain.com/login in Azure AD App Registration
   // under Authentication > Redirect URIs for automatic redirect to work.
-  const postLogoutUri = encodeURIComponent(window.location.origin + 'https://gentle-bush-0a1f4bd03.3.azurestaticapps.net/login');
+  const postLogoutUri = encodeURIComponent(window.location.origin + '/login');
   window.location.href = 'https://login.microsoftonline.com/common/oauth2/v2.0/logout?post_logout_redirect_uri=' + postLogoutUri;
 }, 1000);

@@ -109,11 +109,11 @@ module.exports = async function (context, req) {
 
     await table.createEntity(entity);
 
-    // Use the domain from the current request (where user is accessing the app)
-    const hostHeader = (req && (req.headers && (req.headers['x-forwarded-host'] || req.headers['host']))) || "";
-    const envDomain = process.env.DOMAIN && process.env.DOMAIN.trim();
-    const siteHost = hostHeader.replace(/^https?:\/\//i, "") || envDomain;
-    const base = siteHost ? `https://${siteHost}` : "";
+    // Build base URL from request, respecting custom domains
+    const proto = req.headers["x-forwarded-proto"] || "https";
+    const detectedHost = req.headers["x-ms-original-host"] || req.headers["x-forwarded-host"] || req.headers["host"];
+    const host = process.env.DOMAIN?.trim() || detectedHost;
+    const base = `${proto}://${host}`;
 
     context.res = jsonResponse(200, {
       message: "Shortened URL created successfully.",

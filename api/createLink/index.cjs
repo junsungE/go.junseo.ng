@@ -109,10 +109,10 @@ module.exports = async function (context, req) {
 
     await table.createEntity(entity);
 
-    // Build fallback base URL from request host when DOMAIN is not set
-    const envDomain = process.env.DOMAIN && process.env.DOMAIN.trim();
+    // Use the domain from the current request (where user is accessing the app)
     const hostHeader = (req && (req.headers && (req.headers['x-forwarded-host'] || req.headers['host']))) || "";
-    const siteHost = envDomain || hostHeader.replace(/^https?:\/\//i, "");
+    const envDomain = process.env.DOMAIN && process.env.DOMAIN.trim();
+    const siteHost = hostHeader.replace(/^https?:\/\//i, "") || envDomain;
     const base = siteHost ? `https://${siteHost}` : "";
 
     context.res = jsonResponse(200, {

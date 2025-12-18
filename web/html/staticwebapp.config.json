@@ -50,7 +50,6 @@
     }
   ],
   "globalHeaders": {
-    "Access-Control-Allow-Origin": "https://gentle-bush-0a1f4bd03.3.azurestaticapps.net",
     "X-Frame-Options": "DENY",
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "strict-origin-when-cross-origin",

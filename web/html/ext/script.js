@@ -55,7 +55,8 @@ shortenUrlBtn.addEventListener("click", async () => {
 
     if (res.ok) {
       const slug = result.slug || "";
-      currentFullUrl = result.fullUrl || `https://go.junseo.ng/ext/${slug}`;
+      // Use the URL from API response, or construct from current origin (not hardcoded)
+      currentFullUrl = result.fullUrl || `${window.location.origin}/ext/${slug}`;
       
       slugOutput.value = slug;
       

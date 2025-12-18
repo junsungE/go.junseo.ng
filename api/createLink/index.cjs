@@ -110,9 +110,23 @@ module.exports = async function (context, req) {
     await table.createEntity(entity);
 
     // Build base URL from request, respecting custom domains
+    // Security: Validate host against allowlist to prevent header spoofing
     const proto = req.headers["x-forwarded-proto"] || "https";
     const detectedHost = req.headers["x-ms-original-host"] || req.headers["x-forwarded-host"] || req.headers["host"];
-    const host = process.env.DOMAIN?.trim() || detectedHost;
+    
+    // Trusted domains allowlist (add your Azure SWA default + custom domains)
+    const trustedDomains = (process.env.TRUSTED_DOMAINS || "go.junseo.ng,gentle-bush-0a1f4bd03.3.azurestaticapps.net")
+      .split(",")
+      .map(d => d.trim().toLowerCase());
+    
+    // Extract hostname without port for validation
+    const hostWithoutPort = (detectedHost || "").split(":")[0].toLowerCase();
+    const isTrusted = trustedDomains.some(trusted => 
+      hostWithoutPort === trusted || hostWithoutPort.endsWith("." + trusted)
+    );
+    
+    // Use detected host only if trusted, otherwise fall back to first trusted domain
+    const host = isTrusted ? detectedHost : trustedDomains[0];
     const base = `${proto}://${host}`;
 
     context.res = jsonResponse(200, {

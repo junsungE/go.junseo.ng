@@ -28,6 +28,7 @@ if (form) {
     const data = Object.fromEntries(new FormData(form).entries());
     data.isCaseSensitive = form.isCaseSensitive.checked;
     data.type = "internal";
+    data.origin = window.location.origin; // Tell backend which domain we're on
 
     const res = await fetch("/api/createLink", {
       method: "POST",

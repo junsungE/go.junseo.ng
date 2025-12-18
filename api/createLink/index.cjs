@@ -18,7 +18,8 @@ module.exports = async function (context, req) {
     visitLimit,
     title,
     isCaseSensitive = false,
-    createdBy = "anonymous"
+    createdBy = "anonymous",
+    origin // Frontend will send window.location.origin
   } = body;
 
   if (!targetUrl) {
@@ -109,27 +110,39 @@ module.exports = async function (context, req) {
 
     await table.createEntity(entity);
 
-    // Build base URL from request, respecting custom domains
-    // Security: Validate host against allowlist to prevent header spoofing
-    const proto = req.headers["x-forwarded-proto"] || "https";
-    // Prefer 'host' header first - it reflects what the user typed in browser
-    // x-ms-original-host and x-forwarded-host may contain the "primary" custom domain
-    const detectedHost = req.headers["host"] || req.headers["x-forwarded-host"] || req.headers["x-ms-original-host"];
-    
-    // Trusted domains allowlist (add your Azure SWA default + custom domains)
+    // Build base URL - prefer origin from frontend (most accurate)
+    // Security: Validate against allowlist to prevent spoofing
     const trustedDomains = (process.env.TRUSTED_DOMAINS || "go.junseo.ng,gentle-bush-0a1f4bd03.3.azurestaticapps.net")
       .split(",")
       .map(d => d.trim().toLowerCase());
     
-    // Extract hostname without port for validation
-    const hostWithoutPort = (detectedHost || "").split(":")[0].toLowerCase();
-    const isTrusted = trustedDomains.some(trusted => 
-      hostWithoutPort === trusted || hostWithoutPort.endsWith("." + trusted)
-    );
+    let base;
     
-    // Use detected host only if trusted, otherwise fall back to first trusted domain
-    const host = isTrusted ? detectedHost : trustedDomains[0];
-    const base = `${proto}://${host}`;
+    if (origin) {
+      // Frontend sent origin - validate it's trusted
+      const originHostMatch = origin.match(/^https?:\/\/([^/:]+)/);
+      if (originHostMatch) {
+        const originHost = originHostMatch[1].toLowerCase();
+        const isOriginTrusted = trustedDomains.some(trusted => 
+          originHost === trusted || originHost.endsWith("." + trusted)
+        );
+        if (isOriginTrusted) {
+          base = origin;
+        }
+      }
+    }
+    
+    // Fallback to header detection if origin not provided or not trusted
+    if (!base) {
+      const proto = req.headers["x-forwarded-proto"] || "https";
+      const detectedHost = req.headers["host"] || req.headers["x-forwarded-host"] || req.headers["x-ms-original-host"];
+      const hostWithoutPort = (detectedHost || "").split(":")[0].toLowerCase();
+      const isTrusted = trustedDomains.some(trusted => 
+        hostWithoutPort === trusted || hostWithoutPort.endsWith("." + trusted)
+      );
+      const host = isTrusted ? detectedHost : trustedDomains[0];
+      base = `${proto}://${host}`;
+    }
 
     context.res = jsonResponse(200, {
       message: "Shortened URL created successfully.",

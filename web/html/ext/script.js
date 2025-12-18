@@ -23,7 +23,8 @@ shortenUrlBtn.addEventListener("click", async () => {
 
   const data = {
     type: "external",
-    targetUrl: targetUrl
+    targetUrl: targetUrl,
+    origin: window.location.origin // Tell backend which domain we're on
   };
 
   if (expiryDateInput.value) {

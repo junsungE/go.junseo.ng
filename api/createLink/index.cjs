@@ -112,7 +112,9 @@ module.exports = async function (context, req) {
     // Build base URL from request, respecting custom domains
     // Security: Validate host against allowlist to prevent header spoofing
     const proto = req.headers["x-forwarded-proto"] || "https";
-    const detectedHost = req.headers["x-ms-original-host"] || req.headers["x-forwarded-host"] || req.headers["host"];
+    // Prefer 'host' header first - it reflects what the user typed in browser
+    // x-ms-original-host and x-forwarded-host may contain the "primary" custom domain
+    const detectedHost = req.headers["host"] || req.headers["x-forwarded-host"] || req.headers["x-ms-original-host"];
     
     // Trusted domains allowlist (add your Azure SWA default + custom domains)
     const trustedDomains = (process.env.TRUSTED_DOMAINS || "go.junseo.ng,gentle-bush-0a1f4bd03.3.azurestaticapps.net")

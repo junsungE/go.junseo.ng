@@ -14,9 +14,16 @@ module.exports = async function (context, req) {
       now,
       node_version: process.version,
       storage_present: !!process.env.STORAGE_CONN,
-      domain_env: process.env.DOMAIN || null,
+      trusted_domains_env: process.env.TRUSTED_DOMAINS || null,
       module_loaded: true,
-      handler: 'cjs'
+      handler: 'cjs',
+      // Debug: show host-related headers to verify detection
+      headers: {
+        host: req.headers["host"] || null,
+        "x-forwarded-host": req.headers["x-forwarded-host"] || null,
+        "x-ms-original-host": req.headers["x-ms-original-host"] || null,
+        "x-forwarded-proto": req.headers["x-forwarded-proto"] || null
+      }
     };
     context.res = {
       status: 200,

@@ -124,8 +124,7 @@ button[disabled] {
   cursor: not-allowed;
 }
 
-/* Clear buttons (ID and URL) share the same styles */
-#clearId,
+/* Clear button (URL) share the same styles */
 #clearUrl {
   background: #e5e7eb;
   color: #111;
@@ -227,8 +226,7 @@ h1,
     justify-content: flex-start;
   }
 
-  /* Slightly smaller clear buttons on narrow screens */
-  #clearId,
+  /* Slightly smaller clear button on narrow screens */
   #clearUrl {
     padding: 6px 8px;
   }
@@ -259,7 +257,6 @@ h1,
 
 /* ensure prefix and clear button don't force overflow in horizontal layouts */
 .prefix,
-#clearId,
 #clearUrl {
   flex: 0 0 auto;
 }

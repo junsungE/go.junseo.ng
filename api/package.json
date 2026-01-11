@@ -4,8 +4,9 @@
   "private": true,
   "dependencies": {
     "@azure/data-tables": "13.1.0",
-    "uuid": "^9.0.0",
-    "ua-parser-js": "^1.0.2"
+    "bcryptjs": "^3.0.3",
+    "ua-parser-js": "^1.0.2",
+    "uuid": "^9.0.0"
   },
   "overrides": {
     "@azure/core-util": "1.10.0",

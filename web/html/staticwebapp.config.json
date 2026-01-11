@@ -83,7 +83,6 @@
       "/*.gif",
       "/media/*",
       "/ext/*",
-      "/ext/premium/*",
       "/.auth/*"
     ]
   },

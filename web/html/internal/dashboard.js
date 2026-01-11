@@ -39,3 +39,104 @@ const form = document.getElementById("fetchForm");
           errorMsg.textContent = result.error || "Failed to fetch stats.";
         }
       });
+
+      // --- Premium Users Management ---
+      const usersBody = document.getElementById("usersBody");
+      const usersLoading = document.getElementById("usersLoading");
+      
+      async function fetchUsers() {
+        usersLoading.style.display = "block";
+        usersBody.innerHTML = "";
+        
+        // Use secret from localStorage if exists, otherwise prompt
+        let secret = localStorage.getItem("adminSecret");
+        if (!secret) {
+            secret = prompt("Please enter Admin Secret to view users:");
+            if (secret) {
+                localStorage.setItem("adminSecret", secret);
+            }
+        }
+        
+        if (!secret) {
+            usersLoading.style.display = "none";
+            usersBody.innerHTML = "<tr><td colspan='5'>Admin secret required to load users.</td></tr>";
+            return;
+        }
+
+        try {
+          const res = await fetch("/api/listUsers", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ secret })
+          });
+          
+          if (res.status === 401) {
+              localStorage.removeItem("adminSecret");
+              usersBody.innerHTML = "<tr><td colspan='5'>Unauthorized. Refresh to try again.</td></tr>";
+              return;
+          }
+
+          const users = await res.json();
+          usersLoading.style.display = "none";
+
+          if (users.length === 0) {
+              usersBody.innerHTML = "<tr><td colspan='5'>No premium users found.</td></tr>";
+              return;
+          }
+
+          users.forEach(user => {
+            const tr = document.createElement("tr");
+            
+            // Format date
+            const dateStr = user.lastSignin === "Never" ? "Never" : new Date(user.lastSignin).toLocaleString();
+            
+            let actionHtml = "";
+            if (user.status === "pending") {
+                actionHtml = `
+                    <button class="action-btn approve" onclick="updateUserStatus('${user.id}', 'approved')">Approve</button>
+                    <button class="action-btn reject" onclick="updateUserStatus('${user.id}', 'rejected')">Reject</button>
+                `;
+            } else {
+                actionHtml = `<span style="font-size: 0.8em; color: #666;">No actions</span>`;
+            }
+
+            tr.innerHTML = `
+              <td>${user.displayName}</td>
+              <td style="font-family: monospace; font-size: 0.9em;">${user.email}</td>
+              <td><span class="status-badge status-${user.status}">${user.status}</span></td>
+              <td>${dateStr}</td>
+              <td>${actionHtml}</td>
+            `;
+            usersBody.appendChild(tr);
+          });
+        } catch (err) {
+          usersLoading.style.display = "none";
+          usersBody.innerHTML = `<tr><td colspan='5'>Error: ${err.message}</td></tr>`;
+        }
+      }
+
+      window.updateUserStatus = async (userId, newStatus) => {
+          const secret = localStorage.getItem("adminSecret");
+          if (!confirm(`Are you sure you want to set this user to ${newStatus}?`)) return;
+
+          try {
+            const res = await fetch("/api/adminApprove", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId, secret, status: newStatus })
+            });
+            const result = await res.json();
+            
+            if (res.ok) {
+                alert(result.message);
+                fetchUsers(); // reload list
+            } else {
+                alert("Error: " + result.error);
+            }
+          } catch (err) {
+              alert("Error: " + err.message);
+          }
+      };
+
+      // Load users on init
+      fetchUsers();

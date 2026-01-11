@@ -26,7 +26,7 @@ module.exports = async function (context, req) {
 
     // Update status to pending
     user.status = "pending";
-    user.requestedAt = new Date().toISOString(); 
+    user.approvalRequestedAt = new Date().toISOString(); 
     
     await usersTable.updateEntity(user);
 

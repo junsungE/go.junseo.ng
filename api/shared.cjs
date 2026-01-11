@@ -1,5 +1,6 @@
 // Shared utility for all Azure Functions (CommonJS version)
 const { TableClient, AzureNamedKeyCredential } = require("@azure/data-tables");
+const { EmailClient } = require("@azure/communication-email");
 const { v4: uuidv4 } = require("uuid");
 const UAParser = require("ua-parser-js");
 
@@ -22,6 +23,14 @@ function getTableClient(tableName) {
     credential
   );
   return tableClient;
+}
+
+function getEmailClient() {
+  const connectionString = process.env.COMMUNICATION_SERVICES_CONNECTION_STRING;
+  if (!connectionString) {
+    throw new Error("COMMUNICATION_SERVICES_CONNECTION_STRING is not set");
+  }
+  return new EmailClient(connectionString);
 }
 
 // Parse user agent to identify device/platform
@@ -108,6 +117,7 @@ function jsonResponse(status, data) {
 
 module.exports = {
   getTableClient,
+  getEmailClient,
   parseUserAgent,
   recordVisit,
   incrementVisit,

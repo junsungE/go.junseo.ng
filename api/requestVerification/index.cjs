@@ -1,4 +1,4 @@
-const { getTableClient, jsonResponse } = require("../shared.cjs");
+const { getTableClient, getEmailClient, jsonResponse } = require("../shared.cjs");
 
 module.exports = async function (context, req) {
   const { email } = req.body || {};
@@ -44,16 +44,44 @@ module.exports = async function (context, req) {
 
     await usersTable.upsertEntity(entity, "Replace");
 
-    // 4. Send Mock Email
-    // Link now points to signup page with parameters
+    // 4. Send Email via Azure Communication Services
+    const senderEmail = process.env.SENDER_EMAIL || "donotreply@yourdomain.com";
     const linkUrl = `${process.env.URL || "http://localhost:4280"}/ext/premium/signup.html?email=${encodeURIComponent(email)}&code=${verificationCode}`;
-    
-    context.log("---------------------------------------------------");
-    context.log(`[MOCK EMAIL] To: ${email}`);
-    context.log(`[MOCK EMAIL] Subject: Verify your email`);
-    context.log(`[MOCK EMAIL] Code: ${verificationCode}`);
-    context.log(`[MOCK EMAIL] Continue Signup Link: ${linkUrl}`);
-    context.log("---------------------------------------------------");
+
+    try {
+      const emailClient = getEmailClient();
+      const emailMessage = {
+        senderAddress: senderEmail,
+        content: {
+          subject: "Verify your email to register for Premium Go URL Shortener(ext)",
+          plainText: `Your verification code is: ${verificationCode}\n\nAlternatively, click here to continue: ${linkUrl}`,
+          html: `
+            <html>
+              <body>
+                <h2>Verify your email</h2>
+                <p>Your verification code is: <strong>${verificationCode}</strong></p>
+                <p>Alternatively, click the link below to continue your sign up:</p>
+                <a href="${linkUrl}">Continue Sign up</a>
+                <p>This code will expire in 1 hour.</p>
+              </body>
+            </html>
+          `,
+        },
+        recipients: {
+          to: [{ address: email }],
+        },
+      };
+
+      const poller = await emailClient.beginSend(emailMessage);
+      await poller.pollUntilDone();
+      
+      context.log(`Email sent successfully to ${email}`);
+    } catch (emailErr) {
+      context.log.error("Failed to send email:", emailErr.message);
+      // We still return 200 to avoid leaking if email service is down, 
+      // but in dev we might want to know. 
+      // For now, let's just log it.
+    }
 
     context.res = jsonResponse(200, { message: "Verification code sent." });
 

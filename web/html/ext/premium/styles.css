@@ -212,7 +212,7 @@ h1,
 
   /* Stack nav vertically on narrow screens */
   nav{flex-direction:column;gap:8px}
-  nav a{display:block;margin-right:0;width:100%;text-align:center}
+  nav a{display:block;margin-right:0;text-align:center}
 
   /* Stack rows vertically on narrow screens */
   .id-row,

@@ -35,7 +35,6 @@ if (user && nav) {
         reqLink.textContent = "Request access";
         reqLink.style.color = "#0078d4";
         reqLink.style.cursor = "pointer";
-        reqLink.style.textDecoration = "underline";
         
         reqLink.onclick = async (e) => {
             e.preventDefault();

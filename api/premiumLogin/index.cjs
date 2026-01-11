@@ -43,22 +43,22 @@ module.exports = async function (context, req) {
         return;
     }
 
-    // Allow login even if pending, but frontend will handle restricted access
-    // if (user.status !== "approved") { ... } 
+    // Allow sign in for all verified users. Frontend handles restricted access based on status.
+    // Status can be: new (default after sign up), pending (after request), approved, rejected
 
     context.res = jsonResponse(200, {
-      message: "Login successful.",
+      message: "Sign in successful.",
       user: {
         id: user.rowKey,
         displayName: user.displayName,
         email: user.email,
-        status: user.status // pending or approved
+        status: user.status // key for frontend logic
       }
     });
 
   } catch (err) {
     if (context.log && context.log.error) {
-        context.log.error("Login error:", err.message);
+        context.log.error("Sign in error:", err.message);
     }
     context.res = jsonResponse(500, { error: "Server error." });
   }

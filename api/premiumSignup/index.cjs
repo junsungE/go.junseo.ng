@@ -63,7 +63,7 @@ module.exports = async function (context, req) {
       email,
       displayName,
       password: hashedPassword,
-      status: "pending", // pending, approved, rejected
+      status: "new", // new, pending, approved, rejected
       isEmailVerified: true, // Auto-verified because they provided valid code
       requestedAt: new Date().toISOString()
     };
@@ -71,14 +71,14 @@ module.exports = async function (context, req) {
     await usersTable.createEntity(entity);
 
     context.res = jsonResponse(200, {
-      message: "Signup successful. Your account is pending admin approval.",
+      message: "Sign up successful. Please sign in to request full access.",
       userId
     });
   } catch (err) {
     if (context && context.log && typeof context.log.error === "function") {
-      context.log.error("Premium signup error:", err.message);
+      context.log.error("Premium sign up error:", err.message);
     } else {
-      console.error("Premium signup error:", err.message);
+      console.error("Premium sign up error:", err.message);
     }
     context.res = jsonResponse(500, { error: "Server error." });
   }

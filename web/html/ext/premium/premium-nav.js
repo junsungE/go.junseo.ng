@@ -3,7 +3,30 @@ const user = userStr ? JSON.parse(userStr) : null;
 
 const nav = document.getElementById("premium-nav");
 
+// Function to refresh user status from server
+async function refreshUserStatus() {
+    if (!user || !user.id) return;
+    try {
+        const res = await fetch(`/api/getUserStatus?userId=${user.id}`);
+        if (res.ok) {
+            const data = await res.json();
+            // If status changed on server, update local storage and reload to reflect changes
+            if (data.status !== user.status) {
+                user.status = data.status;
+                user.displayName = data.displayName; // Sync name too just in case
+                localStorage.setItem("user", JSON.stringify(user));
+                window.location.reload();
+            }
+        }
+    } catch (err) {
+        console.error("Failed to sync user status:", err);
+    }
+}
+
 if (user && nav) {
+    // Kick off status sync in background
+    refreshUserStatus();
+
     const container = document.createElement("span");
     container.style.display = "flex";
     container.style.alignItems = "center";

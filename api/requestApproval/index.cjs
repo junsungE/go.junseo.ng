@@ -74,28 +74,28 @@ module.exports = async function (context, req) {
             // Start sending
             const poller = await emailClient.beginSend(emailMessage);
             
-            // To ensure the email is actually processed by ACS but avoid the long 'pollUntilDone'
-            // we'll wait just a moment for the initial 'Accepted' response.
-            // In modern Azure Functions, wait for pollUntilDone or a reasonable timeout to ensure the send is committed.
-            // Since we're hitting 'Failed to fetch' in the UI if we wait for full delivery, we'll use a Promise.race
-            // or just await the start. Let's try awaiting the poller's result for a brief period.
-            await Promise.race([
+            // We wait for the email to be successfully sent (delivered to the mail server)
+            // We use a longer timeout (8 seconds) to ensure confirmation but avoid browser timeouts.
+            // Result will contain the status of the operation.
+            const result = await Promise.race([
                 poller.pollUntilDone(),
-                new Promise(resolve => setTimeout(resolve, 2000)) // Wait max 2 seconds for email send
+                new Promise((_, reject) => setTimeout(() => reject(new Error("Email notification timed out. Please try again.")), 8000))
             ]);
 
-            if (context.log) context.log(`Admin notification email processed for ${user.email}`); 
-        } catch (emailErr) {
-            if (context.log && context.log.error) {
-                context.log.error("Failed to send admin notification:", emailErr.message);
+            if (result.status !== "Succeeded") {
+                throw new Error(`Admin email delivery failed with status: ${result.status}`);
             }
+
+            if (context.log) context.log(`Admin notification email sent successfully for ${user.email}`); 
+        } catch (emailErr) {
+            // Re-throw so the API returns a 500 error, preventing the UI from showing "Pending"
+            throw new Error(`Email Error: ${emailErr.message}`);
         }
     } else {
-        const msg = `Missing config: adminEmail=${!!adminEmail}, senderEmail=${!!senderEmail}, adminSecret=${!!adminSecret}`;
-        if (context.log && context.log.warn) context.log.warn(msg);
+        throw new Error("Admin configuration (email/secret) is missing in server settings.");
     }
 
-    context.res = jsonResponse(200, { message: "Approval requested.", status: "pending" });
+    context.res = jsonResponse(200, { message: "Approval requested and admin notified.", status: "pending" });
 
   } catch (err) {
     if (err.statusCode === 404) {

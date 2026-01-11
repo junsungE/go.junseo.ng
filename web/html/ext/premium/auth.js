@@ -1,6 +1,13 @@
 const API_BASE = "/api"; 
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Redirect if already logged in
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    if (user) {
+        window.location.href = "/ext/premium";
+        return;
+    }
+
     const loginForm = document.getElementById("loginForm");
     const signupForm = document.getElementById("signupForm");
     const messageEl = document.getElementById("message");

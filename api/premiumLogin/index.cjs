@@ -2,19 +2,18 @@ const bcrypt = require("bcryptjs");
 const { getTableClient, jsonResponse } = require("../shared.cjs");
 
 module.exports = async function (context, req) {
-  const { username, password } = req.body || {}; // username can be email or displayName
+  const { email, password } = req.body || {}; 
 
-  if (!username || !password) {
-    context.res = jsonResponse(400, { error: "Missing username or password." });
+  if (!email || !password) {
+    context.res = jsonResponse(400, { error: "Missing email or password." });
     return;
   }
 
   try {
     const usersTable = getTableClient("Users");
 
-    // Search for user by email or displayName
-    // Note: In production, input should be sanitized to prevent injection, though Azure Table SDK mostly handles it if using parameterized queries (which JS SDK filter string doesn't fully abstract perfectly, but string concatenation here is a minor risk if inputs are simple strings. Ideally validation of input format is good.)
-    const filter = `PartitionKey eq 'Users' and (email eq '${username.replace(/'/g, "''")}' or displayName eq '${username.replace(/'/g, "''")}')`;
+    // Search for user by email only
+    const filter = `PartitionKey eq 'Users' and email eq '${email.replace(/'/g, "''")}'`;
     
     const usersIterator = usersTable.listEntities({
       queryOptions: { filter }

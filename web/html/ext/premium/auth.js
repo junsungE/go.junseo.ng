@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (loginForm) {
         loginForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const username = document.getElementById("username").value;
+            const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
             messageEl.textContent = "Signing in...";
             messageEl.style.color = "#333";
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const res = await fetch(`${API_BASE}/premiumLogin`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({ email, password })
                 });
                 const data = await res.json();
                 
@@ -34,13 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     // Store user info
                     localStorage.setItem("user", JSON.stringify(data.user));
                     
-                    if (data.user.status === "pending") {
-                        alert("Your account is verified but pending admin approval. Usage is restricted.");
-                        // Redirect to a specific "waiting" page or dashboard with limited view
-                        window.location.href = "/ext/premium"; 
-                    } else {
-                        window.location.href = "/ext/premium";
-                    }
+                    window.location.href = "/ext/premium";
                 } else {
                     messageEl.textContent = data.error || "Login failed.";
                     messageEl.style.color = "red";

@@ -97,7 +97,7 @@ const form = document.getElementById("fetchForm");
             const tr = document.createElement("tr");
             
             // Format date
-            const dateStr = user.lastSignin === "Never" ? "Never" : new Date(user.lastSignin).toLocaleString();
+            const dateStr = user.lastSignIn === "Never" ? "Never" : new Date(user.lastSignIn).toLocaleString();
             
             let actionHtml = "";
             if (user.status === "pending") {

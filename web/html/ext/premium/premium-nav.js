@@ -40,6 +40,12 @@ if (user && nav) {
             e.preventDefault();
             if(!confirm("Request admin approval for full access?")) return;
 
+            // Immediate UI update: Disable link and show progress
+            const originalText = reqLink.textContent;
+            reqLink.textContent = "Requesting...";
+            reqLink.style.pointerEvents = "none";
+            reqLink.style.color = "gray";
+
             try {
                 const res = await fetch("/api/requestApproval", {
                     method: "POST",
@@ -48,14 +54,23 @@ if (user && nav) {
                 });
                 const data = await res.json();
                 if (res.ok) {
+                    // Update local state and refresh to show "Pending"
                     user.status = "pending";
                     localStorage.setItem("user", JSON.stringify(user));
                     window.location.reload();
                 } else {
                     alert(data.error || "Request failed");
+                    // Revert UI if failed
+                    reqLink.textContent = originalText;
+                    reqLink.style.pointerEvents = "auto";
+                    reqLink.style.color = "#0078d4";
                 }
             } catch(err) {
                 alert("Error: " + err.message);
+                // Revert UI if error
+                reqLink.textContent = originalText;
+                reqLink.style.pointerEvents = "auto";
+                reqLink.style.color = "#0078d4";
             }
         };
         statusSpan.appendChild(reqLink);

@@ -88,9 +88,14 @@ module.exports = async function (context, req) {
           };
 
           const poller = await emailClient.beginSend(emailMessage);
-          await poller.pollUntilDone();
+          // Speed up response by not waiting for full delivery confirmation
+          context.log(`User notification email initiated for ${user.email}`); 
         } catch (emailErr) {
-          context.log.error("Failed to send notification email:", emailErr.message);
+          if (context.log && context.log.error) {
+              context.log.error("Failed to send notification email:", emailErr.message);
+          } else {
+              console.error("Failed to send notification email:", emailErr.message);
+          }
         }
     }
 

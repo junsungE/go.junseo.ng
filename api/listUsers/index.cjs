@@ -21,7 +21,7 @@ module.exports = async function (context, req) {
         displayName: user.displayName,
         email: user.email,
         status: user.status,
-        lastSignin: user.lastSignin || "Never",
+        lastSignIn: user.lastSignIn || "Never",
         approvalRequestedAt: user.approvalRequestedAt
       });
     }

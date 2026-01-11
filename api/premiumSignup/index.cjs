@@ -65,7 +65,6 @@ module.exports = async function (context, req) {
       password: hashedPassword,
       status: "new", // new, pending, approved, rejected
       isEmailVerified: true, // Auto-verified because they provided valid code
-      requestedAt: new Date().toISOString()
     };
 
     await usersTable.createEntity(entity);

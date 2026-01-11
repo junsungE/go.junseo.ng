@@ -46,13 +46,18 @@ module.exports = async function (context, req) {
     // Allow sign in for all verified users. Frontend handles restricted access based on status.
     // Status can be: new (default after sign up), pending (after request), approved, rejected
 
+    // Update lastSignIn timestamp
+    user.lastSignIn = new Date().toISOString();
+    await usersTable.updateEntity(user);
+
     context.res = jsonResponse(200, {
       message: "Sign in successful.",
       user: {
         id: user.rowKey,
         displayName: user.displayName,
         email: user.email,
-        status: user.status // key for frontend logic
+        status: user.status, // key for frontend logic
+        lastSignIn: user.lastSignIn
       }
     });
 

@@ -40,29 +40,34 @@ const form = document.getElementById("fetchForm");
         }
       });
 
-      // --- Premium Users Management ---
       const usersBody = document.getElementById("usersBody");
       const usersLoading = document.getElementById("usersLoading");
+      const adminLoginForm = document.getElementById("adminLoginForm");
+      const adminSecretInput = document.getElementById("adminSecretInput");
+      const adminStatus = document.getElementById("adminStatus");
       
+      // Load saved secret if exists
+      if (localStorage.getItem("adminSecret")) {
+          adminSecretInput.value = localStorage.getItem("adminSecret");
+          adminStatus.textContent = "Saved secret loaded.";
+          adminStatus.style.color = "green";
+      }
+
+      adminLoginForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+          localStorage.setItem("adminSecret", adminSecretInput.value);
+          adminStatus.textContent = "Secret updated.";
+          adminStatus.style.color = "green";
+          fetchUsers();
+      });
+
       async function fetchUsers() {
+        const secret = localStorage.getItem("adminSecret");
+        if (!secret) return;
+
         usersLoading.style.display = "block";
         usersBody.innerHTML = "";
         
-        // Use secret from localStorage if exists, otherwise prompt
-        let secret = localStorage.getItem("adminSecret");
-        if (!secret) {
-            secret = prompt("Please enter Admin Secret to view users:");
-            if (secret) {
-                localStorage.setItem("adminSecret", secret);
-            }
-        }
-        
-        if (!secret) {
-            usersLoading.style.display = "none";
-            usersBody.innerHTML = "<tr><td colspan='5'>Admin secret required to load users.</td></tr>";
-            return;
-        }
-
         try {
           const res = await fetch("/api/listUsers", {
               method: "POST",
@@ -71,13 +76,17 @@ const form = document.getElementById("fetchForm");
           });
           
           if (res.status === 401) {
-              localStorage.removeItem("adminSecret");
-              usersBody.innerHTML = "<tr><td colspan='5'>Unauthorized. Refresh to try again.</td></tr>";
+              adminStatus.textContent = "Invalid secret.";
+              adminStatus.style.color = "red";
+              usersBody.innerHTML = "<tr><td colspan='5'>Unauthorized. Please update the Admin Secret above.</td></tr>";
+              usersLoading.style.display = "none";
               return;
           }
 
           const users = await res.json();
           usersLoading.style.display = "none";
+          adminStatus.textContent = "Authenticated successfully.";
+          adminStatus.style.color = "green";
 
           if (users.length === 0) {
               usersBody.innerHTML = "<tr><td colspan='5'>No premium users found.</td></tr>";

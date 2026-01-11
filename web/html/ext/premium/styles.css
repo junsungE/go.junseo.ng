@@ -21,6 +21,10 @@ body {
   padding-top: calc(24px + 32px);
   padding-bottom: calc(24px + 32px);
 }
+nav{
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
 
 .classification {
   display: block;
@@ -44,6 +48,10 @@ body {
 
 header.classification { top: 0 }
 footer.classification { bottom: 0 }
+
+nav{display:flex;gap:12px;justify-content:center;margin:12px 0 18px;align-items: center;}
+nav a{color:var(--accent);text-decoration:none;padding:6px 10px;border-radius:8px;border:1px solid transparent;font-weight:600}
+nav a:hover{background:#f3f7fb;border-color:#e6eef9}
 
 .container {
   max-width: 760px;
@@ -201,6 +209,10 @@ h1,
   .container {
     padding: 14px;
   }
+
+  /* Stack nav vertically on narrow screens */
+  nav{flex-direction:column;gap:8px}
+  nav a{display:block;margin-right:0;width:100%;text-align:center}
 
   /* Stack rows vertically on narrow screens */
   .id-row,

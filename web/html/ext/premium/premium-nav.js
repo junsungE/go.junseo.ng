@@ -74,7 +74,7 @@ if (user && nav) {
     logoutBtn.onclick = (e) => {
       e.preventDefault();
       localStorage.removeItem("user");
-      window.location.href = "login.html";
+      window.location.href = "/ext/premium/login";
     };
     container.appendChild(logoutBtn);
 
@@ -82,6 +82,6 @@ if (user && nav) {
 } else {
     // If no user, redirect to sign in? Or show sign in link
     if(nav) {
-        nav.innerHTML = '<a href="login.html">Sign in</a>';
+        nav.innerHTML = '<a href="/ext/premium/login">Sign In</a>';
     }
 }

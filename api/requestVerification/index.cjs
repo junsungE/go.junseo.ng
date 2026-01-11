@@ -1,7 +1,7 @@
 const { getTableClient, getEmailClient, jsonResponse } = require("../shared.cjs");
 
 module.exports = async function (context, req) {
-  const { email } = req.body || {};
+  const { email, displayName } = req.body || {};
 
   if (!email) {
     context.res = jsonResponse(400, { error: "Missing email." });
@@ -46,22 +46,24 @@ module.exports = async function (context, req) {
 
     // 4. Send Email via Azure Communication Services
     const senderEmail = process.env.SENDER_EMAIL || "donotreply@yourdomain.com";
-    const linkUrl = `${process.env.URL || "http://localhost:4280"}/ext/premium/signup.html?email=${encodeURIComponent(email)}&code=${verificationCode}`;
+    const nameParam = displayName ? `&displayName=${encodeURIComponent(displayName)}` : "";
+    const linkUrl = `${process.env.URL || "https://go.junseo.ng"}/ext/premium/signup.html?email=${encodeURIComponent(email)}&code=${verificationCode}${nameParam}`;
 
     try {
       const emailClient = getEmailClient();
+      const personalizedGreeting = displayName ? `Hi ${displayName},` : "Hello,";
       const emailMessage = {
         senderAddress: senderEmail,
         content: {
           subject: "Verify your email to register for Premium Go URL Shortener(ext)",
-          plainText: `Your verification code is: ${verificationCode}\n\nAlternatively, click here to continue: ${linkUrl}`,
+          plainText: `${personalizedGreeting}\n\nYour verification code is: ${verificationCode}\n\nAlternatively, click here to continue: ${linkUrl}`,
           html: `
             <html>
               <body>
                 <h2>Verify your email</h2>
-                <p>Your verification code is: <strong>${verificationCode}</strong></p>
-                <p>Alternatively, click the link below to continue your sign up:</p>
-                <a href="${linkUrl}">Continue Sign up</a>
+                <p>${personalizedGreeting}</p>
+                <p>Your verification code for Premium access is: <strong>${verificationCode}</strong></p>
+                <p>Alternatively, <a href="${linkUrl}">click this link</a> to continue your sign up.</p>
                 <p>This code will expire in 1 hour.</p>
               </body>
             </html>

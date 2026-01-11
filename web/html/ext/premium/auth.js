@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
-            messageEl.textContent = "Logging in...";
+            messageEl.textContent = "Signing in...";
             messageEl.style.color = "#333";
 
             try {
@@ -30,9 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (data.user.status === "pending") {
                         alert("Your account is verified but pending admin approval. Usage is restricted.");
                         // Redirect to a specific "waiting" page or dashboard with limited view
-                        window.location.href = "index.html"; 
+                        window.location.href = "/ext/premium"; 
                     } else {
-                        window.location.href = "index.html";
+                        window.location.href = "/ext/premium";
                     }
                 } else {
                     messageEl.textContent = data.error || "Login failed.";
@@ -67,9 +67,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const params = new URLSearchParams(window.location.search);
         const urlEmail = params.get("email");
         const urlCode = params.get("code");
+        const urlName = params.get("displayName");
 
         if (urlEmail) {
             document.getElementById("email").value = urlEmail;
+        }
+        if (urlName) {
+            document.getElementById("displayName").value = urlName;
         }
         if (urlCode && urlEmail) {
              codeInput.value = urlCode;
@@ -80,6 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // 1. Send Code Handler
         btnSendCode.addEventListener("click", async () => {
              const email = document.getElementById("email").value;
+             const displayName = document.getElementById("displayName").value;
              if (!email) {
                  messageEl.textContent = "Please enter an email address.";
                  messageEl.style.color = "red";
@@ -93,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 const res = await fetch(`${API_BASE}/requestVerification`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email })
+                    body: JSON.stringify({ email, displayName })
                 });
                 const data = await res.json();
 
@@ -101,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     messageEl.textContent = "";
                     codeSection.style.display = "block";
                     btnSendCode.style.display = "none"; // Hide "Verify Email" button once sent
-                    codeStatus.textContent = "Code sent to email.";
+                    codeStatus.innerHTML = "Code sent to email.<br>Please check your spam folder.";
                     codeStatus.style.color = "blue";
                 } else {
                     messageEl.textContent = data.error || "Failed to send code.";
@@ -116,6 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // 2. Resend Code Handler
         btnResendCode.addEventListener("click", async () => {
              const email = document.getElementById("email").value;
+             const displayName = document.getElementById("displayName").value;
              
              // Disable button immediately
              btnResendCode.disabled = true;
@@ -138,12 +144,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 const res = await fetch(`${API_BASE}/requestVerification`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email })
+                    body: JSON.stringify({ email, displayName })
                 });
                 
                 if (res.ok) {
                     messageEl.textContent = "";
-                    codeStatus.textContent = "Code Resent";
+                    codeStatus.innerHTML = "Code Resent.<br>Please check your spam folder.";
                     codeStatus.style.color = "blue";
                 } else {
                     const data = await res.json();
@@ -244,10 +250,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     messageEl.textContent = "Success! Account created. Redirecting...";
                     messageEl.style.color = "green";
                     setTimeout(() => {
-                        window.location.href = "login.html";
+                        window.location.href = "/ext/premium";
                     }, 2000);
                 } else {
-                    messageEl.textContent = data.error || "Signup failed.";
+                    messageEl.textContent = data.error || "Sign up failed.";
                     messageEl.style.color = "red";
                 }
             } catch (err) {

@@ -62,7 +62,7 @@ module.exports = async function (context, req) {
               <body>
                 <h2>Verify your email</h2>
                 <p>${personalizedGreeting}</p>
-                <p>Your verification code for Premium access is: <strong>${verificationCode}</strong></p>
+                <p>Your verification code to register for Premium Go URL Shortener(ext) is: <strong>${verificationCode}</strong></p>
                 <p>Alternatively, <a href="${linkUrl}">click this link</a> to continue your sign up.</p>
                 <p>This code will expire in 1 hour.</p>
               </body>

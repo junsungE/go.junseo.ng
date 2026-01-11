@@ -81,6 +81,26 @@ document.addEventListener("DOMContentLoaded", () => {
              btnSendCode.style.display = "none";
         }
 
+        // 0. Reset Verification on Email Change
+        document.getElementById("email").addEventListener("input", () => {
+             if (isEmailVerified || codeSection.style.display === "block") {
+                 isEmailVerified = false;
+                 codeSection.style.display = "none";
+                 btnSendCode.style.display = "block";
+                 btnSendCode.disabled = false;
+                 
+                 // Unlock inputs if they were locked
+                 document.getElementById("email").readOnly = false;
+                 codeInput.readOnly = false;
+                 codeInput.value = "";
+                 codeStatus.textContent = "";
+                 
+                 // Re-enable other buttons
+                 btnVerifyCode.disabled = false;
+                 // Note: Resend timer might still be running but the button is hidden anyway
+             }
+        });
+
         // 1. Send Code Handler
         btnSendCode.addEventListener("click", async () => {
              const email = document.getElementById("email").value;
@@ -93,6 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
              messageEl.textContent = "Sending verification code...";
              messageEl.style.color = "#333";
+             btnSendCode.disabled = true;
              
              try {
                 const res = await fetch(`${API_BASE}/requestVerification`, {
@@ -111,10 +132,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 } else {
                     messageEl.textContent = data.error || "Failed to send code.";
                     messageEl.style.color = "red";
+                    btnSendCode.disabled = false;
                 }
              } catch (err) {
                  messageEl.textContent = "Error: " + err.message;
                  messageEl.style.color = "red";
+                 btnSendCode.disabled = false;
              }
         });
 
@@ -134,7 +157,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (timeLeft <= 0) {
                     clearInterval(timerId);
                     btnResendCode.textContent = originalText;
-                    btnResendCode.disabled = false;
+                    // Only re-enable if email isn't already verified
+                    if (!isEmailVerified) {
+                        btnResendCode.disabled = false;
+                    }
                 }
              }, 1000);
 
@@ -178,6 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
              codeStatus.textContent = "Verifying code...";
              codeStatus.style.color = "#333";
+             btnVerifyCode.disabled = true;
 
              try {
                 const res = await fetch(`${API_BASE}/validateCode`, {
@@ -200,10 +227,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     codeStatus.textContent = data.error || "Invalid code.";
                     codeStatus.style.color = "red";
                     isEmailVerified = false;
+                    btnVerifyCode.disabled = false;
                 }
              } catch (err) {
                  codeStatus.textContent = "Error: " + err.message;
                  codeStatus.style.color = "red";
+                 btnVerifyCode.disabled = false;
              }
         });
 

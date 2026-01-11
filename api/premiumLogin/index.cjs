@@ -31,24 +31,28 @@ module.exports = async function (context, req) {
       return;
     }
 
-    if (user.status !== "approved") {
-      context.res = jsonResponse(403, { error: "Account not approved yet." });
-      return;
-    }
-
     const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
       context.res = jsonResponse(403, { error: "Invalid credentials." });
       return;
     }
+    
+    if (!user.isEmailVerified) {
+        context.res = jsonResponse(403, { error: "Please verify your email first." });
+        return;
+    }
+
+    // Allow login even if pending, but frontend will handle restricted access
+    // if (user.status !== "approved") { ... } 
 
     context.res = jsonResponse(200, {
       message: "Login successful.",
       user: {
         id: user.rowKey,
         displayName: user.displayName,
-        email: user.email
+        email: user.email,
+        status: user.status // pending or approved
       }
     });
 

@@ -12,15 +12,33 @@
 <body style="background-image: url('/media/doggles.webp'); background-position: 50%; background-size: cover; min-height: 100vh;">
     <header class="classification">EXTERNAL</header>
         <main class="container">
-            <h2>Sign up</h2>
-            <form id="signupForm">
-                <input type="text" id="displayName" placeholder="Display Name" required>
-                <input type="email" id="email" placeholder="Email" required>
-                <input type="password" id="password" placeholder="Password" required>
-                <button type="submit">Sign Up</button>
-            </form>
-            <p id="message"></p>
-            <p>Already have an account? <a href="/ext/premium/login">Sign in</a></p>
+            <section id="signupSection">
+                <h2>Sign up</h2>
+                <form id="signupForm">
+                    <input type="text" id="displayName" placeholder="Display Name" required>
+                    
+                    <section class="input-group">
+                        <input type="email" id="email" placeholder="Email" required style="margin-bottom: 5px;">
+                        <button type="button" id="btnSendCode" style="margin-bottom: 15px; background-color: #555;">Verify Email</button>
+                    </section>
+
+                    <!-- Hidden Code Section -->
+                    <section id="codeSection" style="display:none; background: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                        <input type="text" id="verificationCode" placeholder="Enter 6-digit code">
+                        <section style="display: flex; gap: 5px;">
+                            <button type="button" id="btnVerifyCode" style="background-color: #28a745;">Verify</button>
+                            <button type="button" id="btnResendCode" style="background-color: #0078d4;">Resend</button>
+                        </section>
+                        <p id="codeStatus" style="font-size: 0.9em; margin-top: 5px; font-weight: bold;"></p>
+                    </section>
+
+                    <input type="password" id="password" placeholder="Password" required>
+                    
+                    <button type="submit" id="btnSignUp">Sign Up</button>
+                </form>
+                <p id="message"></p>
+                <p>Already have an account? <a href="/ext/premium/login">Sign in</a></p>
+            </section>
         </main>
     <footer class="classification">EXTERNAL</footer>
 

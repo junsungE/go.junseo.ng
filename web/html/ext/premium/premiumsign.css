@@ -8,6 +8,29 @@ body {
     margin: 0;
 }
 
+.classification {
+  display: block;
+  unicode-bidi: isolate;
+  text-align: center;
+
+  color: #fff;
+  font-size: 16px;
+  left: 0;
+  right: 0;
+  flex-shrink: 0;
+  background: #3d1e5a;
+  z-index: 20;
+  font-weight: 400;
+  padding: calc(var(--spacing) * 0);
+  -webkit-font-smoothing: antialiased;
+  height: calc(var(--spacing) * 8);
+
+  position: fixed;
+}
+
+header.classification { top: 0 }
+footer.classification { bottom: 0 }
+
 .container {
     background: white;
     padding: 2rem;

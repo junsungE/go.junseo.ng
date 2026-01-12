@@ -36,10 +36,40 @@ module.exports = async function (context, req) {
         partitionKey = "internal";
         break;
       case "premium":
+         tableName = "ExternalLinks";
+         partitionKey = "premium";
+ 
+         // Security check: Verify user is approved
+         if (!createdBy || createdBy === "anonymous") {
+             context.res = jsonResponse(401, { error: "Login required for premium links." });
+             return;
+         }
+ 
+         const usersTable = getTableClient("Users");
+         const safeEmail = createdBy.replace(/'/g, "''");
+         const userFilter = `PartitionKey eq 'Users' and email eq '${safeEmail}'`;
+         
+         const userIterator = usersTable.listEntities({ queryOptions: { filter: userFilter } });
+         let verifiedUser = null;
+         for await (const u of userIterator) {
+             verifiedUser = u;
+             break;
+         }
+ 
+         if (!verifiedUser) {
+              context.res = jsonResponse(403, { error: "User identity verification failed." });
+              return;
+         }
+         
+         if (verifiedUser.status !== 'approved') {
+              context.res = jsonResponse(403, { error: "Account must be approved to create premium links." });
+              return;
+         }
+         break;
       case "external":
       default:
         tableName = "ExternalLinks";
-        partitionKey = type === "premium" ? "premium" : "free";
+        partitionKey = "free";
         break;
     }
     

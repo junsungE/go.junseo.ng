@@ -29,6 +29,33 @@ function getUser() {
     }
 }
 
+function checkAccountStatus() {
+    const user = getUser();
+    const isApproved = user && user.status === 'approved';
+    const notApprovedMsg = document.querySelector('.account-not-approved');
+
+    const inputsToDisable = [
+        urlInput,
+        idInput,
+        expiryDateInput,
+        visitLimitInput,
+        titleInput,
+        caseSensitiveInput,
+        shortenUrlBtn
+    ];
+
+    if (isApproved) {
+        // User is approved: Hide warning, enable inputs
+        if (notApprovedMsg) notApprovedMsg.hidden = true;
+        inputsToDisable.forEach(el => { if(el) el.disabled = false; });
+    } else {
+        // User not approved or not logged in: Show warning, disable inputs
+        if (notApprovedMsg) notApprovedMsg.hidden = false;
+        inputsToDisable.forEach(el => { if(el) el.disabled = true; });
+    }
+}
+
+
 // Fetch user's links
 async function fetchMyLinks() {
     const user = getUser();
@@ -294,3 +321,6 @@ shortenAnotherBtn.addEventListener("click", () => {
 
 // Initially hide buttons
 shortenAnotherBtn.hidden = true;
+
+// Check permissions
+checkAccountStatus();

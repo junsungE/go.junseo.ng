@@ -105,12 +105,12 @@ module.exports = async function (context, req) {
             senderAddress: senderEmail,
             content: {
               subject: `Request ${statusText} - Premium Go URL Shortener(ext)`,
-              plainText: `Hi ${user.displayName},\n\n${messageText}\n\nBest regards,\nGo.junseo.ng`,
+              plainText: `Hi ${user.displayName},\n\n${messageText}\n\nBest regards,\nGo.junseo.ng/ext/premium`,
               html: `
                 <html>
                   <body>
                     <h2>Status Update</h2>
-                    <p>Hi <strong>${user.displayName}</strong>,</p>
+                    <p>Hi ${user.displayName},</p>
                     <p>${messageText}</p>
                     <p>Best regards,<br>Go.junseo.ng/ext/premium</p>
                   </body>

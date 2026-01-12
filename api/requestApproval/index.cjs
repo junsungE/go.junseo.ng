@@ -53,6 +53,7 @@ module.exports = async function (context, req) {
                                 <p><strong>User:</strong> ${user.displayName} (${user.email})</p>
                                 <p><strong>Requested at:</strong> ${user.approvalRequestedAt}</p>
                                 <br>
+                                <p>Go.junseo.ng/internal/dashboard</p>
                                 <p>
                                     <a href="${approveUrl}" style="background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block; margin-right: 10px;">Approve</a>
                                     <a href="${rejectUrl}" style="background-color: #dc3545; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block;">Reject</a>

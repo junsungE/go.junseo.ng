@@ -122,14 +122,14 @@ function renderLinks() {
 
         tr.innerHTML = `
             <td><a href="${fullUrl}" target="_blank">${link.slug}</a></td>
+            <td>${link.isCaseSensitive ? 'Yes' : 'No'}</td>
             <td title="${link.targetUrl}" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${link.targetUrl}</td>
             <td>${link.title || '-'}</td>
-            <td>${new Date(link.createdAt).toLocaleDateString()}</td>
             <td>${link.visits}${link.visitLimit ? '/' + link.visitLimit : ''}</td>
-            <td>${lastVisitedDisplay}</td>
             <td>${expiryDisplay}</td>
-            <td>${link.isCaseSensitive ? 'Yes' : 'No'}</td>
             <td>${status}</td>
+            <td>${lastVisitedDisplay}</td>
+            <td>${new Date(link.createdAt).toLocaleDateString()}</td>
         `;
         myLinksBody.appendChild(tr);
     });

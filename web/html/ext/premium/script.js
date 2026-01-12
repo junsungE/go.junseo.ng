@@ -60,7 +60,7 @@ function checkAccountStatus() {
 async function fetchMyLinks() {
     const user = getUser();
     if (!user || !user.email) {
-        myLinksBody.innerHTML = "<tr><td colspan='5'>Please log in to see your links.</td></tr>";
+        myLinksBody.innerHTML = "<tr><td colspan='9'>Please log in to see your links.</td></tr>";
         return;
     }
 

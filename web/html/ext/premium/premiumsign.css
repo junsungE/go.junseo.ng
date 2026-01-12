@@ -31,6 +31,10 @@ body {
 header.classification { top: 0 }
 footer.classification { bottom: 0 }
 
+main {
+  display: grid;
+}
+
 .container {
     background: white;
     padding: 2rem;

@@ -29,10 +29,6 @@ body {
   padding-bottom: calc(24px + 32px);
 }
 
-main {
-  display: grid;
-}
-
 .classification {
   display: block;
   unicode-bidi: isolate;
@@ -57,6 +53,10 @@ main {
 
 header.classification { top: 0 }
 footer.classification { bottom: 0 }
+
+main {
+  display: grid;
+}
 
 .container {
   max-width: 760px;

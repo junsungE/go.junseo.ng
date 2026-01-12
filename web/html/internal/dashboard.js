@@ -128,22 +128,35 @@ const form = document.getElementById("fetchForm");
           const secret = localStorage.getItem("adminSecret");
           if (!confirm(`Are you sure you want to set this user to ${newStatus}?`)) return;
 
+          console.log(`Updating user ${userId} to ${newStatus}...`);
+
           try {
             const res = await fetch("/api/adminApprove", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userId, secret, status: newStatus })
             });
-            const result = await res.json();
+
+            // Parse response - handle both success and error JSON
+            let result;
+            try {
+                result = await res.json();
+            } catch (e) {
+                console.error("Failed to parse JSON:", e);
+                alert("Error: Server returned invalid response. See console.");
+                return;
+            }
             
             if (res.ok) {
                 alert(result.message);
                 fetchUsers(); // reload list
             } else {
-                alert("Error: " + result.error);
+                console.error("API Error:", result);
+                alert("Error: " + (result.error || result.message || "Unknown error"));
             }
           } catch (err) {
-              alert("Error: " + err.message);
+              console.error("Network Error:", err);
+              alert("Network Error: " + err.message);
           }
       };
 

@@ -2,26 +2,40 @@ const { getTableClient, getEmailClient, jsonResponse } = require("../shared.cjs"
 
 module.exports = async function (context, req) {
   // Support both POST (from dashboard) and GET (from direct email links)
-  // Ensure method check is case-insensitive for robustness
   const method = req.method ? req.method.toUpperCase() : "POST";
   const isGet = method === "GET";
   
-  // Combine query and body for easier access
-  const params = { ...(req.query || {}), ...(req.body || {}) };
+  // Safe parameter extraction
+  let body = req.body;
+  
+  // Handle case where body might be a JSON string but not parsed
+  if (body && typeof body === "string") {
+      try {
+          body = JSON.parse(body);
+      } catch (e) {
+          // If parse fails, assume it's just a query string-like body or raw buffer.
+          // For this API, valid JSON is expected for POST.
+      }
+  }
+
+  const query = req.query || {};
+  const params = { ...query, ...(typeof body === "object" ? body : {}) };
+  
   const { userId, secret, status } = params;
   
   const adminSecret = process.env.ADMIN_SECRET;
   
   if (!adminSecret || secret !== adminSecret) {
-      context.log.warn(`Unauthorized admin attempt. Secret provided: ${!!secret}`);
       if (isGet) {
+          // Return 200 OK with error UI to prevent SWA/Browser from hiding the error
           context.res = {
-              status: 403,
+              status: 200,
               headers: { "Content-Type": "text/html" },
-              body: "<h1>Forbidden</h1><p>Invalid or missing admin secret.</p>"
+              body: "<h1 style='color:red;'>Unauthorized</h1><p>Invalid or missing admin secret.</p>"
           };
       } else {
-          context.res = jsonResponse(403, { error: "Forbidden: Invalid admin secret." });
+          // Dashboard expects JSON
+          context.res = jsonResponse(403, { error: "Authorization failed. Check Admin Secret." });
       }
       return;
   }
@@ -29,7 +43,7 @@ module.exports = async function (context, req) {
   if (!userId || !status) {
     if (isGet) {
         context.res = {
-            status: 400,
+            status: 200, 
             headers: { "Content-Type": "text/html" },
             body: "<h1>Bad Request</h1><p>Missing userId or status.</p>"
         };
@@ -42,7 +56,7 @@ module.exports = async function (context, req) {
   if (status !== "approved" && status !== "rejected") {
     if (isGet) {
         context.res = {
-            status: 400,
+            status: 200,
             headers: { "Content-Type": "text/html" },
             body: "<h1>Bad Request</h1><p>Invalid status.</p>"
         };
@@ -62,7 +76,7 @@ module.exports = async function (context, req) {
     } catch (e) {
         if (e.statusCode === 404) {
             if (isGet) {
-                context.res = { status: 404, headers: { "Content-Type": "text/html" }, body: "<h1>User Not Found</h1>" };
+                context.res = { status: 200, headers: { "Content-Type": "text/html" }, body: "<h1>User Not Found</h1>" };
             } else {
                 context.res = jsonResponse(404, { error: "User not found." });
             }
@@ -138,7 +152,7 @@ module.exports = async function (context, req) {
     context.log.error("adminApprove general error:", err.message);
     if (isGet) {
         context.res = {
-            status: 500,
+            status: 200,
             headers: { "Content-Type": "text/html" },
             body: `<h1>Error</h1><p>${err.message}</p>`
         };

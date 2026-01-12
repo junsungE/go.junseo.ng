@@ -77,8 +77,14 @@ function renderLinks() {
 
         // Standard comparison
         let cmp = 0;
-        if (valA < valB) cmp = -1;
-        if (valA > valB) cmp = 1;
+        
+        // Use localeCompare for strings to ensure case-insensitive sorting or proper alphabetical sorting
+        if (typeof valA === 'string' && typeof valB === 'string') {
+            cmp = valA.localeCompare(valB, undefined, { sensitivity: 'base' });
+        } else {
+            if (valA < valB) cmp = -1;
+            if (valA > valB) cmp = 1;
+        }
 
         // Secondary sort by CreatedAt (descending) if equal
         if (cmp === 0) {

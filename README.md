@@ -2,7 +2,7 @@
 
 ## Premium Go URL Shortener(ext)
 
-1. My Links table:
+My Links table:
 - Clicking any column header sorts the table by that column.
 - Clicking the same header again toggles between Ascending and Descending.
 - Default sort for generic columns is Ascending.

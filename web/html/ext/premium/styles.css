@@ -72,15 +72,13 @@ h1 {
   font-size: 20px;
 }
 
-h2.account-not-approved {
-    font-size: 18px;
-    text-align: center;
-    color: red;
-}
-
 h2 {
   font-size: 18px;
-  margin: 24px 0 12px;
+}
+
+h2.account-not-approved {
+    text-align: center;
+    color: red;
 }
 
 .url-row, .optional-row, .id-row {

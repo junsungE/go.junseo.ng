@@ -99,23 +99,53 @@ const form = document.getElementById("fetchForm");
             // Format date
             const dateStr = user.lastSignIn === "Never" ? "Never" : new Date(user.lastSignIn).toLocaleString();
             
-            let actionHtml = "";
+            // Create cells
+            const nameCell = document.createElement("td");
+            nameCell.textContent = user.displayName;
+            
+            const emailCell = document.createElement("td");
+            emailCell.style.fontFamily = "monospace";
+            emailCell.style.fontSize = "0.9em";
+            emailCell.textContent = user.email;
+            
+            const statusCell = document.createElement("td");
+            const statusBadge = document.createElement("span");
+            statusBadge.className = `status-badge status-${user.status}`;
+            statusBadge.textContent = user.status;
+            statusCell.appendChild(statusBadge);
+            
+            const dateCell = document.createElement("td");
+            dateCell.textContent = dateStr;
+            
+            const actionCell = document.createElement("td");
+            
             if (user.status === "pending") {
-                actionHtml = `
-                    <button class="action-btn approve" onclick="updateUserStatus('${user.id}', 'approved')">Approve</button>
-                    <button class="action-btn reject" onclick="updateUserStatus('${user.id}', 'rejected')">Reject</button>
-                `;
+                const approveBtn = document.createElement("button");
+                approveBtn.className = "action-btn approve";
+                approveBtn.textContent = "Approve";
+                approveBtn.addEventListener("click", () => updateUserStatus(user.id, "approved"));
+                
+                const rejectBtn = document.createElement("button");
+                rejectBtn.className = "action-btn reject";
+                rejectBtn.textContent = "Reject";
+                rejectBtn.addEventListener("click", () => updateUserStatus(user.id, "rejected"));
+                
+                actionCell.appendChild(approveBtn);
+                actionCell.appendChild(document.createTextNode(" "));
+                actionCell.appendChild(rejectBtn);
             } else {
-                actionHtml = `<span style="font-size: 0.8em; color: #666;">No actions</span>`;
+                const noAction = document.createElement("span");
+                noAction.style.fontSize = "0.8em";
+                noAction.style.color = "#666";
+                noAction.textContent = "No actions";
+                actionCell.appendChild(noAction);
             }
-
-            tr.innerHTML = `
-              <td>${user.displayName}</td>
-              <td style="font-family: monospace; font-size: 0.9em;">${user.email}</td>
-              <td><span class="status-badge status-${user.status}">${user.status}</span></td>
-              <td>${dateStr}</td>
-              <td>${actionHtml}</td>
-            `;
+            
+            tr.appendChild(nameCell);
+            tr.appendChild(emailCell);
+            tr.appendChild(statusCell);
+            tr.appendChild(dateCell);
+            tr.appendChild(actionCell);
             usersBody.appendChild(tr);
           });
         } catch (err) {
@@ -124,7 +154,7 @@ const form = document.getElementById("fetchForm");
         }
       }
 
-      window.updateUserStatus = async (userId, newStatus) => {
+      async function updateUserStatus(userId, newStatus) {
           const secret = localStorage.getItem("adminSecret");
           if (!confirm(`Are you sure you want to set this user to ${newStatus}?`)) return;
 

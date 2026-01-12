@@ -79,7 +79,6 @@ h1 {
   color: var(--muted);
   font-weight: 600;
   flex: 0 0 auto;
-  min-width: 0;
 }
 
 input[type="text"],
@@ -90,7 +89,6 @@ input[type="number"] {
   padding: 10px;
   border-radius: 6px;
   border: 1px solid #d1d5db;
-  min-width: 0;
 }
 
 .url-label, .expiryDateLabel, .visitLimitLabel {
@@ -113,6 +111,8 @@ button {
   padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 button[disabled] {
@@ -173,7 +173,6 @@ h1,
   word-break: break-word;
   overflow-wrap: anywhere;
   hyphens: auto;
-  min-width: 0;
 }
 
 /* Responsive adjustments */

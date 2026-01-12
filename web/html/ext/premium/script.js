@@ -5,7 +5,6 @@ const visitLimitInput = document.getElementById("visitLimitInput");
 const titleInput = document.getElementById("titleInput");
 const caseSensitiveInput = document.getElementById("caseSensitiveInput");
 const shortenUrlBtn = document.getElementById("shortenUrl");
-const slugOutput = document.getElementById("slugOutput");
 const shortenAnotherBtn = document.getElementById("shortenAnother");
 const resultSection = document.querySelector(".result");
 const copyUrlBtn = document.getElementById("copyUrl");
@@ -89,7 +88,7 @@ shortenUrlBtn.addEventListener("click", async () => {
   }
 
   shortenUrlBtn.disabled = true;
-  slugOutput.value = "Creating...";
+  shortenUrlBtn.textContent = "Creating...";
 
   const data = {
     type: "premium", // Important
@@ -132,10 +131,9 @@ shortenUrlBtn.addEventListener("click", async () => {
       const slug = result.slug || "";
       currentFullUrl = result.fullUrl || `${window.location.origin}/ext/${slug}`;
       
-      slugOutput.value = slug;
-      
       resultSection.hidden = false;
       shortenAnotherBtn.hidden = false;
+      shortenUrlBtn.textContent = "Shorten"; // Reset button text
       
       // Disable inputs
       urlInput.disabled = true;
@@ -149,14 +147,14 @@ shortenUrlBtn.addEventListener("click", async () => {
       // Refresh list
       fetchMyLinks();
     } else {
-      slugOutput.value = "";
       alert(`Error: ${result && result.error ? result.error : 'Server error'}`);
       shortenUrlBtn.disabled = false;
+      shortenUrlBtn.textContent = "Shorten";
     }
   } catch (err) {
-    slugOutput.value = "";
     alert(`Network error: ${err && err.message ? err.message : String(err)}`);
     shortenUrlBtn.disabled = false;
+    shortenUrlBtn.textContent = "Shorten";
   }
 });
 
@@ -186,7 +184,6 @@ shortenAnotherBtn.addEventListener("click", () => {
   visitLimitInput.value = "";
   titleInput.value = "";
   caseSensitiveInput.checked = false;
-  slugOutput.value = "";
   currentFullUrl = "";
   
   // Hide result section

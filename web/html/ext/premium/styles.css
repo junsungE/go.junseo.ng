@@ -50,14 +50,9 @@ body {
 header.classification { top: 0 }
 footer.classification { bottom: 0 }
 
-/* Premium Nav overrides */
-#premium-nav {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-#premium-nav a {color:var(--accent);text-decoration:none;padding:6px 10px;border-radius:8px;border:1px solid transparent;font-weight:600}
-#premium-nav a:hover {background:#f3f7fb;border-color:#e6eef9}
+nav{display:flex;gap:12px;justify-content:center;margin:12px 0 18px;align-items: center;}
+nav a{color:var(--accent);text-decoration:none;padding:6px 10px;border-radius:8px;border:1px solid transparent;font-weight:600}
+nav a:hover{background:#f3f7fb;border-color:#e6eef9}
 
 .container {
   max-width: 760px;
@@ -78,7 +73,7 @@ h2 {
   margin: 24px 0 12px;
 }
 
-.url-row, .optional-row, .result-row, .id-row {
+.url-row, .optional-row, .id-row {
   display: flex;
   gap: 8px;
   align-items: center;
@@ -156,12 +151,6 @@ button[disabled] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-.result-label {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 6px;
 }
 
 .copy-row {
@@ -248,7 +237,6 @@ h1,
   /* Stack rows vertically on narrow screens */
   .url-row,
   .optional-row,
-  .result-row,
   .id-row {
     flex-direction: column;
     align-items: stretch;
@@ -264,7 +252,6 @@ h1,
 
   .url-row input,
   .optional-row input,
-  .result-row input,
   .id-row input {
     width: 100%;
   }

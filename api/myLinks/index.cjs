@@ -30,6 +30,7 @@ module.exports = async function (context, req) {
         targetUrl: entity.targetUrl,
         createdAt: entity.createdAt,
         visits: entity.visits || 0,
+        lastVisitedAt: entity.lastVisitedAt,
         expiryDate: entity.expiryDate,
         visitLimit: entity.visitLimit,
         isCaseSensitive: entity.isCaseSensitive,

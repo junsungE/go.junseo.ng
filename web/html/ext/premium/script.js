@@ -10,8 +10,13 @@ const resultSection = document.querySelector(".result");
 const copyUrlBtn = document.getElementById("copyUrl");
 const copiedSpan = document.getElementById("copied");
 const myLinksBody = document.getElementById("myLinksBody");
+const tableHeaders = document.querySelectorAll(".links-table th");
 
 let currentFullUrl = "";
+let userLinks = []; // Store links locally for sorting
+let sortCol = "createdAt";
+let sortAsc = false; // default desc
+
 
 // Get logged in user info (assumes auth.js or other updated localStorage)
 // Note: premium-nav.js or auth.js might have set simple user info.
@@ -35,40 +40,118 @@ async function fetchMyLinks() {
     try {
         const res = await fetch(`/api/myLinks?email=${encodeURIComponent(user.email)}`);
         if (res.ok) {
-            const links = await res.json();
-            if (links.length === 0) {
-                myLinksBody.innerHTML = "<tr><td colspan='5'>No links found. Create one!</td></tr>";
-                return;
-            }
-            
-            myLinksBody.innerHTML = "";
-            links.forEach(link => {
-                const tr = document.createElement("tr");
-                
-                // Determine status
-                let status = "Active";
-                if (link.expiryDate && new Date(link.expiryDate) < new Date()) status = "Expired";
-                if (link.visitLimit && link.visits >= link.visitLimit) status = "Limit Reached";
-
-                const fullUrl = `${window.location.origin}/ext/${link.slug}`;
-
-                tr.innerHTML = `
-                    <td><a href="${fullUrl}" target="_blank">${link.slug}</a></td>
-                    <td title="${link.targetUrl}" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${link.targetUrl}</td>
-                    <td>${link.title || '-'}</td>
-                    <td>${new Date(link.createdAt).toLocaleDateString()}</td>
-                    <td>${link.visits}${link.visitLimit ? '/' + link.visitLimit : ''}</td>
-                    <td>${status}</td>
-                `;
-                myLinksBody.appendChild(tr);
-            });
+            userLinks = await res.json();
+            renderLinks();
         } else {
-            myLinksBody.innerHTML = "<tr><td colspan='6'>Failed to load links.</td></tr>";
+            myLinksBody.innerHTML = "<tr><td colspan='9'>Failed to load links.</td></tr>";
         }
     } catch (err) {
-        myLinksBody.innerHTML = `<tr><td colspan='6'>Error: ${err.message}</td></tr>`;
+        myLinksBody.innerHTML = `<tr><td colspan='9'>Error: ${err.message}</td></tr>`;
     }
 }
+
+// Render sorted links
+function renderLinks() {
+    if (userLinks.length === 0) {
+        myLinksBody.innerHTML = "<tr><td colspan='9'>No links found. Create one!</td></tr>";
+        return;
+    }
+
+    // Sort logic
+    userLinks.sort((a, b) => {
+        let valA, valB;
+
+        // Custom getters for specific columns
+        if (sortCol === "status") {
+            valA = getStatus(a);
+            valB = getStatus(b);
+        } else {
+            // Default property access
+            valA = a[sortCol];
+            valB = b[sortCol];
+        }
+
+        // Handle nulls/undefined
+        if (valA === null || valA === undefined) valA = "";
+        if (valB === null || valB === undefined) valB = "";
+
+        // Standard comparison
+        let cmp = 0;
+        if (valA < valB) cmp = -1;
+        if (valA > valB) cmp = 1;
+
+        // Secondary sort by CreatedAt (descending) if equal
+        if (cmp === 0) {
+            const dateA = new Date(a.createdAt || 0);
+            const dateB = new Date(b.createdAt || 0);
+            return dateB - dateA; 
+        }
+
+        return sortAsc ? cmp : -cmp;
+    });
+
+    // Update table headers UI
+    tableHeaders.forEach(th => {
+        const span = th.querySelector("span");
+        if (th.dataset.sort === sortCol) {
+            span.textContent = sortAsc ? " ▲" : " ▼";
+        } else {
+            span.textContent = "";
+        }
+    });
+
+    myLinksBody.innerHTML = "";
+    userLinks.forEach(link => {
+        const tr = document.createElement("tr");
+        const status = getStatus(link);
+        const fullUrl = `${window.location.origin}/ext/${link.slug}`;
+        
+        const lastVisitedDisplay = link.lastVisitedAt 
+            ? new Date(link.lastVisitedAt).toLocaleString() 
+            : "-";
+            
+        const expiryDisplay = link.expiryDate
+            ? new Date(link.expiryDate).toLocaleDateString()
+            : "-";
+
+        tr.innerHTML = `
+            <td><a href="${fullUrl}" target="_blank">${link.slug}</a></td>
+            <td title="${link.targetUrl}" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${link.targetUrl}</td>
+            <td>${link.title || '-'}</td>
+            <td>${new Date(link.createdAt).toLocaleDateString()}</td>
+            <td>${link.visits}${link.visitLimit ? '/' + link.visitLimit : ''}</td>
+            <td>${lastVisitedDisplay}</td>
+            <td>${expiryDisplay}</td>
+            <td>${link.isCaseSensitive ? 'Yes' : 'No'}</td>
+            <td>${status}</td>
+        `;
+        myLinksBody.appendChild(tr);
+    });
+}
+
+function getStatus(link) {
+    if (link.expiryDate && new Date(link.expiryDate) < new Date()) return "Expired";
+    if (link.visitLimit && link.visits >= link.visitLimit) return "Limit Reached";
+    return "Active";
+}
+
+// Header click handlers
+tableHeaders.forEach(th => {
+    th.addEventListener("click", () => {
+        const col = th.dataset.sort;
+        if (sortCol === col) {
+            sortAsc = !sortAsc;
+        } else {
+            sortCol = col;
+            sortAsc = true; // Default to asc for new column
+            // Exception: Dates usually better desc by default
+            if (["createdAt", "lastVisitedAt", "expiryDate", "visits"].includes(col)) {
+                sortAsc = false;
+            }
+        }
+        renderLinks();
+    });
+});
 
 // Initial fetch
 fetchMyLinks();

@@ -66,18 +66,36 @@ async function recordVisit(slug, ip, uaString, country = "Unknown") {
 }
 
 // Increment visit counter in target table
-async function incrementVisit(tableName, slug) {
+async function incrementVisit(tableName, slug, partitionKey = null) {
   const table = getTableClient(tableName);
   try {
-    const entity = await table.getEntity(
-      tableName === "InternalLinks" ? "internal" : "free",
-      slug
-    );
+    // If no partition key provided, guess based on tableName (legacy support)
+    if (!partitionKey) {
+      partitionKey = tableName === "InternalLinks" ? "internal" : "free"; 
+    }
+
+    const entity = await table.getEntity(partitionKey, slug);
     entity.visits = (entity.visits || 0) + 1;
     entity.lastVisitedAt = new Date().toISOString();
     await table.updateEntity(entity, "Replace");
   } catch (err) {
+    // If premium, try to find in premium partition if not found in free?
+    // No, cleaner logic should be handled by caller properly passing partitionKey.
+    // However, if the error is "Not Found", it might be because we defaulted to "free" but it's "premium".
+    if (tableName === "ExternalLinks" && partitionKey === "free") {
+      try {
+        const entity = await table.getEntity("premium", slug);
+        entity.visits = (entity.visits || 0) + 1;
+        entity.lastVisitedAt = new Date().toISOString();
+        await table.updateEntity(entity, "Replace");
+        return;
+      } catch (innerErr) {
+        // really not found
+      }
+    }
     console.error("Error incrementing visit count:", err.message);
+  }
+}
   }
 }
 

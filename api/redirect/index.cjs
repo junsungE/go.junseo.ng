@@ -171,7 +171,7 @@ module.exports = async function (context, req) {
         redirectUrl = entity.langMap[lang];
 
       // Log visit and redirect
-      await incrementVisit("InternalLinks", slug);
+      await incrementVisit("InternalLinks", entity.rowKey, entity.partitionKey);
       await recordVisit(slug, ip, ua, country);
       context.res = {
         status: 302,
@@ -181,7 +181,7 @@ module.exports = async function (context, req) {
     }
 
     // External redirect
-    await incrementVisit("ExternalLinks", slug);
+    await incrementVisit("ExternalLinks", entity.rowKey, entity.partitionKey);
     await recordVisit(slug, ip, ua);
 
     context.res = {

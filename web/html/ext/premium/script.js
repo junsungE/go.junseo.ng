@@ -138,6 +138,7 @@ shortenUrlBtn.addEventListener("click", async () => {
       // Disable inputs
       urlInput.disabled = true;
       idInput.disabled = true;
+      idInput.value = slug; // Show generated slug if it was random
       expiryDateInput.disabled = true;
       visitLimitInput.disabled = true;
       titleInput.disabled = true;

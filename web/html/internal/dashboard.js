@@ -161,7 +161,7 @@ const form = document.getElementById("fetchForm");
           console.log(`Updating user ${userId} to ${newStatus}...`);
 
           try {
-            const res = await fetch("/api/adminApprove", {
+            const res = await fetch("/api/approve", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userId, secret, status: newStatus })

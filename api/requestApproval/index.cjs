@@ -35,7 +35,7 @@ module.exports = async function (context, req) {
     if (adminEmail && senderEmail && adminSecret) {
         try {
             // Always use production domain for email links
-            const baseUrl = "https://go.junseo.ng/api/adminApprove";
+            const baseUrl = "https://go.junseo.ng/api/approve";
             
             const approveUrl = `${baseUrl}?userId=${user.rowKey}&status=approved&secret=${adminSecret}`;
             const rejectUrl = `${baseUrl}?userId=${user.rowKey}&status=rejected&secret=${adminSecret}`;

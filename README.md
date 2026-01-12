@@ -1,5 +1,11 @@
 # go.junseo.ng
 
+Features:
+- Optional Case Sensitivity toggle for all custom slugs (random slugs are always case sensitive)
+- External free: random slug, expiry date, visit limit
+- External premium (sign-in required): custom slug, analytics
+- Internal: custom slug, password-protected or private links, conditional redirects
+
 ## Premium Go URL Shortener(ext)
 
 My Links table:

@@ -2,20 +2,26 @@ const { getTableClient, getEmailClient, jsonResponse } = require("../shared.cjs"
 
 module.exports = async function (context, req) {
   // Support both POST (from dashboard) and GET (from direct email links)
-  const isGet = req.method === "GET";
-  const { userId, secret, status } = isGet ? req.query : (req.body || {});
+  // Ensure method check is case-insensitive for robustness
+  const method = req.method ? req.method.toUpperCase() : "POST";
+  const isGet = method === "GET";
+  
+  // Combine query and body for easier access
+  const params = { ...(req.query || {}), ...(req.body || {}) };
+  const { userId, secret, status } = params;
   
   const adminSecret = process.env.ADMIN_SECRET;
   
   if (!adminSecret || secret !== adminSecret) {
+      context.log.warn(`Unauthorized admin attempt. Secret provided: ${!!secret}`);
       if (isGet) {
           context.res = {
-              status: 401,
+              status: 403,
               headers: { "Content-Type": "text/html" },
-              body: "<h1>Unauthorized</h1><p>Invalid or missing admin secret.</p>"
+              body: "<h1>Forbidden</h1><p>Invalid or missing admin secret.</p>"
           };
       } else {
-          context.res = jsonResponse(401, { error: "Unauthorized" });
+          context.res = jsonResponse(403, { error: "Forbidden: Invalid admin secret." });
       }
       return;
   }
@@ -50,12 +56,27 @@ module.exports = async function (context, req) {
     const usersTable = getTableClient("Users");
     
     // Retrieve the entity first
-    const user = await usersTable.getEntity("Users", userId);
+    let user;
+    try {
+        user = await usersTable.getEntity("Users", userId);
+    } catch (e) {
+        if (e.statusCode === 404) {
+            if (isGet) {
+                context.res = { status: 404, headers: { "Content-Type": "text/html" }, body: "<h1>User Not Found</h1>" };
+            } else {
+                context.res = jsonResponse(404, { error: "User not found." });
+            }
+            return;
+        }
+        throw e;
+    }
     
     // Only update if actually changing status (idempotency)
     if (user.status !== status) {
+        const oldStatus = user.status;
         user.status = status;
         await usersTable.updateEntity(user);
+        context.log(`User ${user.email} status changed from ${oldStatus} to ${status}`);
 
         // Send Notification Email to user
         const senderEmail = process.env.SENDER_EMAIL || "donotreply@yourdomain.com";
@@ -88,14 +109,9 @@ module.exports = async function (context, req) {
           };
 
           const poller = await emailClient.beginSend(emailMessage);
-          // Speed up response by not waiting for full delivery confirmation
           context.log(`User notification email initiated for ${user.email}`); 
         } catch (emailErr) {
-          if (context.log && context.log.error) {
-              context.log.error("Failed to send notification email:", emailErr.message);
-          } else {
-              console.error("Failed to send notification email:", emailErr.message);
-          }
+          context.log.error("Failed to send notification email:", emailErr.message);
         }
     }
 
@@ -103,33 +119,31 @@ module.exports = async function (context, req) {
         context.res = {
             status: 200,
             headers: { "Content-Type": "text/html" },
-            body: `<h1>Success</h1><p>User <strong>${user.displayName}</strong> (${user.email}) has been <strong>${status}</strong>.</p><p><a href="/">Return to site</a></p>`
+            body: `
+                <html>
+                <body style="font-family: sans-serif; text-align: center; padding: 50px;">
+                    <h1 style="color: #28a745;">Success</h1>
+                    <p>User <strong>${user.displayName}</strong> (${user.email}) has been <strong>${status}</strong>.</p>
+                    <br>
+                    <a href="/ext/premium" style="color: #0078d4; text-decoration: none;">Return to site</a>
+                </body>
+                </html>
+            `
         };
     } else {
         context.res = jsonResponse(200, { message: `User ${user.displayName} (${user.email}) set to ${status}.` });
     }
 
   } catch (err) {
-    if (err.statusCode === 404) {
-        if (isGet) {
-            context.res = {
-                status: 404,
-                headers: { "Content-Type": "text/html" },
-                body: "<h1>Not Found</h1><p>User not found.</p>"
-            };
-        } else {
-            context.res = jsonResponse(404, { error: "User not found." });
-        }
+    context.log.error("adminApprove general error:", err.message);
+    if (isGet) {
+        context.res = {
+            status: 500,
+            headers: { "Content-Type": "text/html" },
+            body: `<h1>Error</h1><p>${err.message}</p>`
+        };
     } else {
-        if (isGet) {
-            context.res = {
-                status: 500,
-                headers: { "Content-Type": "text/html" },
-                body: `<h1>Error</h1><p>${err.message}</p>`
-            };
-        } else {
-            context.res = jsonResponse(500, { error: err.message });
-        }
+        context.res = jsonResponse(500, { error: err.message });
     }
   }
 };

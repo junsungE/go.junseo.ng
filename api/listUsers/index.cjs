@@ -4,7 +4,7 @@ module.exports = async function (context, req) {
   const { secret } = req.body || {};
 
   if (!process.env.ADMIN_SECRET || secret !== process.env.ADMIN_SECRET) {
-    context.res = jsonResponse(401, { error: "Unauthorized" });
+    context.res = jsonResponse(403, { error: "Forbidden: Invalid secret." });
     return;
   }
 

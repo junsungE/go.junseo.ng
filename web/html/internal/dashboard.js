@@ -75,10 +75,10 @@ const form = document.getElementById("fetchForm");
               body: JSON.stringify({ secret })
           });
           
-          if (res.status === 401) {
+          if (res.status === 401 || res.status === 403) {
               adminStatus.textContent = "Invalid secret.";
               adminStatus.style.color = "red";
-              usersBody.innerHTML = "<tr><td colspan='5'>Unauthorized. Please update the Admin Secret above.</td></tr>";
+              usersBody.innerHTML = "<tr><td colspan='5'>Forbidden. Please update the Admin Secret above.</td></tr>";
               usersLoading.style.display = "none";
               return;
           }

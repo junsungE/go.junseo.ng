@@ -46,14 +46,14 @@ module.exports = async function (context, req) {
             const emailMessage = {
                 senderAddress: senderEmail,
                 content: {
-                    subject: `[Approval Request] ${user.displayName}`,
+                    subject: `Premium Go URL Shortener(ext) - Approval Request - ${user.displayName}`,
                     plainText: `Premium Go URL Shortener(ext) approval request from ${user.displayName} (${user.email}). \n\nApprove: ${approveUrl} \nReject: ${rejectUrl}`,
                     html: `
                         <html>
                             <body style="font-family: Arial, sans-serif;">
                                 <h2>Premium Go URL Shortener(ext) Approval Request</h2>
                                 <p><strong>User:</strong> ${user.displayName} (${user.email})</p>
-                                <p><strong>Requested At:</strong> ${user.approvalRequestedAt}</p>
+                                <p><strong>Requested at:</strong> ${user.approvalRequestedAt}</p>
                                 <br>
                                 <p>
                                     <a href="${approveUrl}" style="background-color: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block; margin-right: 10px;">Approve</a>

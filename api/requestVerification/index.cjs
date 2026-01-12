@@ -47,7 +47,7 @@ module.exports = async function (context, req) {
     // 4. Send Email via Azure Communication Services
     const senderEmail = process.env.SENDER_EMAIL || "donotreply@yourdomain.com";
     const nameParam = displayName ? `&displayName=${encodeURIComponent(displayName)}` : "";
-    const linkUrl = `${process.env.URL || "https://go.junseo.ng"}/ext/premium/signup.html?email=${encodeURIComponent(email)}&code=${verificationCode}${nameParam}`;
+    const linkUrl = `${process.env.URL || "https://go.junseo.ng"}/ext/premium/signup?email=${encodeURIComponent(email)}&code=${verificationCode}${nameParam}`;
 
     try {
       const emailClient = getEmailClient();

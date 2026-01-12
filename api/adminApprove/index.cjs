@@ -77,7 +77,7 @@ module.exports = async function (context, req) {
                     <h2>Status Update</h2>
                     <p>Hi <strong>${user.displayName}</strong>,</p>
                     <p>${messageText}</p>
-                    <p>Best regards,<br>Go.junseo.ng</p>
+                    <p>Best regards,<br>Go.junseo.ng/ext/premium</p>
                   </body>
                 </html>
               `,

@@ -94,7 +94,6 @@ input[type="number"] {
 .url-label, .expiryDateLabel, .visitLimitLabel {
   font-size: 13px;
   color: var(--muted);
-  margin-bottom: 6px;
 }
 
 .action {
@@ -128,12 +127,6 @@ button[disabled] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-.result-label {
-  font-size: 13px;
-  color: var(--muted);
-  margin-bottom: 6px;
 }
 
 .copy-row {

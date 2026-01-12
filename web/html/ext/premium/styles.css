@@ -125,7 +125,6 @@ input[type="checkbox"] {
 .url-label, .expiryDateLabel, .visitLimitLabel {
   font-size: 13px;
   color: var(--muted);
-  margin-bottom: 6px;
 }
 
 .action {

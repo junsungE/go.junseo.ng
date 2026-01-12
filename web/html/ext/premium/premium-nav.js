@@ -111,7 +111,7 @@ if (user && nav) {
     logoutBtn.onclick = (e) => {
       e.preventDefault();
       localStorage.removeItem("user");
-      window.location.href = "/ext/premium/login";
+      window.location.href = "/ext/premium";
     };
     container.appendChild(logoutBtn);
 

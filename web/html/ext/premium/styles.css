@@ -26,6 +26,10 @@ body {
   padding-top: calc(24px + 32px);
   padding-bottom: calc(24px + 32px);
 }
+nav{
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
 
 .classification {
   display: block;

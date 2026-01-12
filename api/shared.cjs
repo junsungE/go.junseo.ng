@@ -96,8 +96,6 @@ async function incrementVisit(tableName, slug, partitionKey = null) {
     console.error("Error incrementing visit count:", err.message);
   }
 }
-  }
-}
 
 // Common helper to validate expiry or start date
 function isLinkActive(entity) {

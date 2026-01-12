@@ -62,6 +62,7 @@ footer.classification { bottom: 0 }
 h1 {
   margin: 0 0 14px;
   font-size: 20px;
+  text-align: center;
 }
 
 .url-row, .optional-row, .result-row {

@@ -11,6 +11,11 @@
   box-sizing: border-box;
 }
 
+/* Ensure hidden attribute is always respected */
+[hidden] {
+  display: none !important;
+}
+
 body {
   font-family: Inter, ui-sans-serif, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background: var(--bg);
@@ -20,10 +25,6 @@ body {
   /* reserve space for the fixed classification bars */
   padding-top: calc(24px + 32px);
   padding-bottom: calc(24px + 32px);
-}
-nav{
-    word-break: break-word;
-    overflow-wrap: anywhere;
 }
 
 .classification {
@@ -49,9 +50,14 @@ nav{
 header.classification { top: 0 }
 footer.classification { bottom: 0 }
 
-nav{display:flex;gap:12px;justify-content:center;margin:12px 0 18px;align-items: center;}
-nav a{color:var(--accent);text-decoration:none;padding:6px 10px;border-radius:8px;border:1px solid transparent;font-weight:600}
-nav a:hover{background:#f3f7fb;border-color:#e6eef9}
+/* Premium Nav overrides */
+#premium-nav {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+#premium-nav a {color:var(--accent);text-decoration:none;padding:6px 10px;border-radius:8px;border:1px solid transparent;font-weight:600}
+#premium-nav a:hover {background:#f3f7fb;border-color:#e6eef9}
 
 .container {
   max-width: 760px;
@@ -67,7 +73,12 @@ h1 {
   font-size: 20px;
 }
 
-.id-row, .url-row {
+h2 {
+  font-size: 18px;
+  margin: 24px 0 12px;
+}
+
+.url-row, .optional-row, .result-row, .id-row {
   display: flex;
   gap: 8px;
   align-items: center;
@@ -87,7 +98,8 @@ h1 {
 
 input[type="text"],
 input[type="url"],
-textarea {
+input[type="date"],
+input[type="number"] {
   flex: 1;
   padding: 10px;
   border-radius: 6px;
@@ -95,17 +107,21 @@ textarea {
   min-width: 0;
 }
 
-textarea#output {
-  font-family: inherit;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-  width: 100%;
+/* Checkbox alignment */
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #333;
+}
+input[type="checkbox"] {
+    margin: 0;
+    width: 16px;
+    height: 16px;
 }
 
-.url-label {
+.url-label, .expiryDateLabel, .visitLimitLabel {
   font-size: 13px;
   color: var(--muted);
   margin-bottom: 6px;
@@ -132,8 +148,7 @@ button[disabled] {
   cursor: not-allowed;
 }
 
-/* Clear button (URL) share the same styles */
-#clearUrl {
+#copyUrl {
   background: #e5e7eb;
   color: #111;
   padding: 10px;
@@ -143,28 +158,10 @@ button[disabled] {
   justify-content: center;
 }
 
-.result {
-  margin-top: 6px;
-}
-
 .result-label {
   font-size: 13px;
   color: var(--muted);
   margin-bottom: 6px;
-}
-
-.site-entry .site-anchor {
-  font-weight: 600;
-  color: var(--accent);
-  text-decoration: underline;
-  display: block;
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
-textarea {
-  width: 100%;
-  resize: vertical;
 }
 
 .copy-row {
@@ -193,11 +190,45 @@ textarea {
   border-radius: 4px;
 }
 
+/* My Links Table */
+.links-table-container {
+  overflow-x: auto;
+  margin-top: 12px;
+}
+
+.links-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.links-table th, .links-table td {
+  border: 1px solid #e5e7eb;
+  padding: 8px;
+  text-align: left;
+}
+
+.links-table th {
+  background: #f9fafb;
+  font-weight: 600;
+}
+
+.links-table td a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.links-table td a:hover {
+  text-decoration: underline;
+}
+
 /* Prevent horizontal overflow on narrow screens */
 h1,
 .prefix,
 .notes,
-.url-label {
+.url-label,
+.expiryDateLabel,
+.visitLimitLabel,
+#copied {
   word-break: break-word;
   overflow-wrap: anywhere;
   hyphens: auto;
@@ -215,21 +246,26 @@ h1,
   nav a{display:block;margin-right:0;text-align:center}
 
   /* Stack rows vertically on narrow screens */
-  .id-row,
-  .url-row {
+  .url-row,
+  .optional-row,
+  .result-row,
+  .id-row {
     flex-direction: column;
     align-items: stretch;
   }
 
  .prefix,
- .url-label {
+ .url-label,
+ .expiryDateLabel,
+ .visitLimitLabel {
     width: 100%;
     margin-bottom: 6px;
   }
 
-  .id-row input,
   .url-row input,
-  textarea {
+  .optional-row input,
+  .result-row input,
+  .id-row input {
     width: 100%;
   }
 
@@ -238,8 +274,8 @@ h1,
     justify-content: flex-start;
   }
 
-  /* Slightly smaller clear button on narrow screens */
-  #clearUrl {
+  /* Slightly smaller clear buttons on narrow screens */
+  #shortenUrl {
     padding: 6px 8px;
   }
 
@@ -269,7 +305,7 @@ h1,
 
 /* ensure prefix and clear button don't force overflow in horizontal layouts */
 .prefix,
-#clearUrl {
+#shortenUrl {
   flex: 0 0 auto;
 }
 

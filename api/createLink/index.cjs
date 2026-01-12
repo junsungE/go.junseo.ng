@@ -48,8 +48,10 @@ module.exports = async function (context, req) {
       isCaseSensitive = true;
     }
     
-    // Force case-sensitive for external premium URLs
-    if (type === "premium" && partitionKey === "premium") {
+    // For premium: Force case-sensitive ONLY if generating a random slug (no custom slug provided)
+    // If custom slug is provided, respect the isCaseSensitive flag from request.
+    const isCustomSlug = slug && slug.trim() !== "";
+    if (type === "premium" && partitionKey === "premium" && !isCustomSlug) {
       isCaseSensitive = true;
     }
 

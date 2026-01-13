@@ -66,6 +66,10 @@ main {
   text-align: center;
 }
 
+.remove-margin-bottom {
+  margin-bottom: 0;
+}
+
 h1 {
   margin: 0 0 14px;
   font-size: 20px;

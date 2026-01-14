@@ -31,7 +31,8 @@ module.exports = async function (context, req) {
             ip: item.ip,
             userAgent: item.userAgent,
             country: item.country,
-            language: item.language
+            language: item.language,
+            referrer: item.referrer
           });
         }
 
@@ -73,7 +74,8 @@ module.exports = async function (context, req) {
                     ip: visit.ip,
                     userAgent: visit.userAgent,
                     country: visit.country,
-                    language: visit.language
+                    language: visit.language,
+                    referrer: visit.referrer
                 });
             }
         }

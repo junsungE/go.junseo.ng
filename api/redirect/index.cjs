@@ -56,6 +56,7 @@ module.exports = async function (context, req) {
   const ip = req.headers["x-forwarded-for"] ? req.headers["x-forwarded-for"].split(",")[0].trim() : "Hidden";
   const country = req.headers["x-country"] || req.headers["cf-ipcountry"] || req.headers["x-client-geo-country"] || req.headers["client-ip-country"] || "Unknown";
   const lang = req.headers["accept-language"] ? req.headers["accept-language"].split(",")[0].trim() : "Unknown";
+  const referrer = req.headers["referer"] || req.headers["referrer"] || "Direct";
 
   if (!slug) {
     context.res = { status: 400, body: "Missing slug." };
@@ -184,7 +185,7 @@ module.exports = async function (context, req) {
 
       // Log visit and redirect
       await incrementVisit("InternalLinks", entity.rowKey, entity.partitionKey);
-      await recordVisit(slug, ip, ua, country, lang);
+      await recordVisit(slug, ip, ua, country, lang, referrer);
       context.res = {
         status: 302,
         headers: { Location: redirectUrl }
@@ -194,7 +195,7 @@ module.exports = async function (context, req) {
 
     // External redirect
     await incrementVisit("ExternalLinks", entity.rowKey, entity.partitionKey);
-    await recordVisit(slug, ip, ua, country, lang);
+    await recordVisit(slug, ip, ua, country, lang, referrer);
 
     context.res = {
       status: 302,

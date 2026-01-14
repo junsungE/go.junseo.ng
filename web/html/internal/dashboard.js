@@ -27,6 +27,7 @@ const form = document.getElementById("fetchForm");
               <th>User Agent</th>
               <th>Country</th>
               <th>Language</th>
+              <th>Referrer</th>
             </tr>`;
           table.appendChild(thead);
 
@@ -39,7 +40,8 @@ const form = document.getElementById("fetchForm");
               <td>${v.ip}</td>
               <td>${v.userAgent}</td>
               <td>${v.country}</td>
-              <td>${v.language || 'Unknown'}</td>`;
+              <td>${v.language || 'Unknown'}</td>
+              <td>${v.referrer || 'Direct'}</td>`;
             tbody.appendChild(tr);
           });
           table.appendChild(tbody);

@@ -45,7 +45,7 @@ function parseUserAgent(uaString) {
 }
 
 // Store a visit record
-async function recordVisit(slug, ip, uaString, country = "Unknown", language = "Unknown") {
+async function recordVisit(slug, ip, uaString, country = "Unknown", language = "Unknown", referrer = "Direct") {
   try {
     const visitsTable = getTableClient("Visits");
     const visitId = uuidv4();
@@ -77,7 +77,8 @@ async function recordVisit(slug, ip, uaString, country = "Unknown", language = "
       ip: ip || "Hidden",
       userAgent: `${deviceInfo.browser} on ${deviceInfo.os}`,
       country: detectedLocation || "Unknown",
-      language
+      language,
+      referrer: referrer || "Direct"
     });
   } catch (err) {
     console.error("Error saving visit:", err);

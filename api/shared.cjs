@@ -52,13 +52,31 @@ async function recordVisit(slug, ip, uaString, country = "Unknown", language = "
     const now = new Date().toISOString();
     const deviceInfo = parseUserAgent(uaString);
 
+    // If country is unknown and we have a valid IP, try a quick geo lookup
+    let detectedLocation = country;
+    if ((!country || country === "Unknown") && ip && ip !== "Hidden" && ip !== "::1" && ip !== "127.0.0.1") {
+      try {
+        // Use ip-api.com (free, no key for legacy usage)
+        // Note: Free tier limited to 45 req/min.
+        const geoRes = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,regionName,city`);
+        if (geoRes.ok) {
+          const geoData = await geoRes.json();
+          if (geoData.status === 'success') {
+            detectedLocation = `${geoData.city || ''}, ${geoData.regionName || ''}, ${geoData.country || ''}`.replace(/^, |, $/g, '').replace(/, , /g, ', ');
+          }
+        }
+      } catch (geoErr) {
+        console.error("Geo lookup failed:", geoErr.message);
+      }
+    }
+
     await visitsTable.createEntity({
       partitionKey: slug,
       rowKey: visitId,
       timestamp: now,
       ip: ip || "Hidden",
       userAgent: `${deviceInfo.browser} on ${deviceInfo.os}`,
-      country,
+      country: detectedLocation || "Unknown",
       language
     });
   } catch (err) {

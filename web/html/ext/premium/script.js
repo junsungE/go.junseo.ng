@@ -256,6 +256,35 @@ shortenUrlBtn.addEventListener("click", async () => {
   }
 
   shortenUrlBtn.disabled = true;
+  shortenUrlBtn.textContent = "Checking...";
+
+  try {
+      // 1. Check for duplicate Target URLs for this user
+      const checkRes = await fetch("/api/checkExistingTargetURL", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+              targetUrl: targetUrl,
+              createdBy: user.email,
+              type: "premium"
+          })
+      });
+
+      if (checkRes.ok) {
+          const checkData = await checkRes.json();
+          if (checkData.exists) {
+              const confirmMsg = `Target URL already exists under slug(s): ${checkData.slugs.join(", ")}\nDo you want to create an additional slug?`;
+              if (!confirm(confirmMsg)) {
+                  shortenUrlBtn.disabled = false;
+                  shortenUrlBtn.textContent = "Shorten";
+                  return;
+              }
+          }
+      }
+  } catch (err) {
+      console.warn("Duplicate check failed, proceeding anyway:", err);
+  }
+
   shortenUrlBtn.textContent = "Creating...";
 
   const data = {

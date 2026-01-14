@@ -212,7 +212,11 @@ function initResizableTable() {
 
         const mouseMoveHandler = (e) => {
             const dx = e.clientX - x;
-            th.style.width = `${w + dx}px`;
+            const newWidth = w + dx;
+            if (newWidth > 50) { // Set a minimum width for columns
+                th.style.width = `${newWidth}px`;
+                th.style.minWidth = `${newWidth}px`;
+            }
         };
 
         const mouseUpHandler = () => {

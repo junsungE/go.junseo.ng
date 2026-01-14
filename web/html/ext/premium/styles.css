@@ -198,11 +198,11 @@ button[disabled] {
 }
 
 .links-table {
-  width: auto; /* Allow table to fit column widths rather than forcing 100% */
-  min-width: 100%; /* But at least fill the container if columns are small */
   border-collapse: collapse;
   font-size: 14px;
   table-layout: fixed;
+  width: max-content; /* Ensure table width is determined by columns */
+  min-width: 100%;     /* But at least fill the container */
 }
 
 .links-table th, .links-table td {

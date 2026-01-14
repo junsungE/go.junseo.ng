@@ -224,12 +224,13 @@ button[disabled] {
 .resizer {
   position: absolute;
   top: 0;
-  right: 0;
-  width: 5px;
+  right: -5px; /* Increase hit area slightly outside the cell */
+  width: 15px;  /* Much wider hit area for fingers */
   cursor: col-resize;
   user-select: none;
   height: 100%;
   z-index: 1;
+  /* Visual line is only in the middle of this area */
 }
 
 .resizer:hover,

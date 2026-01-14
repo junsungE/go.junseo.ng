@@ -201,17 +201,24 @@ function initResizableTable() {
 
         const mouseDownHandler = (e) => {
             e.stopPropagation(); // Prevent sort click trigger
-            x = e.clientX;
+            x = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
             const styles = window.getComputedStyle(th);
             w = parseInt(styles.width, 10);
 
-            document.addEventListener('mousemove', mouseMoveHandler);
-            document.addEventListener('mouseup', mouseUpHandler);
+            if (e.type.startsWith('touch')) {
+                document.addEventListener('touchmove', mouseMoveHandler, { passive: false });
+                document.addEventListener('touchend', mouseUpHandler);
+            } else {
+                document.addEventListener('mousemove', mouseMoveHandler);
+                document.addEventListener('mouseup', mouseUpHandler);
+            }
             resizer.classList.add('resizing');
         };
 
         const mouseMoveHandler = (e) => {
-            const dx = e.clientX - x;
+            if (e.type === 'touchmove') e.preventDefault(); // Prevent scrolling while resizing
+            const currentX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+            const dx = currentX - x;
             const newWidth = w + dx;
             if (newWidth > 50) { // Set a minimum width for columns
                 th.style.width = `${newWidth}px`;
@@ -222,10 +229,13 @@ function initResizableTable() {
         const mouseUpHandler = () => {
             document.removeEventListener('mousemove', mouseMoveHandler);
             document.removeEventListener('mouseup', mouseUpHandler);
+            document.removeEventListener('touchmove', mouseMoveHandler);
+            document.removeEventListener('touchend', mouseUpHandler);
             resizer.classList.remove('resizing');
         };
 
         resizer.addEventListener('mousedown', mouseDownHandler);
+        resizer.addEventListener('touchstart', mouseDownHandler, { passive: true });
         resizer.addEventListener('click', (e) => e.stopPropagation()); // Extra safety
     });
 }

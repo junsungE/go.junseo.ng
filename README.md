@@ -6,6 +6,10 @@ Features:
 - External premium (sign-in required): custom slug, analytics
 - Internal: custom slug, password-protected or private links, conditional redirects
 
+Slug creation rule:
+- If there are only case sensitive URLs for a slug, the system can create a different case sensitive URLs for the same slug. It will allow random slug(which is case sensitive) reusability.
+- But when the user tries to create non case sensitive URL with the same slug, it should block creation to prevent conflict. Also, when non case sensitive slug exists, the system would not allow to create case sensitive URL with that non case sensitive slug.
+
 ## Premium Go URL Shortener(ext)
 
 My Links table:

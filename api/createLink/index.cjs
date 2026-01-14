@@ -94,39 +94,68 @@ module.exports = async function (context, req) {
             ? generateRandomSlug(5, 7) 
             : uuidv4().substring(0, 6));
 
-    // Case-insensitive conflict prevention:
-    // We store the link using a lowercase RowKey to ensure uniqueness,
-    // while keeping the original casing in 'originalSlug' for redirection logic.
-    const lowerEncodedSlug = encodeURIComponent(finalSlug.toLowerCase());
-    const originalEncodedSlug = encodeURIComponent(finalSlug);
+    const lowerSlug = finalSlug.toLowerCase();
+    const encodedFinalSlug = encodeURIComponent(finalSlug);
+    const encodedLowerSlug = encodeURIComponent(lowerSlug);
 
-    // Check if slug already exists (case-insensitive check)
+    // Conflict Check:
+    // 1. Exact match check (always blocked)
     try {
-      // 1. Try lowercase (recommended for all new links)
-      await table.getEntity(partitionKey, lowerEncodedSlug);
+      await table.getEntity(partitionKey, encodedFinalSlug);
       context.res = jsonResponse(409, {
         error: "Slug already exists. Choose another."
       });
       return;
     } catch {
-      // 2. Try original case (fallback for legacy links that might be mixed case)
-      if (lowerEncodedSlug !== originalEncodedSlug) {
+      // OK
+    }
+
+    // 2. Case-sensitivity overlap checks
+    if (isCaseSensitive) {
+      // Check if a non-case-sensitive version already exists at the lowercase slot
+      if (encodedFinalSlug !== encodedLowerSlug) {
         try {
-          await table.getEntity(partitionKey, originalEncodedSlug);
-          context.res = jsonResponse(409, {
-            error: "Slug already exists. Choose another."
-          });
-          return;
+          const lowerEntity = await table.getEntity(partitionKey, encodedLowerSlug);
+          if (lowerEntity.isCaseSensitive === false || lowerEntity.isCaseSensitive === "false") {
+            context.res = jsonResponse(409, {
+              error: "A non-case-sensitive version of this slug already exists."
+            });
+            return;
+          }
         } catch {
-          // OK, truly available
+          // OK
         }
+      }
+    } else {
+      // Creating a non-case-sensitive link: Must ensure NO variations exist.
+      // Check lowercase slot first
+      try {
+        await table.getEntity(partitionKey, encodedLowerSlug);
+        context.res = jsonResponse(409, {
+          error: "Slug namespace taken. To create a non-case-sensitive link, no other variations can exist."
+        });
+        return;
+      } catch {
+        // OK
+      }
+
+      // Scan for variations (to catch things like "Test" when creating "test")
+      // This uses the 'slugLower' property which we will store from now on.
+      const filter = `PartitionKey eq '${partitionKey}' and slugLower eq '${lowerSlug.replace(/'/g, "''")}'`;
+      const entities = table.listEntities({ queryOptions: { filter } });
+      for await (const _ of entities) {
+        context.res = jsonResponse(409, {
+          error: "Case-sensitive variations of this slug already exist. Non-case-sensitive links require a unique namespace."
+        });
+        return;
       }
     }
 
     const entity = {
       partitionKey,
-      rowKey: lowerEncodedSlug,
+      rowKey: encodedFinalSlug, // Store using exact casing (CS/Non-CS)
       originalSlug: finalSlug,
+      slugLower: lowerSlug, // Added for case-insensitive collision checks
       targetUrl,
       defaultUrl: targetUrl,
       mode,

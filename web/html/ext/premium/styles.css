@@ -198,25 +198,28 @@ button[disabled] {
 }
 
 .links-table {
-  width: 100%;
+  width: auto; /* Allow table to fit column widths rather than forcing 100% */
+  min-width: 100%; /* But at least fill the container if columns are small */
   border-collapse: collapse;
   font-size: 14px;
+  table-layout: fixed;
 }
 
 .links-table th, .links-table td {
   border: 1px solid #e5e7eb;
   padding: 8px;
   text-align: left;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-word; /* Allow content to wrap and height to grow */
+  vertical-align: top;
 }
 
 .links-table th {
   position: relative;
   background: #f9fafb;
   font-weight: 600;
-  white-space: nowrap;
+  white-space: nowrap; /* Keep headers on one line */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .resizer {

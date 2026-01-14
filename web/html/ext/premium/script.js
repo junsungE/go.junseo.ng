@@ -213,7 +213,6 @@ function initResizableTable() {
         const mouseMoveHandler = (e) => {
             const dx = e.clientX - x;
             th.style.width = `${w + dx}px`;
-            th.style.minWidth = `${w + dx}px`; // Force override
         };
 
         const mouseUpHandler = () => {

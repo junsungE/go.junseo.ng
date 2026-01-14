@@ -34,7 +34,8 @@ module.exports = async function (context, req) {
         timestamp: item.timestamp,
         ip: item.ip,
         userAgent: item.userAgent,
-        country: item.country
+        country: item.country,
+        language: item.language
       });
     }
 

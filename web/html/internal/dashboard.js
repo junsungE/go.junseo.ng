@@ -19,6 +19,7 @@ const form = document.getElementById("fetchForm");
               <th>IP</th>
               <th>User Agent</th>
               <th>Country</th>
+              <th>Language</th>
             </tr>`;
           table.appendChild(thead);
 
@@ -26,10 +27,11 @@ const form = document.getElementById("fetchForm");
           result.visits.forEach(v => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
-              <td>${v.timestamp}</td>
+              <td>${new Date(v.timestamp).toLocaleString()}</td>
               <td>${v.ip}</td>
               <td>${v.userAgent}</td>
-              <td>${v.country}</td>`;
+              <td>${v.country}</td>
+              <td>${v.language || 'Unknown'}</td>`;
             tbody.appendChild(tr);
           });
           table.appendChild(tbody);

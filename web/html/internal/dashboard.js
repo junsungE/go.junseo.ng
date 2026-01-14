@@ -7,14 +7,21 @@ const form = document.getElementById("fetchForm");
         statsSection.textContent = "";
         errorMsg.textContent = "";
         const data = Object.fromEntries(new FormData(form).entries());
-        const res = await fetch(`/api/getStats?slug=${data.slug}&type=${data.type}`);
+        const res = await fetch(`/api/getStats?slug=${encodeURIComponent(data.slug)}&type=${data.type}`);
         const result = await res.json();
         if (res.ok) {
+          if (!result.visits || result.visits.length === 0) {
+              statsSection.innerHTML = "<p>No visits found for this criteria.</p>";
+              return;
+          }
+
+          const hasSlugColumn = !data.slug; // Show slug column if searching for all
           const table = document.createElement("table");
           table.className = "stats-table";
           const thead = document.createElement("thead");
           thead.innerHTML = `
             <tr>
+              ${hasSlugColumn ? '<th>Slug</th>' : ''}
               <th>Timestamp</th>
               <th>IP</th>
               <th>User Agent</th>
@@ -27,6 +34,7 @@ const form = document.getElementById("fetchForm");
           result.visits.forEach(v => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
+              ${hasSlugColumn ? `<td>${v.slug}</td>` : ''}
               <td>${new Date(v.timestamp).toLocaleString()}</td>
               <td>${v.ip}</td>
               <td>${v.userAgent}</td>

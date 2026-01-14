@@ -23,12 +23,18 @@ module.exports = async function (context, req) {
             queryOptions: { filter }
         });
 
-        const slugList = [];
+        const foundLinks = [];
         for await (const entity of entities) {
-            // Use originalSlug if available, else decode RowKey
-            const slug = entity.originalSlug || decodeURIComponent(entity.rowKey);
-            slugList.push(slug);
+            foundLinks.push({
+                slug: entity.originalSlug || decodeURIComponent(entity.rowKey),
+                createdAt: entity.createdAt || entity.timestamp || 0
+            });
         }
+
+        // Sort by createdAt descending (newest first)
+        foundLinks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        const slugList = foundLinks.map(link => link.slug);
 
         context.res = jsonResponse(200, { 
             exists: slugList.length > 0,

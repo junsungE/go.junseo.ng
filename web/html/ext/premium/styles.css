@@ -59,7 +59,6 @@ nav a{color:var(--accent);text-decoration:none;padding:6px 10px;border-radius:8p
 nav a:hover{background:#f3f7fb;border-color:#e6eef9}
 
 .container {
-  max-width: 760px;
   margin: 0 auto;
   background: var(--card);
   padding: 20px;

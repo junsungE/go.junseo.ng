@@ -120,6 +120,18 @@ module.exports = async function (context, req) {
       }
     }
 
+    // Case sensitivity check
+    if (entity.isCaseSensitive) {
+      const storedSlug = entity.originalSlug || decodeURIComponent(entity.rowKey);
+      if (storedSlug !== slug) {
+        context.res = {
+          status: 302,
+          headers: { Location: "/error" }
+        };
+        return;
+      }
+    }
+
     // Check validity
     if (!isLinkActive(entity)) {
       context.res = { status: 410, body: "This link has expired or is inactive." };

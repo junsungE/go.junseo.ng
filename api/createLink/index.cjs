@@ -94,23 +94,38 @@ module.exports = async function (context, req) {
             ? generateRandomSlug(5, 7) 
             : uuidv4().substring(0, 6));
 
-    // URL-encode slug for Azure Table Storage (RowKey doesn't allow / \ # ?)
-    const encodedSlug = encodeURIComponent(finalSlug);
+    // Case-insensitive conflict prevention:
+    // We store the link using a lowercase RowKey to ensure uniqueness,
+    // while keeping the original casing in 'originalSlug' for redirection logic.
+    const lowerEncodedSlug = encodeURIComponent(finalSlug.toLowerCase());
+    const originalEncodedSlug = encodeURIComponent(finalSlug);
 
-    // Check if slug already exists
+    // Check if slug already exists (case-insensitive check)
     try {
-      await table.getEntity(partitionKey, encodedSlug);
+      // 1. Try lowercase (recommended for all new links)
+      await table.getEntity(partitionKey, lowerEncodedSlug);
       context.res = jsonResponse(409, {
         error: "Slug already exists. Choose another."
       });
       return;
     } catch {
-      // ok, slug is new
+      // 2. Try original case (fallback for legacy links that might be mixed case)
+      if (lowerEncodedSlug !== originalEncodedSlug) {
+        try {
+          await table.getEntity(partitionKey, originalEncodedSlug);
+          context.res = jsonResponse(409, {
+            error: "Slug already exists. Choose another."
+          });
+          return;
+        } catch {
+          // OK, truly available
+        }
+      }
     }
 
     const entity = {
       partitionKey,
-      rowKey: encodedSlug,
+      rowKey: lowerEncodedSlug,
       originalSlug: finalSlug,
       targetUrl,
       defaultUrl: targetUrl,

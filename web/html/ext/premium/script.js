@@ -150,13 +150,13 @@ function renderLinks() {
         tr.innerHTML = `
             <td><a href="${fullUrl}" target="_blank">${link.slug}</a></td>
             <td>${link.isCaseSensitive ? 'Yes' : 'No'}</td>
-            <td title="${link.targetUrl}" style="max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${link.targetUrl}</td>
+            <td title="${link.targetUrl}">${link.targetUrl}</td>
             <td>${link.title || '-'}</td>
             <td>${link.visits}${link.visitLimit ? '/' + link.visitLimit : ''}</td>
             <td>${expiryDisplay}</td>
             <td>${status}</td>
             <td>${lastVisitedDisplay}</td>
-            <td>${new Date(link.createdAt).toLocaleDateString()}</td>
+            <td>${new Date(link.createdAt).toLocaleString()}</td>
         `;
         myLinksBody.appendChild(tr);
     });
@@ -188,6 +188,45 @@ tableHeaders.forEach(th => {
 
 // Initial fetch
 fetchMyLinks();
+
+// --- Resizable Table Columns logic ---
+function initResizableTable() {
+    tableHeaders.forEach(th => {
+        const resizer = document.createElement('div');
+        resizer.classList.add('resizer');
+        th.appendChild(resizer);
+        
+        let x = 0;
+        let w = 0;
+
+        const mouseDownHandler = (e) => {
+            e.stopPropagation(); // Prevent sort click trigger
+            x = e.clientX;
+            const styles = window.getComputedStyle(th);
+            w = parseInt(styles.width, 10);
+
+            document.addEventListener('mousemove', mouseMoveHandler);
+            document.addEventListener('mouseup', mouseUpHandler);
+            resizer.classList.add('resizing');
+        };
+
+        const mouseMoveHandler = (e) => {
+            const dx = e.clientX - x;
+            th.style.width = `${w + dx}px`;
+            th.style.minWidth = `${w + dx}px`; // Force override
+        };
+
+        const mouseUpHandler = () => {
+            document.removeEventListener('mousemove', mouseMoveHandler);
+            document.removeEventListener('mouseup', mouseUpHandler);
+            resizer.classList.remove('resizing');
+        };
+
+        resizer.addEventListener('mousedown', mouseDownHandler);
+        resizer.addEventListener('click', (e) => e.stopPropagation()); // Extra safety
+    });
+}
+initResizableTable();
 
 // Shorten URL logic
 shortenUrlBtn.addEventListener("click", async () => {

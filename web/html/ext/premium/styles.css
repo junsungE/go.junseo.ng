@@ -207,11 +207,32 @@ button[disabled] {
   border: 1px solid #e5e7eb;
   padding: 8px;
   text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .links-table th {
+  position: relative;
   background: #f9fafb;
   font-weight: 600;
+  white-space: nowrap;
+}
+
+.resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 5px;
+  cursor: col-resize;
+  user-select: none;
+  height: 100%;
+  z-index: 1;
+}
+
+.resizer:hover,
+.resizing {
+  border-right: 2px solid var(--accent);
 }
 
 .links-table td a {

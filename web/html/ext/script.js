@@ -1,4 +1,5 @@
 const urlInput = document.getElementById("urlInput");
+const startDateInput = document.getElementById("startDateInput");
 const expiryDateInput = document.getElementById("expiryDateInput");
 const visitLimitInput = document.getElementById("visitLimitInput");
 const shortenUrlBtn = document.getElementById("shortenUrl");
@@ -27,6 +28,9 @@ shortenUrlBtn.addEventListener("click", async () => {
     origin: window.location.origin // Tell backend which domain we're on
   };
 
+  if (startDateInput.value) {
+    data.startDate = startDateInput.value;
+  }
   if (expiryDateInput.value) {
     data.expiryDate = expiryDateInput.value;
   }
@@ -66,6 +70,7 @@ shortenUrlBtn.addEventListener("click", async () => {
       
       // Disable inputs after successful creation
       urlInput.disabled = true;
+      startDateInput.disabled = true;
       expiryDateInput.disabled = true;
       visitLimitInput.disabled = true;
       shortenUrlBtn.disabled = true;
@@ -104,6 +109,7 @@ if (copyUrlBtn) {
 shortenAnotherBtn.addEventListener("click", () => {
   // Reset all inputs
   urlInput.value = "";
+  startDateInput.value = "";
   expiryDateInput.value = "";
   visitLimitInput.value = "";
   slugOutput.value = "";
@@ -114,6 +120,7 @@ shortenAnotherBtn.addEventListener("click", () => {
   
   // Re-enable inputs
   urlInput.disabled = false;
+  startDateInput.disabled = false;
   expiryDateInput.disabled = false;
   visitLimitInput.disabled = false;
   shortenUrlBtn.disabled = false;

@@ -126,7 +126,7 @@ input[type="checkbox"] {
     height: 16px;
 }
 
-.url-label, .expiryDateLabel, .visitLimitLabel {
+.url-label, .startDateLabel, .expiryDateLabel, .visitLimitLabel {
   font-size: 13px;
   color: var(--muted);
 }
@@ -251,6 +251,7 @@ h1,
 .prefix,
 .notes,
 .url-label,
+.startDateLabel,
 .expiryDateLabel,
 .visitLimitLabel,
 #copied {
@@ -279,6 +280,7 @@ h1,
 
  .prefix,
  .url-label,
+ .startDateLabel,
  .expiryDateLabel,
  .visitLimitLabel {
     width: 100%;

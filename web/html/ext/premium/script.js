@@ -1,5 +1,6 @@
 const urlInput = document.getElementById("urlInput");
 const idInput = document.getElementById("idInput"); // Custom slug
+const startDateInput = document.getElementById("startDateInput");
 const expiryDateInput = document.getElementById("expiryDateInput");
 const visitLimitInput = document.getElementById("visitLimitInput");
 const titleInput = document.getElementById("titleInput");
@@ -37,6 +38,7 @@ function checkAccountStatus() {
     const inputsToDisable = [
         urlInput,
         idInput,
+        startDateInput,
         expiryDateInput,
         visitLimitInput,
         titleInput,
@@ -143,6 +145,10 @@ function renderLinks() {
             ? new Date(link.lastVisitedAt).toLocaleString() 
             : "-";
             
+        const startDisplay = link.startDate
+            ? new Date(link.startDate).toLocaleDateString()
+            : "-";
+
         const expiryDisplay = link.expiryDate
             ? new Date(link.expiryDate).toLocaleDateString()
             : "-";
@@ -153,6 +159,7 @@ function renderLinks() {
             <td title="${link.targetUrl}">${link.targetUrl}</td>
             <td>${link.title || '-'}</td>
             <td>${link.visits}${link.visitLimit ? '/' + link.visitLimit : ''}</td>
+            <td>${startDisplay}</td>
             <td>${expiryDisplay}</td>
             <td>${status}</td>
             <td>${lastVisitedDisplay}</td>
@@ -163,7 +170,9 @@ function renderLinks() {
 }
 
 function getStatus(link) {
-    if (link.expiryDate && new Date(link.expiryDate) < new Date()) return "Expired";
+    const now = new Date();
+    if (link.startDate && new Date(link.startDate) > now) return "Not Started";
+    if (link.expiryDate && new Date(link.expiryDate) < now) return "Expired";
     if (link.visitLimit && link.visits >= link.visitLimit) return "Limit Reached";
     return "Active";
 }
@@ -178,7 +187,7 @@ tableHeaders.forEach(th => {
             sortCol = col;
             sortAsc = true; // Default to asc for new column
             // Exception: Dates usually better desc by default
-            if (["createdAt", "lastVisitedAt", "expiryDate", "visits"].includes(col)) {
+            if (["createdAt", "lastVisitedAt", "expiryDate", "startDate", "visits"].includes(col)) {
                 sortAsc = false;
             }
         }
@@ -297,6 +306,9 @@ shortenUrlBtn.addEventListener("click", async () => {
     isCaseSensitive: caseSensitiveInput.checked
   };
 
+  if (startDateInput.value) {
+    data.startDate = startDateInput.value;
+  }
   if (expiryDateInput.value) {
     data.expiryDate = expiryDateInput.value;
   }
@@ -336,6 +348,7 @@ shortenUrlBtn.addEventListener("click", async () => {
       urlInput.disabled = true;
       idInput.disabled = true;
       idInput.value = slug; // Show generated slug if it was random
+      startDateInput.disabled = true;
       expiryDateInput.disabled = true;
       visitLimitInput.disabled = true;
       titleInput.disabled = true;
@@ -378,6 +391,7 @@ shortenAnotherBtn.addEventListener("click", () => {
   // Reset all inputs
   urlInput.value = "";
   idInput.value = "";
+  startDateInput.value = "";
   expiryDateInput.value = "";
   visitLimitInput.value = "";
   titleInput.value = "";
@@ -390,6 +404,7 @@ shortenAnotherBtn.addEventListener("click", () => {
   // Re-enable inputs
   urlInput.disabled = false;
   idInput.disabled = false;
+  startDateInput.disabled = false;
   expiryDateInput.disabled = false;
   visitLimitInput.disabled = false;
   titleInput.disabled = false;

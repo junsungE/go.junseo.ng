@@ -266,7 +266,7 @@ shortenUrlBtn.addEventListener("click", async () => {
   // Date validation
   if (startDateInput.value && expiryDateInput.value) {
     if (new Date(expiryDateInput.value) <= new Date(startDateInput.value)) {
-        await showPopup("Expiry date must be later than the start date.");
+        alert("Expiry date must be later than the start date.");
         return;
     }
   }

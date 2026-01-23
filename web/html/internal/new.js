@@ -32,7 +32,7 @@ if (form) {
     const end = formData.get("expiryDate");
     
     if (start && end && new Date(end) <= new Date(start)) {
-        await showPopup("Expiry date must be later than the start date.");
+        alert("Expiry date must be later than the start date.");
         return;
     }
 
@@ -110,6 +110,7 @@ if (form) {
       const url = result && (result.fullUrl || result.url || result.slug) ? (result.fullUrl || result.url || result.slug) : 'created';
       msg.textContent = `Success! URL: ${url}`;
     } else {
+      alert(`Error: ${result && result.error ? result.error : 'Server error'}`);
       msg.textContent = `Error: ${result && result.error ? result.error : 'Server error'}`;
       if (submitBtn) submitBtn.disabled = false;
     }

@@ -34,7 +34,8 @@ module.exports = async function (context, req) {
         expiryDate: entity.expiryDate,
         visitLimit: entity.visitLimit,
         isCaseSensitive: entity.isCaseSensitive,
-        title: entity.title
+        title: entity.title,
+        startDate: entity.startDate
       });
     }
 

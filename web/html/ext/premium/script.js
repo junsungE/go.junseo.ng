@@ -62,7 +62,7 @@ function checkAccountStatus() {
 async function fetchMyLinks() {
     const user = getUser();
     if (!user || !user.email) {
-        myLinksBody.innerHTML = "<tr><td colspan='9'>Please log in to see your links.</td></tr>";
+        myLinksBody.innerHTML = "<tr><td colspan='10'>Please log in to see your links.</td></tr>";
         return;
     }
 
@@ -72,17 +72,17 @@ async function fetchMyLinks() {
             userLinks = await res.json();
             renderLinks();
         } else {
-            myLinksBody.innerHTML = "<tr><td colspan='9'>Failed to load links.</td></tr>";
+            myLinksBody.innerHTML = "<tr><td colspan='10'>Failed to load links.</td></tr>";
         }
     } catch (err) {
-        myLinksBody.innerHTML = `<tr><td colspan='9'>Error: ${err.message}</td></tr>`;
+        myLinksBody.innerHTML = `<tr><td colspan='10'>Error: ${err.message}</td></tr>`;
     }
 }
 
 // Render sorted links
 function renderLinks() {
     if (userLinks.length === 0) {
-        myLinksBody.innerHTML = "<tr><td colspan='9'>No links found. Create one!</td></tr>";
+        myLinksBody.innerHTML = "<tr><td colspan='10'>No links found. Create one!</td></tr>";
         return;
     }
 
@@ -263,7 +263,13 @@ shortenUrlBtn.addEventListener("click", async () => {
     alert("You must be logged in to create premium links.");
     return;
   }
-
+  // Date validation
+  if (startDateInput.value && expiryDateInput.value) {
+    if (new Date(expiryDateInput.value) <= new Date(startDateInput.value)) {
+        await showPopup("Expiry date must be later than the start date.");
+        return;
+    }
+  }
   shortenUrlBtn.disabled = true;
   shortenUrlBtn.textContent = "Checking...";
 

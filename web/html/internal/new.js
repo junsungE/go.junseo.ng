@@ -25,6 +25,17 @@ modeSelect && modeSelect.addEventListener('change', togglePasswordRow);
 if (form) {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    
+    // Date validation
+    const formData = new FormData(form);
+    const start = formData.get("startDate");
+    const end = formData.get("expiryDate");
+    
+    if (start && end && new Date(end) <= new Date(start)) {
+        await showPopup("Expiry date must be later than the start date.");
+        return;
+    }
+
     const submitBtn = e.submitter || form.querySelector('button[type="submit"]');
     if (submitBtn) submitBtn.disabled = true;
     msg.textContent = "Checking...";

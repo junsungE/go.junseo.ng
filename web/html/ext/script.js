@@ -19,6 +19,14 @@ shortenUrlBtn.addEventListener("click", async () => {
     return;
   }
 
+  // Date validation
+  if (startDateInput.value && expiryDateInput.value) {
+    if (new Date(expiryDateInput.value) <= new Date(startDateInput.value)) {
+        alert("Expiry date must be later than the start date.");
+        return;
+    }
+  }
+
   shortenUrlBtn.disabled = true;
   slugOutput.value = "Creating...";
 

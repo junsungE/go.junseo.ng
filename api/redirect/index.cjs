@@ -137,7 +137,7 @@ module.exports = async function (context, req) {
 
     // Check validity
     if (!isLinkActive(entity)) {
-      context.res = { status: 410, body: "This link has expired or is inactive." };
+      context.res = { status: 410, body: "This link is inactive or has expired." };
       return;
     }
 

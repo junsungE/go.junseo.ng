@@ -5,6 +5,7 @@ Features:
 - External free: random slug, expiry date, visit limit
 - External premium (sign-in required): custom slug, analytics
 - Internal: custom slug, password-protected or private links, conditional redirects
+* Tags are case sensitive
 
 Slug creation rule:
 - If there are only case sensitive URLs for a slug, the system can create a different case sensitive URLs for the same slug. It will allow random slug(which is case sensitive) reusability.

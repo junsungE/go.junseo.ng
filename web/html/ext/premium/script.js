@@ -505,7 +505,18 @@ function renderSelectedTags() {
   selectedTagsList.querySelectorAll('.tag-color-picker').forEach(picker => {
     picker.addEventListener('input', (e) => {
       const idx = parseInt(e.target.dataset.index);
-      selectedTags[idx].color = e.target.value;
+      const newColor = e.target.value;
+      const tagName = selectedTags[idx].name;
+      
+      // Update the selected tag's color
+      selectedTags[idx].color = newColor;
+      
+      // Also update the color in existingTags so future selections use this color
+      const existingTag = existingTags.find(t => t.name.toLowerCase() === tagName.toLowerCase());
+      if (existingTag) {
+        existingTag.color = newColor;
+      }
+      
       renderSelectedTags();
     });
   });
@@ -584,7 +595,10 @@ function selectTag(tag) {
 function addNewTag(name) {
   if (!name.trim()) return;
   if (!selectedTags.some(t => t.name.toLowerCase() === name.toLowerCase())) {
-    selectedTags.push({ name: name.trim(), color: getRandomColor() });
+    // Check if this tag exists in existingTags (case-insensitive) to use its color
+    const existingTag = existingTags.find(t => t.name.toLowerCase() === name.trim().toLowerCase());
+    const color = existingTag ? existingTag.color : getRandomColor();
+    selectedTags.push({ name: name.trim(), color: color });
     renderSelectedTags();
   }
   tagInput.value = '';

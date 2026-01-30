@@ -17,6 +17,7 @@ module.exports = async function (context, req) {
     expiryDate,
     visitLimit,
     title,
+    tags,
     isCaseSensitive = false,
     createdBy = "anonymous",
     origin // Frontend will send window.location.origin
@@ -170,6 +171,7 @@ module.exports = async function (context, req) {
       visitLimit: visitLimit ? parseInt(visitLimit) : null,
       visits: 0,
       title,
+      tags: tags && Array.isArray(tags) ? JSON.stringify(tags) : null,
       isCaseSensitive
     };
 

@@ -66,6 +66,16 @@
             <input type="text" name="title">
           </label>
 
+          <fieldset id="tagsFieldset">
+            <legend>Tags (optional)</legend>
+            <section class="tags-container">
+              <ul id="selectedTags" class="selected-tags-list" aria-label="Selected tags"></ul>
+              <input type="text" id="tagInput" placeholder="Type to search or add tags..." autocomplete="off">
+            </section>
+            <datalist id="tagSuggestions"></datalist>
+            <menu id="tagSuggestionsMenu" class="tag-suggestions-menu" hidden></menu>
+          </fieldset>
+
           <label>
             Case Sensitive:
             <input type="checkbox" name="isCaseSensitive">

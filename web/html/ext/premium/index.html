@@ -45,6 +45,15 @@
           <input id="titleInput" type="text" />
         </label>
 
+        <fieldset id="tagsFieldset" class="tags-fieldset">
+          <legend>Tags (optional)</legend>
+          <section class="tags-container">
+            <ul id="selectedTags" class="selected-tags-list" aria-label="Selected tags"></ul>
+            <input type="text" id="tagInput" placeholder="Type to search or add tags..." autocomplete="off">
+          </section>
+          <menu id="tagSuggestionsMenu" class="tag-suggestions-menu" hidden></menu>
+        </fieldset>
+
         <label class="optional-row" style="justify-content: flex-start;">
             <label class="checkbox-label">
                 <input id="caseSensitiveInput" type="checkbox">
@@ -84,6 +93,7 @@
                         <th data-sort="isCaseSensitive" style="cursor: pointer; width: 100px;">Case Sensitive <span></span></th>
                         <th data-sort="targetUrl" style="cursor: pointer; width: 250px;">Target URL <span></span></th>
                         <th data-sort="title" style="cursor: pointer; width: 120px;">Title <span></span></th>
+                        <th data-sort="tags" style="cursor: pointer; width: 150px;">Tags <span></span></th>
                         <th data-sort="visits" style="cursor: pointer; width: 80px;">Visits <span></span></th>
                         <th data-sort="startDate" style="cursor: pointer; width: 100px;">Start <span></span></th>
                         <th data-sort="expiryDate" style="cursor: pointer; width: 100px;">Expiry <span></span></th>
@@ -93,7 +103,7 @@
                     </tr>
                 </thead>
                 <tbody id="myLinksBody">
-                    <tr><td colspan="10">Loading...</td></tr>
+                    <tr><td colspan="11">Loading...</td></tr>
                 </tbody>
             </table>
         </figure>

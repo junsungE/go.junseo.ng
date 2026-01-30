@@ -10,6 +10,8 @@ module.exports = async function (context, req) {
 
   // Get email from query (GET) or body (POST)
   const email = (req.query && req.query.email) || (req.body && req.body.email);
+  // Get type from query - 'internal' or 'premium' (default)
+  const type = (req.query && req.query.type) || (req.body && req.body.type) || 'premium';
 
   if (!email) {
     context.res = jsonResponse(400, { error: "Missing email." });
@@ -17,14 +19,33 @@ module.exports = async function (context, req) {
   }
 
   try {
-    const table = getTableClient("ExternalLinks");
-    // Filter by partitionKey = 'premium' and createdBy = email
+    let tableName, partitionKey;
+    if (type === 'internal') {
+      tableName = 'InternalLinks';
+      partitionKey = 'internal';
+    } else {
+      tableName = 'ExternalLinks';
+      partitionKey = 'premium';
+    }
+
+    const table = getTableClient(tableName);
+    // Filter by partitionKey and createdBy = email
     const links = [];
     const entities = table.listEntities({
-      queryOptions: { filter: `PartitionKey eq 'premium' and createdBy eq '${email}'` }
+      queryOptions: { filter: `PartitionKey eq '${partitionKey}' and createdBy eq '${email}'` }
     });
 
     for await (const entity of entities) {
+      // Parse tags from JSON string if present
+      let parsedTags = null;
+      if (entity.tags) {
+        try {
+          parsedTags = JSON.parse(entity.tags);
+        } catch (e) {
+          parsedTags = null;
+        }
+      }
+
       links.push({
         slug: entity.originalSlug || decodeURIComponent(entity.rowKey), // Fallback if originalSlug missing
         targetUrl: entity.targetUrl,
@@ -35,6 +56,7 @@ module.exports = async function (context, req) {
         visitLimit: entity.visitLimit,
         isCaseSensitive: entity.isCaseSensitive,
         title: entity.title,
+        tags: parsedTags,
         startDate: entity.startDate
       });
     }

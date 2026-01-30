@@ -72,7 +72,7 @@ function renderSelectedTags() {
 
   // Add event listeners for color pickers and remove buttons
   selectedTagsList.querySelectorAll('.tag-color-picker').forEach(picker => {
-    picker.addEventListener('input', (e) => {
+    picker.addEventListener('change', async (e) => {
       const idx = parseInt(e.target.dataset.index);
       const newColor = e.target.value;
       const tagName = selectedTags[idx].name;
@@ -84,9 +84,37 @@ function renderSelectedTags() {
       const existingTag = existingTags.find(t => t.name.toLowerCase() === tagName.toLowerCase());
       if (existingTag) {
         existingTag.color = newColor;
+        
+        // Update all existing links in the database with this tag
+        try {
+          const authRes = await fetch("/.auth/me");
+          const authData = await authRes.json();
+          if (authData.clientPrincipal) {
+            const userEmail = authData.clientPrincipal.userDetails;
+            await fetch('/api/updateTagColor', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: userEmail,
+                tagName: tagName,
+                newColor: newColor,
+                type: 'internal'
+              })
+            });
+          }
+        } catch (err) {
+          console.warn('Failed to update tag color in existing links:', err);
+        }
       }
       
       renderSelectedTags();
+    });
+    
+    // Live preview on input
+    picker.addEventListener('input', (e) => {
+      const idx = parseInt(e.target.dataset.index);
+      selectedTags[idx].color = e.target.value;
+      e.target.closest('.tag-item').style.backgroundColor = e.target.value;
     });
   });
 

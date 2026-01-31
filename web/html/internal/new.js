@@ -286,15 +286,7 @@ const addLangLocaleBtn = document.getElementById('addLangLocaleBtn');
 if (conditionalRedirectToggle) {
   conditionalRedirectToggle.addEventListener('change', () => {
     conditionalRedirectOptions.hidden = !conditionalRedirectToggle.checked;
-    if (!conditionalRedirectToggle.checked) {
-      // Reset all sub-toggles when main toggle is unchecked
-      desktopToggle.checked = false;
-      mobileToggle.checked = false;
-      desktopSection.hidden = true;
-      mobileSection.hidden = true;
-      // Clear lang-locale entries
-      langLocaleList.innerHTML = '';
-    }
+    // State is preserved - just hide/show without clearing
   });
 }
 
@@ -350,18 +342,18 @@ function addLangLocaleEntry(localeData = {}) {
     <section class="lang-locale-subsection lang-locale-desktop-section" ${hasDesktop ? '' : 'hidden'}>
       <h5>Desktop</h5>
       <fieldset>
-        <label>Windows<input type="url" placeholder="https://..." value="${escapeHtml(desktop.windows || '')}" class="lang-locale-windows"></label>
-        <label>macOS<input type="url" placeholder="https://..." value="${escapeHtml(desktop.macos || '')}" class="lang-locale-macos"></label>
-        <label>Linux<input type="url" placeholder="https://..." value="${escapeHtml(desktop.linux || '')}" class="lang-locale-linux"></label>
-        <label>ChromeOS<input type="url" placeholder="https://..." value="${escapeHtml(desktop.chromeos || '')}" class="lang-locale-chromeos"></label>
+        <label>Windows<input type="url" placeholder="https://example.com/localized/windows" value="${escapeHtml(desktop.windows || '')}" class="lang-locale-windows"></label>
+        <label>macOS<input type="url" placeholder="https://example.com/localized/macos" value="${escapeHtml(desktop.macos || '')}" class="lang-locale-macos"></label>
+        <label>Linux<input type="url" placeholder="https://example.com/localized/linux" value="${escapeHtml(desktop.linux || '')}" class="lang-locale-linux"></label>
+        <label>ChromeOS<input type="url" placeholder="https://example.com/localized/chromeos" value="${escapeHtml(desktop.chromeos || '')}" class="lang-locale-chromeos"></label>
       </fieldset>
     </section>
     <section class="lang-locale-subsection lang-locale-mobile-section" ${hasMobile ? '' : 'hidden'}>
       <h5>Mobile</h5>
       <fieldset>
-        <label>Android<input type="url" placeholder="https://..." value="${escapeHtml(mobile.android || '')}" class="lang-locale-android"></label>
-        <label>iOS<input type="url" placeholder="https://..." value="${escapeHtml(mobile.ios || '')}" class="lang-locale-ios"></label>
-        <label>iPadOS<input type="url" placeholder="https://..." value="${escapeHtml(mobile.ipados || '')}" class="lang-locale-ipados"></label>
+        <label>Android<input type="url" placeholder="https://example.com/localized/android" value="${escapeHtml(mobile.android || '')}" class="lang-locale-android"></label>
+        <label>iOS<input type="url" placeholder="https://example.com/localized/ios" value="${escapeHtml(mobile.ios || '')}" class="lang-locale-ios"></label>
+        <label>iPadOS<input type="url" placeholder="https://example.com/localized/ipados" value="${escapeHtml(mobile.ipados || '')}" class="lang-locale-ipados"></label>
       </fieldset>
     </section>
     <p class="lang-locale-error">Please provide at least one URL for this locale.</p>

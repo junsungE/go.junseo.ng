@@ -624,8 +624,8 @@ h1,
   font-weight: 600;
 }
 .lang-locale-subsection fieldset {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 8px;
   border: none;
   padding: 0;
@@ -659,9 +659,6 @@ h1,
   .conditional-label {
     min-width: auto;
     margin-bottom: 4px;
-  }
-  .lang-locale-subsection fieldset {
-    grid-template-columns: 1fr;
   }
   .lang-locale-item header {
     flex-direction: column;

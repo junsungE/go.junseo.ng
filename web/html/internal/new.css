@@ -365,8 +365,8 @@ input:focus, select:focus, button:focus{outline:3px solid rgba(0,103,197,0.15);o
   font-weight: 600;
 }
 .lang-locale-subsection fieldset {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 8px;
   border: none;
   padding: 0;

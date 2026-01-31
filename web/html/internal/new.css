@@ -289,7 +289,6 @@ input:focus, select:focus, button:focus{outline:3px solid rgba(0,103,197,0.15);o
 }
 .lang-locale-section {
   margin-top: 16px;
-  border-top: 1px solid var(--border);
   padding-top: 16px;
 }
 .section-description {
@@ -343,6 +342,18 @@ input:focus, select:focus, button:focus{outline:3px solid rgba(0,103,197,0.15);o
 }
 .lang-locale-item label input {
   margin-top: 4px;
+}
+.lang-locale-category-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.lang-locale-category-list li {
+  display: flex;
+  align-items: center;
 }
 .lang-locale-subsection {
   margin-top: 8px;

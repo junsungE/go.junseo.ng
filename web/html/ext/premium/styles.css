@@ -547,7 +547,6 @@ h1,
 }
 .lang-locale-section {
   margin-top: 16px;
-  border-top: 1px solid #d1d5db;
   padding-top: 16px;
 }
 .section-description {
@@ -602,6 +601,18 @@ h1,
 }
 .lang-locale-item label input {
   margin-top: 4px;
+}
+.lang-locale-category-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.lang-locale-category-list li {
+  display: flex;
+  align-items: center;
 }
 .lang-locale-subsection {
   margin-top: 8px;

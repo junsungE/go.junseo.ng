@@ -318,6 +318,8 @@ function addLangLocaleEntry(localeData = {}) {
   const mainUrl = localeData.mainUrl || '';
   const desktop = localeData.desktop || {};
   const mobile = localeData.mobile || {};
+  const hasDesktop = Object.values(desktop).some(v => v);
+  const hasMobile = Object.values(mobile).some(v => v);
 
   const li = document.createElement('li');
   li.className = 'lang-locale-item';
@@ -331,8 +333,22 @@ function addLangLocaleEntry(localeData = {}) {
       Main Target URL (optional)
       <input type="url" placeholder="https://example.com/localized" value="${escapeHtml(mainUrl)}" class="lang-locale-main-url">
     </label>
-    <section class="lang-locale-subsection">
-      <h5>Desktop (optional)</h5>
+    <ul class="lang-locale-category-list">
+      <li>
+        <label class="checkbox-label-inline">
+          <input type="checkbox" class="lang-locale-desktop-toggle" ${hasDesktop ? 'checked' : ''}>
+          Desktop
+        </label>
+      </li>
+      <li>
+        <label class="checkbox-label-inline">
+          <input type="checkbox" class="lang-locale-mobile-toggle" ${hasMobile ? 'checked' : ''}>
+          Mobile
+        </label>
+      </li>
+    </ul>
+    <section class="lang-locale-subsection lang-locale-desktop-section" ${hasDesktop ? '' : 'hidden'}>
+      <h5>Desktop</h5>
       <fieldset>
         <label>Windows<input type="url" placeholder="https://..." value="${escapeHtml(desktop.windows || '')}" class="lang-locale-windows"></label>
         <label>macOS<input type="url" placeholder="https://..." value="${escapeHtml(desktop.macos || '')}" class="lang-locale-macos"></label>
@@ -340,8 +356,8 @@ function addLangLocaleEntry(localeData = {}) {
         <label>ChromeOS<input type="url" placeholder="https://..." value="${escapeHtml(desktop.chromeos || '')}" class="lang-locale-chromeos"></label>
       </fieldset>
     </section>
-    <section class="lang-locale-subsection">
-      <h5>Mobile (optional)</h5>
+    <section class="lang-locale-subsection lang-locale-mobile-section" ${hasMobile ? '' : 'hidden'}>
+      <h5>Mobile</h5>
       <fieldset>
         <label>Android<input type="url" placeholder="https://..." value="${escapeHtml(mobile.android || '')}" class="lang-locale-android"></label>
         <label>iOS<input type="url" placeholder="https://..." value="${escapeHtml(mobile.ios || '')}" class="lang-locale-ios"></label>
@@ -351,6 +367,19 @@ function addLangLocaleEntry(localeData = {}) {
     <p class="lang-locale-error">Please provide at least one URL for this locale.</p>
   `;
   langLocaleList.appendChild(li);
+
+  // Add toggle listeners for Desktop/Mobile sections
+  const desktopToggle = li.querySelector('.lang-locale-desktop-toggle');
+  const mobileToggle = li.querySelector('.lang-locale-mobile-toggle');
+  const desktopSection = li.querySelector('.lang-locale-desktop-section');
+  const mobileSection = li.querySelector('.lang-locale-mobile-section');
+
+  desktopToggle.addEventListener('change', () => {
+    desktopSection.hidden = !desktopToggle.checked;
+  });
+  mobileToggle.addEventListener('change', () => {
+    mobileSection.hidden = !mobileToggle.checked;
+  });
 
   // Add remove button listener
   li.querySelector('.remove-lang-locale').addEventListener('click', () => {

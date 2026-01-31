@@ -97,13 +97,14 @@ button[type="submit"]:hover{filter:brightness(0.95)}
 .table-wrapper {
   margin-top: 12px;
   overflow-x: auto;
+  overflow-y: visible;
   max-width: 100%;
 }
 
 /* Table styles used by dashboard script */
-table.stats-table{width:100%;border-collapse:collapse;border:1px solid var(--border);table-layout:fixed}
+table.stats-table{min-width:100%;border-collapse:collapse;border:1px solid var(--border);table-layout:auto}
 table.stats-table thead tr{background:#f3f4f6}
-table.stats-table th, table.stats-table td{border:1px solid var(--border);padding:8px;text-align:left;position:relative;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+table.stats-table th, table.stats-table td{border:1px solid var(--border);padding:8px;text-align:left;position:relative;white-space:nowrap}
 table.stats-table th{cursor:pointer;user-select:none}
 table.stats-table th:hover{background:#e5e7eb}
 

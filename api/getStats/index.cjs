@@ -68,28 +68,29 @@ module.exports = async function (context, req) {
         });
     } else {
         // All stats for a specific type
-        // 1. Get all slugs for this type
-        const slugs = new Set();
+        // 1. Get all slugs for this type (store lowercase for case-insensitive matching)
+        const slugsLower = new Set();
         const linkEntities = linkTable.listEntities({
             queryOptions: { filter: `PartitionKey eq '${partition}'` }
         });
         for await (const link of linkEntities) {
-            slugs.add(link.rowKey);
+            slugsLower.add(link.rowKey.toLowerCase());
         }
 
-        if (slugs.size === 0) {
+        if (slugsLower.size === 0) {
             context.res = jsonResponse(200, { visits: [] });
             return;
         }
 
-        // 2. Fetch ALL visits and filter by slug set (In-memory filtering for simplicity)
+        // 2. Fetch ALL visits and filter by slug set (case-insensitive)
         // Optimization note: Scanning the entire Visits table can be slow if it's large.
         const allVisits = [];
         const visitEntities = visitsTable.listEntities();
         for await (const visit of visitEntities) {
-            if (slugs.has(visit.partitionKey)) {
+            // Case-insensitive match
+            if (slugsLower.has(visit.partitionKey.toLowerCase())) {
                 allVisits.push({
-                    slug: decodeURIComponent(visit.partitionKey),
+                    slug: visit.partitionKey, // Show actual case used when accessing
                     timestamp: visit.timestamp,
                     ip: visit.ip,
                     userAgent: visit.userAgent,

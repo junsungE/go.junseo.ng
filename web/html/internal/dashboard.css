@@ -97,30 +97,51 @@ button[type="submit"]:hover{filter:brightness(0.95)}
 .table-wrapper {
   margin-top: 12px;
   overflow-x: auto;
-  overflow-y: visible;
-  max-width: 100%;
 }
 
 /* Table styles used by dashboard script */
-table.stats-table{min-width:100%;border-collapse:collapse;border:1px solid var(--border);table-layout:auto}
-table.stats-table thead tr{background:#f3f4f6}
-table.stats-table th, table.stats-table td{border:1px solid var(--border);padding:8px;text-align:left;position:relative;white-space:nowrap}
-table.stats-table th{cursor:pointer;user-select:none}
-table.stats-table th:hover{background:#e5e7eb}
+table.stats-table {
+  border-collapse: collapse;
+  font-size: 14px;
+  table-layout: fixed;
+  width: max-content;
+  min-width: 100%;
+}
+table.stats-table th, table.stats-table td {
+  border: 1px solid #e5e7eb;
+  padding: 8px;
+  text-align: left;
+  word-break: break-word;
+  vertical-align: top;
+}
+table.stats-table th {
+  position: relative;
+  background: #f9fafb;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  user-select: none;
+}
+table.stats-table th:hover {
+  background: #e5e7eb;
+}
 
 /* Column resizer */
 .resizer {
   position: absolute;
   top: 0;
-  right: 0;
-  width: 5px;
-  height: 100%;
+  right: -5px;
+  width: 15px;
   cursor: col-resize;
   user-select: none;
-  background: transparent;
+  height: 100%;
+  z-index: 1;
 }
-.resizer:hover, .resizer.resizing {
-  background: var(--accent);
+.resizer:hover,
+.resizer.resizing {
+  border-right: 2px solid var(--accent);
 }
 
 /* Type badges */

@@ -81,14 +81,14 @@ function renderStatsTable() {
   const thead = document.createElement("thead");
   thead.innerHTML = `
     <tr>
-      <th data-sort="type">Type<span></span></th>
-      <th data-sort="slug">Slug<span></span></th>
-      <th data-sort="ip">IP<span></span></th>
-      <th data-sort="userAgent">User Agent<span></span></th>
-      <th data-sort="country">Country<span></span></th>
-      <th data-sort="language">Language<span></span></th>
-      <th data-sort="referrer">Referrer<span></span></th>
-      <th data-sort="timestamp">Timestamp<span></span></th>
+      <th data-sort="type" style="width: 80px;">Type<span></span></th>
+      <th data-sort="slug" style="width: 120px;">Slug<span></span></th>
+      <th data-sort="ip" style="width: 120px;">IP<span></span></th>
+      <th data-sort="userAgent" style="width: 250px;">User Agent<span></span></th>
+      <th data-sort="country" style="width: 100px;">Country<span></span></th>
+      <th data-sort="language" style="width: 100px;">Language<span></span></th>
+      <th data-sort="referrer" style="width: 150px;">Referrer<span></span></th>
+      <th data-sort="timestamp" style="width: 160px;">Timestamp<span></span></th>
     </tr>`;
   table.appendChild(thead);
   

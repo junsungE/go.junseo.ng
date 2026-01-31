@@ -161,27 +161,53 @@ module.exports = async function (context, req) {
       }
 
       // Conditional redirects
-      const deviceType = req.headers["user-agent"] ? req.headers["user-agent"].toLowerCase() : "";
+      let redirectUrl = entity.defaultUrl || entity.targetUrl;
+      
+      // Parse platformRedirects and langMap if stored as JSON strings
+      let platformRedirects = entity.platformRedirects;
+      let langMap = entity.langMap;
+      
+      if (typeof platformRedirects === 'string') {
+        try { platformRedirects = JSON.parse(platformRedirects); } catch { platformRedirects = {}; }
+      }
+      if (typeof langMap === 'string') {
+        try { langMap = JSON.parse(langMap); } catch { langMap = {}; }
+      }
+      
+      platformRedirects = platformRedirects || {};
+      langMap = langMap || {};
 
-      let redirectUrl = entity.defaultUrl;
+      // Detect platform from user-agent
+      const userAgent = (req.headers["user-agent"] || "").toLowerCase();
+      
+      // Mobile detection (check mobile first as they're more specific)
+      if (userAgent.includes("ipad") && platformRedirects.ipados) {
+        redirectUrl = platformRedirects.ipados;
+      } else if (userAgent.includes("iphone") && platformRedirects.ios) {
+        redirectUrl = platformRedirects.ios;
+      } else if (userAgent.includes("android") && platformRedirects.android) {
+        redirectUrl = platformRedirects.android;
+      }
+      // Desktop detection
+      else if (userAgent.includes("cros") && platformRedirects.chromeos) {
+        redirectUrl = platformRedirects.chromeos;
+      } else if (userAgent.includes("windows") && platformRedirects.windows) {
+        redirectUrl = platformRedirects.windows;
+      } else if (userAgent.includes("mac") && platformRedirects.macos) {
+        redirectUrl = platformRedirects.macos;
+      } else if (userAgent.includes("linux") && platformRedirects.linux) {
+        redirectUrl = platformRedirects.linux;
+      }
 
-      // Device/platform-based redirect
-      if (deviceType.includes("android") && entity.androidUrl)
-        redirectUrl = entity.androidUrl;
-      else if (deviceType.includes("iphone") && entity.iosUrl)
-        redirectUrl = entity.iosUrl;
-      else if (deviceType.includes("windows") && entity.windowsUrl)
-        redirectUrl = entity.windowsUrl;
-      else if (deviceType.includes("mac") && entity.macosUrl)
-        redirectUrl = entity.macosUrl;
-      else if (deviceType.includes("linux") && entity.linuxUrl)
-        redirectUrl = entity.linuxUrl;
-
-      // Geo/language conditions
-      if (entity.geoMap && entity.geoMap[country])
-        redirectUrl = entity.geoMap[country];
-      if (entity.langMap && entity.langMap[lang])
-        redirectUrl = entity.langMap[lang];
+      // Lang-locale based redirect (override platform-based if matched)
+      const acceptLanguage = req.headers["accept-language"] || "";
+      // Try exact match first, then prefix match
+      for (const [locale, url] of Object.entries(langMap)) {
+        if (acceptLanguage.toLowerCase().startsWith(locale.toLowerCase())) {
+          redirectUrl = url;
+          break;
+        }
+      }
 
       // Log visit and redirect
       await incrementVisit("InternalLinks", entity.rowKey, entity.partitionKey);
@@ -193,13 +219,62 @@ module.exports = async function (context, req) {
       return;
     }
 
-    // External redirect
+    // External redirect (premium links also support conditional redirects)
+    let redirectUrl = entity.targetUrl;
+    
+    // Parse platformRedirects and langMap if stored as JSON strings
+    let platformRedirects = entity.platformRedirects;
+    let langMap = entity.langMap;
+    
+    if (typeof platformRedirects === 'string') {
+      try { platformRedirects = JSON.parse(platformRedirects); } catch { platformRedirects = {}; }
+    }
+    if (typeof langMap === 'string') {
+      try { langMap = JSON.parse(langMap); } catch { langMap = {}; }
+    }
+    
+    platformRedirects = platformRedirects || {};
+    langMap = langMap || {};
+
+    // Only apply conditional redirects for premium links
+    if (entity.partitionKey === 'premium' && (Object.keys(platformRedirects).length > 0 || Object.keys(langMap).length > 0)) {
+      const userAgent = (req.headers["user-agent"] || "").toLowerCase();
+      
+      // Mobile detection
+      if (userAgent.includes("ipad") && platformRedirects.ipados) {
+        redirectUrl = platformRedirects.ipados;
+      } else if (userAgent.includes("iphone") && platformRedirects.ios) {
+        redirectUrl = platformRedirects.ios;
+      } else if (userAgent.includes("android") && platformRedirects.android) {
+        redirectUrl = platformRedirects.android;
+      }
+      // Desktop detection
+      else if (userAgent.includes("cros") && platformRedirects.chromeos) {
+        redirectUrl = platformRedirects.chromeos;
+      } else if (userAgent.includes("windows") && platformRedirects.windows) {
+        redirectUrl = platformRedirects.windows;
+      } else if (userAgent.includes("mac") && platformRedirects.macos) {
+        redirectUrl = platformRedirects.macos;
+      } else if (userAgent.includes("linux") && platformRedirects.linux) {
+        redirectUrl = platformRedirects.linux;
+      }
+
+      // Lang-locale based redirect
+      const acceptLanguage = req.headers["accept-language"] || "";
+      for (const [locale, url] of Object.entries(langMap)) {
+        if (acceptLanguage.toLowerCase().startsWith(locale.toLowerCase())) {
+          redirectUrl = url;
+          break;
+        }
+      }
+    }
+
     await incrementVisit("ExternalLinks", entity.rowKey, entity.partitionKey);
     await recordVisit(slug, ip, ua, country, lang, referrer);
 
     context.res = {
       status: 302,
-      headers: { Location: entity.targetUrl }
+      headers: { Location: redirectUrl }
     };
   } catch (err) {
     if (context && context.log && typeof context.log.error === "function") {

@@ -272,6 +272,127 @@ if (tagInput) {
 // Initialize - fetch existing tags
 fetchExistingTags();
 
+// Conditional Redirect functionality
+const conditionalRedirectToggle = document.getElementById('conditionalRedirectToggle');
+const conditionalRedirectOptions = document.getElementById('conditionalRedirectOptions');
+const langLocaleToggle = document.getElementById('langLocaleToggle');
+const desktopToggle = document.getElementById('desktopToggle');
+const mobileToggle = document.getElementById('mobileToggle');
+const langLocaleSection = document.getElementById('langLocaleSection');
+const desktopSection = document.getElementById('desktopSection');
+const mobileSection = document.getElementById('mobileSection');
+const langLocaleList = document.getElementById('langLocaleList');
+const addLangLocaleBtn = document.getElementById('addLangLocaleBtn');
+
+// Toggle main conditional redirect section
+if (conditionalRedirectToggle) {
+  conditionalRedirectToggle.addEventListener('change', () => {
+    conditionalRedirectOptions.hidden = !conditionalRedirectToggle.checked;
+    if (!conditionalRedirectToggle.checked) {
+      // Reset all sub-toggles when main toggle is unchecked
+      langLocaleToggle.checked = false;
+      desktopToggle.checked = false;
+      mobileToggle.checked = false;
+      langLocaleSection.hidden = true;
+      desktopSection.hidden = true;
+      mobileSection.hidden = true;
+    }
+  });
+}
+
+// Toggle individual sections
+if (langLocaleToggle) {
+  langLocaleToggle.addEventListener('change', () => {
+    langLocaleSection.hidden = !langLocaleToggle.checked;
+    if (langLocaleToggle.checked && langLocaleList.children.length === 0) {
+      addLangLocaleEntry();
+    }
+  });
+}
+
+if (desktopToggle) {
+  desktopToggle.addEventListener('change', () => {
+    desktopSection.hidden = !desktopToggle.checked;
+  });
+}
+
+if (mobileToggle) {
+  mobileToggle.addEventListener('change', () => {
+    mobileSection.hidden = !mobileToggle.checked;
+  });
+}
+
+// Lang-locale management
+let langLocaleCounter = 0;
+
+function addLangLocaleEntry(locale = '', url = '') {
+  const li = document.createElement('li');
+  li.className = 'lang-locale-item';
+  li.dataset.id = langLocaleCounter++;
+  li.innerHTML = `
+    <input type="text" placeholder="e.g., en-US, ko-KR" value="${escapeHtml(locale)}" class="lang-locale-code">
+    <input type="url" placeholder="https://example.com/localized" value="${escapeHtml(url)}" class="lang-locale-url">
+    <button type="button" class="remove-lang-locale" title="Remove">×</button>
+  `;
+  langLocaleList.appendChild(li);
+
+  // Add remove button listener
+  li.querySelector('.remove-lang-locale').addEventListener('click', () => {
+    li.remove();
+  });
+}
+
+if (addLangLocaleBtn) {
+  addLangLocaleBtn.addEventListener('click', () => {
+    addLangLocaleEntry();
+  });
+}
+
+// Collect conditional redirect data
+function getConditionalRedirectData() {
+  const data = {
+    platformRedirects: {},
+    langMap: {}
+  };
+
+  // Desktop redirects
+  if (desktopToggle && desktopToggle.checked) {
+    const windowsUrl = document.getElementById('windowsUrl')?.value.trim();
+    const macosUrl = document.getElementById('macosUrl')?.value.trim();
+    const linuxUrl = document.getElementById('linuxUrl')?.value.trim();
+    const chromeosUrl = document.getElementById('chromeosUrl')?.value.trim();
+
+    if (windowsUrl) data.platformRedirects.windows = windowsUrl;
+    if (macosUrl) data.platformRedirects.macos = macosUrl;
+    if (linuxUrl) data.platformRedirects.linux = linuxUrl;
+    if (chromeosUrl) data.platformRedirects.chromeos = chromeosUrl;
+  }
+
+  // Mobile redirects
+  if (mobileToggle && mobileToggle.checked) {
+    const androidUrl = document.getElementById('androidUrl')?.value.trim();
+    const iosUrl = document.getElementById('iosUrl')?.value.trim();
+    const ipadosUrl = document.getElementById('ipadosUrl')?.value.trim();
+
+    if (androidUrl) data.platformRedirects.android = androidUrl;
+    if (iosUrl) data.platformRedirects.ios = iosUrl;
+    if (ipadosUrl) data.platformRedirects.ipados = ipadosUrl;
+  }
+
+  // Lang-locale redirects
+  if (langLocaleToggle && langLocaleToggle.checked) {
+    langLocaleList.querySelectorAll('.lang-locale-item').forEach(item => {
+      const code = item.querySelector('.lang-locale-code')?.value.trim();
+      const url = item.querySelector('.lang-locale-url')?.value.trim();
+      if (code && url) {
+        data.langMap[code] = url;
+      }
+    });
+  }
+
+  return data;
+}
+
 function togglePasswordRow() {
   if (!modeSelect) return;
   if (modeSelect.value === 'protected') {
@@ -314,6 +435,17 @@ if (form) {
     // Add tags to the data
     if (selectedTags.length > 0) {
       data.tags = selectedTags;
+    }
+
+    // Add conditional redirect data
+    if (conditionalRedirectToggle && conditionalRedirectToggle.checked) {
+      const conditionalData = getConditionalRedirectData();
+      if (Object.keys(conditionalData.platformRedirects).length > 0) {
+        data.platformRedirects = conditionalData.platformRedirects;
+      }
+      if (Object.keys(conditionalData.langMap).length > 0) {
+        data.langMap = conditionalData.langMap;
+      }
     }
 
     // 1. Get user identity

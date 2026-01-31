@@ -54,6 +54,80 @@
           <menu id="tagSuggestionsMenu" class="tag-suggestions-menu" hidden></menu>
         </fieldset>
 
+        <fieldset id="conditionalRedirectFieldset" class="conditional-fieldset">
+          <legend>
+            <label class="checkbox-label-inline">
+              <input type="checkbox" id="conditionalRedirectToggle">
+              Conditional Redirect (optional)
+            </label>
+          </legend>
+          
+          <section id="conditionalRedirectOptions" hidden>
+            <ul class="conditional-category-list">
+              <li>
+                <label class="checkbox-label-inline">
+                  <input type="checkbox" id="langLocaleToggle">
+                  Lang-locale
+                </label>
+              </li>
+              <li>
+                <label class="checkbox-label-inline">
+                  <input type="checkbox" id="desktopToggle">
+                  Desktop
+                </label>
+              </li>
+              <li>
+                <label class="checkbox-label-inline">
+                  <input type="checkbox" id="mobileToggle">
+                  Mobile
+                </label>
+              </li>
+            </ul>
+
+            <section id="langLocaleSection" class="conditional-section" hidden>
+              <h4>Lang-locale Redirects</h4>
+              <ul id="langLocaleList" class="lang-locale-list"></ul>
+              <button type="button" id="addLangLocaleBtn" class="btn-secondary">+ Add lang-locale</button>
+            </section>
+
+            <section id="desktopSection" class="conditional-section" hidden>
+              <h4>Desktop Redirects</h4>
+              <label class="conditional-input-row">
+                <span class="conditional-label">Windows:</span>
+                <input type="url" id="windowsUrl" placeholder="https://example.com/windows">
+              </label>
+              <label class="conditional-input-row">
+                <span class="conditional-label">Mac OS:</span>
+                <input type="url" id="macosUrl" placeholder="https://example.com/macos">
+              </label>
+              <label class="conditional-input-row">
+                <span class="conditional-label">Linux:</span>
+                <input type="url" id="linuxUrl" placeholder="https://example.com/linux">
+              </label>
+              <label class="conditional-input-row">
+                <span class="conditional-label">ChromeOS:</span>
+                <input type="url" id="chromeosUrl" placeholder="https://example.com/chromeos">
+              </label>
+            </section>
+
+            <section id="mobileSection" class="conditional-section" hidden>
+              <h4>Mobile Redirects</h4>
+              <label class="conditional-input-row">
+                <span class="conditional-label">Android:</span>
+                <input type="url" id="androidUrl" placeholder="https://example.com/android">
+              </label>
+              <label class="conditional-input-row">
+                <span class="conditional-label">iOS:</span>
+                <input type="url" id="iosUrl" placeholder="https://example.com/ios">
+              </label>
+              <label class="conditional-input-row">
+                <span class="conditional-label">iPadOS:</span>
+                <input type="url" id="ipadosUrl" placeholder="https://example.com/ipados">
+              </label>
+            </section>
+          </section>
+        </fieldset>
+
         <label class="optional-row" style="justify-content: flex-start;">
             <label class="checkbox-label">
                 <input id="caseSensitiveInput" type="checkbox">

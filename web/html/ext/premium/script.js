@@ -58,7 +58,8 @@ function checkAccountStatus() {
         titleInput,
         caseSensitiveInput,
         shortenUrlBtn,
-        tagInput
+        tagInput,
+        document.getElementById('conditionalRedirectToggle')
     ];
 
     if (isApproved) {
@@ -364,6 +365,17 @@ shortenUrlBtn.addEventListener("click", async () => {
     data.tags = selectedTags;
   }
 
+  // Add conditional redirect data
+  if (conditionalRedirectToggle && conditionalRedirectToggle.checked) {
+    const conditionalData = getConditionalRedirectData();
+    if (Object.keys(conditionalData.platformRedirects).length > 0) {
+      data.platformRedirects = conditionalData.platformRedirects;
+    }
+    if (Object.keys(conditionalData.langMap).length > 0) {
+      data.langMap = conditionalData.langMap;
+    }
+  }
+
   if (startDateInput.value) {
     data.startDate = startDateInput.value;
   }
@@ -413,6 +425,7 @@ shortenUrlBtn.addEventListener("click", async () => {
       caseSensitiveInput.disabled = true;
       shortenUrlBtn.disabled = true;
       if (tagInput) tagInput.disabled = true;
+      if (conditionalRedirectToggle) conditionalRedirectToggle.disabled = true;
 
       // Refresh list
       fetchMyLinks();
@@ -461,6 +474,35 @@ shortenAnotherBtn.addEventListener("click", () => {
   selectedTags = [];
   renderSelectedTags();
   
+  // Reset conditional redirect
+  if (conditionalRedirectToggle) {
+    conditionalRedirectToggle.checked = false;
+    if (conditionalRedirectOptions) conditionalRedirectOptions.hidden = true;
+    if (langLocaleToggle) langLocaleToggle.checked = false;
+    if (desktopToggle) desktopToggle.checked = false;
+    if (mobileToggle) mobileToggle.checked = false;
+    if (langLocaleSection) langLocaleSection.hidden = true;
+    if (desktopSection) desktopSection.hidden = true;
+    if (mobileSection) mobileSection.hidden = true;
+    if (langLocaleList) langLocaleList.innerHTML = '';
+    // Reset desktop URLs
+    const windowsUrl = document.getElementById('windowsUrl');
+    const macosUrl = document.getElementById('macosUrl');
+    const linuxUrl = document.getElementById('linuxUrl');
+    const chromeosUrl = document.getElementById('chromeosUrl');
+    if (windowsUrl) windowsUrl.value = '';
+    if (macosUrl) macosUrl.value = '';
+    if (linuxUrl) linuxUrl.value = '';
+    if (chromeosUrl) chromeosUrl.value = '';
+    // Reset mobile URLs
+    const androidUrl = document.getElementById('androidUrl');
+    const iosUrl = document.getElementById('iosUrl');
+    const ipadosUrl = document.getElementById('ipadosUrl');
+    if (androidUrl) androidUrl.value = '';
+    if (iosUrl) iosUrl.value = '';
+    if (ipadosUrl) ipadosUrl.value = '';
+  }
+  
   // Hide result section
   resultSection.hidden = true;
   
@@ -475,6 +517,7 @@ shortenAnotherBtn.addEventListener("click", () => {
   shortenUrlBtn.disabled = false;
   shortenAnotherBtn.hidden = true;
   if (tagInput) tagInput.disabled = false;
+  if (conditionalRedirectToggle) conditionalRedirectToggle.disabled = false;
   
   urlInput.focus();
 });
@@ -692,4 +735,126 @@ if (tagInput) {
       showSuggestions(tagInput.value);
     }
   });
+}
+
+// Conditional Redirect functionality
+const conditionalRedirectToggle = document.getElementById('conditionalRedirectToggle');
+const conditionalRedirectOptions = document.getElementById('conditionalRedirectOptions');
+const langLocaleToggle = document.getElementById('langLocaleToggle');
+const desktopToggle = document.getElementById('desktopToggle');
+const mobileToggle = document.getElementById('mobileToggle');
+const langLocaleSection = document.getElementById('langLocaleSection');
+const desktopSection = document.getElementById('desktopSection');
+const mobileSection = document.getElementById('mobileSection');
+const langLocaleList = document.getElementById('langLocaleList');
+const addLangLocaleBtn = document.getElementById('addLangLocaleBtn');
+
+// Toggle main conditional redirect section
+if (conditionalRedirectToggle) {
+  conditionalRedirectToggle.addEventListener('change', () => {
+    conditionalRedirectOptions.hidden = !conditionalRedirectToggle.checked;
+    if (!conditionalRedirectToggle.checked) {
+      // Reset all sub-toggles when main toggle is unchecked
+      if (langLocaleToggle) langLocaleToggle.checked = false;
+      if (desktopToggle) desktopToggle.checked = false;
+      if (mobileToggle) mobileToggle.checked = false;
+      if (langLocaleSection) langLocaleSection.hidden = true;
+      if (desktopSection) desktopSection.hidden = true;
+      if (mobileSection) mobileSection.hidden = true;
+    }
+  });
+}
+
+// Toggle individual sections
+if (langLocaleToggle) {
+  langLocaleToggle.addEventListener('change', () => {
+    langLocaleSection.hidden = !langLocaleToggle.checked;
+    if (langLocaleToggle.checked && langLocaleList && langLocaleList.children.length === 0) {
+      addLangLocaleEntry();
+    }
+  });
+}
+
+if (desktopToggle) {
+  desktopToggle.addEventListener('change', () => {
+    desktopSection.hidden = !desktopToggle.checked;
+  });
+}
+
+if (mobileToggle) {
+  mobileToggle.addEventListener('change', () => {
+    mobileSection.hidden = !mobileToggle.checked;
+  });
+}
+
+// Lang-locale management
+let langLocaleCounter = 0;
+
+function addLangLocaleEntry(locale = '', url = '') {
+  if (!langLocaleList) return;
+  const li = document.createElement('li');
+  li.className = 'lang-locale-item';
+  li.dataset.id = langLocaleCounter++;
+  li.innerHTML = `
+    <input type="text" placeholder="e.g., en-US, ko-KR" value="${escapeHtml(locale)}" class="lang-locale-code">
+    <input type="url" placeholder="https://example.com/localized" value="${escapeHtml(url)}" class="lang-locale-url">
+    <button type="button" class="remove-lang-locale" title="Remove">×</button>
+  `;
+  langLocaleList.appendChild(li);
+
+  // Add remove button listener
+  li.querySelector('.remove-lang-locale').addEventListener('click', () => {
+    li.remove();
+  });
+}
+
+if (addLangLocaleBtn) {
+  addLangLocaleBtn.addEventListener('click', () => {
+    addLangLocaleEntry();
+  });
+}
+
+// Collect conditional redirect data
+function getConditionalRedirectData() {
+  const data = {
+    platformRedirects: {},
+    langMap: {}
+  };
+
+  // Desktop redirects
+  if (desktopToggle && desktopToggle.checked) {
+    const windowsUrl = document.getElementById('windowsUrl')?.value.trim();
+    const macosUrl = document.getElementById('macosUrl')?.value.trim();
+    const linuxUrl = document.getElementById('linuxUrl')?.value.trim();
+    const chromeosUrl = document.getElementById('chromeosUrl')?.value.trim();
+
+    if (windowsUrl) data.platformRedirects.windows = windowsUrl;
+    if (macosUrl) data.platformRedirects.macos = macosUrl;
+    if (linuxUrl) data.platformRedirects.linux = linuxUrl;
+    if (chromeosUrl) data.platformRedirects.chromeos = chromeosUrl;
+  }
+
+  // Mobile redirects
+  if (mobileToggle && mobileToggle.checked) {
+    const androidUrl = document.getElementById('androidUrl')?.value.trim();
+    const iosUrl = document.getElementById('iosUrl')?.value.trim();
+    const ipadosUrl = document.getElementById('ipadosUrl')?.value.trim();
+
+    if (androidUrl) data.platformRedirects.android = androidUrl;
+    if (iosUrl) data.platformRedirects.ios = iosUrl;
+    if (ipadosUrl) data.platformRedirects.ipados = ipadosUrl;
+  }
+
+  // Lang-locale redirects
+  if (langLocaleToggle && langLocaleToggle.checked && langLocaleList) {
+    langLocaleList.querySelectorAll('.lang-locale-item').forEach(item => {
+      const code = item.querySelector('.lang-locale-code')?.value.trim();
+      const url = item.querySelector('.lang-locale-url')?.value.trim();
+      if (code && url) {
+        data.langMap[code] = url;
+      }
+    });
+  }
+
+  return data;
 }

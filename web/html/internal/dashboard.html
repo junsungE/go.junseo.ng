@@ -29,21 +29,19 @@
             <input type="text" name="slug">
           </label>
 
-          <label>
-            Type:
-            <select name="type">
-              <option value="internal">Internal</option>
-              <option value="premium">Premium</option>
-              <option value="free">Free</option>
-            </select>
-          </label>
+          <fieldset class="type-checkboxes">
+            <legend>Type:</legend>
+            <label><input type="checkbox" name="type" value="internal" checked> Internal</label>
+            <label><input type="checkbox" name="type" value="premium"> Premium</label>
+            <label><input type="checkbox" name="type" value="free"> Free</label>
+          </fieldset>
 
           <button type="submit">Fetch</button>
         </form>
 
         <p id="error"></p>
 
-        <section id="statsSection"></section>
+        <section id="statsSection" class="table-wrapper"></section>
 
         <hr style="margin: 30px 0;">
 

@@ -1,63 +1,210 @@
 const form = document.getElementById("fetchForm");
-      const statsSection = document.getElementById("statsSection");
-      const errorMsg = document.getElementById("error");
+const statsSection = document.getElementById("statsSection");
+const errorMsg = document.getElementById("error");
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        statsSection.textContent = "";
-        errorMsg.textContent = "";
-        const data = Object.fromEntries(new FormData(form).entries());
-        const res = await fetch(`/api/getStats?slug=${encodeURIComponent(data.slug)}&type=${data.type}`);
-        const result = await res.json();
-        if (res.ok) {
-          if (!result.visits || result.visits.length === 0) {
-              statsSection.innerHTML = "<p>No visits found for this criteria.</p>";
-              return;
-          }
+// Stats table state
+let statsVisits = [];
+let statsSortCol = "timestamp";
+let statsSortAsc = false;
 
-          const table = document.createElement("table");
-          table.className = "stats-table";
-          const thead = document.createElement("thead");
-          thead.innerHTML = `
-            <tr>
-              <th>Slug</th>
-              <th>IP</th>
-              <th>User Agent</th>
-              <th>Country</th>
-              <th>Language</th>
-              <th>Referrer</th>
-              <th>Timestamp</th>
-            </tr>`;
-          table.appendChild(thead);
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  statsSection.textContent = "";
+  errorMsg.textContent = "";
+  
+  const formData = new FormData(form);
+  const slug = formData.get("slug") || "";
+  const selectedTypes = formData.getAll("type");
+  
+  if (selectedTypes.length === 0) {
+    errorMsg.textContent = "Please select at least one type.";
+    return;
+  }
+  
+  // Fetch from all selected types
+  const allVisits = [];
+  for (const type of selectedTypes) {
+    try {
+      const res = await fetch(`/api/getStats?slug=${encodeURIComponent(slug)}&type=${type}`);
+      const result = await res.json();
+      if (res.ok && result.visits) {
+        // Add type to each visit for display
+        result.visits.forEach(v => {
+          v.type = type;
+          allVisits.push(v);
+        });
+      }
+    } catch (err) {
+      console.warn(`Failed to fetch ${type} stats:`, err);
+    }
+  }
+  
+  if (allVisits.length === 0) {
+    statsSection.innerHTML = "<p>No visits found for this criteria.</p>";
+    return;
+  }
+  
+  statsVisits = allVisits;
+  statsSortCol = "timestamp";
+  statsSortAsc = false;
+  renderStatsTable();
+});
 
-          const tbody = document.createElement("tbody");
-          result.visits.forEach(v => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-              <td>${v.slug}</td>
-              <td>${v.ip}</td>
-              <td>${v.userAgent}</td>
-              <td>${v.country}</td>
-              <td>${v.language || 'Unknown'}</td>
-              <td>${v.referrer || 'Direct'}</td>
-              <td>${new Date(v.timestamp).toLocaleString()}</td>`;
-            tbody.appendChild(tr);
-          });
-          table.appendChild(tbody);
-
-          statsSection.appendChild(table);
-        } else {
-          errorMsg.textContent = result.error || "Failed to fetch stats.";
-        }
-      });
-
-      const usersBody = document.getElementById("usersBody");
-      const usersLoading = document.getElementById("usersLoading");
-      const adminLoginForm = document.getElementById("adminLoginForm");
-      const adminSecretInput = document.getElementById("adminSecretInput");
-      const adminStatus = document.getElementById("adminStatus");
+function renderStatsTable() {
+  statsSection.innerHTML = "";
+  
+  // Sort visits
+  statsVisits.sort((a, b) => {
+    let valA = a[statsSortCol];
+    let valB = b[statsSortCol];
+    
+    if (valA === null || valA === undefined) valA = "";
+    if (valB === null || valB === undefined) valB = "";
+    
+    let cmp = 0;
+    if (statsSortCol === "timestamp") {
+      cmp = new Date(valA) - new Date(valB);
+    } else if (typeof valA === 'string' && typeof valB === 'string') {
+      cmp = valA.localeCompare(valB, undefined, { sensitivity: 'base' });
+    } else {
+      if (valA < valB) cmp = -1;
+      if (valA > valB) cmp = 1;
+    }
+    
+    return statsSortAsc ? cmp : -cmp;
+  });
+  
+  const table = document.createElement("table");
+  table.className = "stats-table";
+  table.id = "statsTable";
+  
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
+    <tr>
+      <th data-sort="type">Type<span></span></th>
+      <th data-sort="slug">Slug<span></span></th>
+      <th data-sort="ip">IP<span></span></th>
+      <th data-sort="userAgent">User Agent<span></span></th>
+      <th data-sort="country">Country<span></span></th>
+      <th data-sort="language">Language<span></span></th>
+      <th data-sort="referrer">Referrer<span></span></th>
+      <th data-sort="timestamp">Timestamp<span></span></th>
+    </tr>`;
+  table.appendChild(thead);
+  
+  // Update sort indicators
+  thead.querySelectorAll("th").forEach(th => {
+    const span = th.querySelector("span");
+    if (th.dataset.sort === statsSortCol) {
+      span.textContent = statsSortAsc ? " ▲" : " ▼";
+    }
+  });
+  
+  const tbody = document.createElement("tbody");
+  statsVisits.forEach(v => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><span class="type-badge type-${v.type}">${v.type}</span></td>
+      <td>${escapeHtml(v.slug)}</td>
+      <td>${escapeHtml(v.ip)}</td>
+      <td>${escapeHtml(v.userAgent)}</td>
+      <td>${escapeHtml(v.country)}</td>
+      <td>${escapeHtml(v.language || 'Unknown')}</td>
+      <td>${escapeHtml(v.referrer || 'Direct')}</td>
+      <td>${new Date(v.timestamp).toLocaleString()}</td>`;
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  
+  statsSection.appendChild(table);
+  
+  // Add click handlers for sorting
+  thead.querySelectorAll("th").forEach(th => {
+    th.style.cursor = "pointer";
+    th.addEventListener("click", (e) => {
+      // Don't sort if clicking resizer
+      if (e.target.classList.contains('resizer')) return;
       
-      // Load saved secret if exists
+      const col = th.dataset.sort;
+      if (statsSortCol === col) {
+        statsSortAsc = !statsSortAsc;
+      } else {
+        statsSortCol = col;
+        statsSortAsc = true;
+      }
+      renderStatsTable();
+    });
+  });
+  
+  // Initialize resizable columns
+  initStatsTableResizer();
+}
+
+function initStatsTableResizer() {
+  const headers = document.querySelectorAll("#statsTable th");
+  headers.forEach(th => {
+    const resizer = document.createElement('div');
+    resizer.classList.add('resizer');
+    th.appendChild(resizer);
+    
+    let x = 0;
+    let w = 0;
+
+    const mouseDownHandler = (e) => {
+      e.stopPropagation();
+      x = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+      const styles = window.getComputedStyle(th);
+      w = parseInt(styles.width, 10);
+
+      if (e.type.startsWith('touch')) {
+        document.addEventListener('touchmove', mouseMoveHandler, { passive: false });
+        document.addEventListener('touchend', mouseUpHandler);
+      } else {
+        document.addEventListener('mousemove', mouseMoveHandler);
+        document.addEventListener('mouseup', mouseUpHandler);
+      }
+      resizer.classList.add('resizing');
+    };
+
+    const mouseMoveHandler = (e) => {
+      if (e.type === 'touchmove') e.preventDefault();
+      const currentX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+      const dx = currentX - x;
+      const newWidth = w + dx;
+      if (newWidth > 50) {
+        th.style.width = `${newWidth}px`;
+        th.style.minWidth = `${newWidth}px`;
+      }
+    };
+
+    const mouseUpHandler = () => {
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
+      document.removeEventListener('touchmove', mouseMoveHandler);
+      document.removeEventListener('touchend', mouseUpHandler);
+      resizer.classList.remove('resizing');
+    };
+
+    resizer.addEventListener('mousedown', mouseDownHandler);
+    resizer.addEventListener('touchstart', mouseDownHandler, { passive: true });
+    resizer.addEventListener('click', (e) => e.stopPropagation());
+  });
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  const p = document.createElement('p');
+  p.textContent = str;
+  return p.innerHTML;
+}
+
+const usersBody = document.getElementById("usersBody");
+const usersLoading = document.getElementById("usersLoading");
+const adminLoginForm = document.getElementById("adminLoginForm");
+const adminSecretInput = document.getElementById("adminSecretInput");
+const adminStatus = document.getElementById("adminStatus");
+
+// Load saved secret if exists
       if (localStorage.getItem("adminSecret")) {
           adminSecretInput.value = localStorage.getItem("adminSecret");
           adminStatus.textContent = "Saved secret loaded.";

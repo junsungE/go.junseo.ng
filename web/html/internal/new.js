@@ -304,7 +304,12 @@ if (mobileToggle) {
 
 // Sync conditional redirect visibility with checkbox states on page show
 // (handles back/forward navigation where browser restores checkbox values but not visibility)
-window.addEventListener('pageshow', () => {
+window.addEventListener('pageshow', (event) => {
+  // Clear saved lang-locale on fresh page load (not back/forward)
+  if (!event.persisted) {
+    sessionStorage.removeItem('langLocaleEntries');
+  }
+  
   // Restore visibility based on checkbox states
   if (conditionalRedirectToggle && conditionalRedirectOptions) {
     conditionalRedirectOptions.hidden = !conditionalRedirectToggle.checked;
@@ -315,20 +320,45 @@ window.addEventListener('pageshow', () => {
   if (mobileToggle && mobileSection) {
     mobileSection.hidden = !mobileToggle.checked;
   }
-  // Restore lang-locale desktop/mobile section visibility
+  
+  // Restore lang-locale entries from sessionStorage on back/forward navigation
+  if (event.persisted && langLocaleList) {
+    const saved = sessionStorage.getItem('langLocaleEntries');
+    if (saved) {
+      try {
+        const entries = JSON.parse(saved);
+        langLocaleList.innerHTML = '';
+        entries.forEach(entry => addLangLocaleEntry(entry));
+      } catch (e) {
+        console.warn('Failed to restore lang-locale entries:', e);
+      }
+    }
+  }
+});
+
+// Save lang-locale entries to sessionStorage before leaving the page
+window.addEventListener('pagehide', () => {
   if (langLocaleList) {
+    const entries = [];
     langLocaleList.querySelectorAll('.lang-locale-item').forEach(item => {
-      const desktopToggleEl = item.querySelector('.lang-locale-desktop-toggle');
-      const mobileToggleEl = item.querySelector('.lang-locale-mobile-toggle');
-      const desktopSectionEl = item.querySelector('.lang-locale-desktop-section');
-      const mobileSectionEl = item.querySelector('.lang-locale-mobile-section');
-      if (desktopToggleEl && desktopSectionEl) {
-        desktopSectionEl.hidden = !desktopToggleEl.checked;
-      }
-      if (mobileToggleEl && mobileSectionEl) {
-        mobileSectionEl.hidden = !mobileToggleEl.checked;
-      }
+      const entry = {
+        locale: item.querySelector('.lang-locale-code')?.value || '',
+        mainUrl: item.querySelector('.lang-locale-main-url')?.value || '',
+        desktop: {
+          windows: item.querySelector('.lang-locale-windows')?.value || '',
+          macos: item.querySelector('.lang-locale-macos')?.value || '',
+          linux: item.querySelector('.lang-locale-linux')?.value || '',
+          chromeos: item.querySelector('.lang-locale-chromeos')?.value || ''
+        },
+        mobile: {
+          android: item.querySelector('.lang-locale-android')?.value || '',
+          ios: item.querySelector('.lang-locale-ios')?.value || '',
+          ipados: item.querySelector('.lang-locale-ipados')?.value || ''
+        }
+      };
+      entries.push(entry);
     });
+    sessionStorage.setItem('langLocaleEntries', JSON.stringify(entries));
   }
 });
 

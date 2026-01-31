@@ -371,7 +371,7 @@ shortenUrlBtn.addEventListener("click", async () => {
     
     // Check for validation errors in lang-locale entries
     if (conditionalData.hasLangLocaleError) {
-      alert('Please provide at least one URL for each lang-locale entry, or remove empty entries.');
+      alert('Please provide a lang-locale code and at least one URL for each lang-locale entry, or remove empty entries.');
       shortenUrlBtn.disabled = false;
       shortenUrlBtn.textContent = 'Shorten';
       return;
@@ -896,7 +896,13 @@ function getConditionalRedirectData() {
   if (langLocaleList) {
     langLocaleList.querySelectorAll('.lang-locale-item').forEach(item => {
       const code = item.querySelector('.lang-locale-code')?.value.trim();
-      if (!code) return; // Skip if no locale code
+      
+      // Lang-locale code is required for each entry
+      if (!code) {
+        item.classList.add('has-error');
+        hasLangLocaleError = true;
+        return;
+      }
 
       const mainUrl = item.querySelector('.lang-locale-main-url')?.value.trim();
       const windowsUrl = item.querySelector('.lang-locale-windows')?.value.trim();

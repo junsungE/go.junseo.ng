@@ -305,8 +305,13 @@ if (mobileToggle) {
 // Sync conditional redirect visibility with checkbox states on page show
 // (handles back/forward navigation where browser restores checkbox values but not visibility)
 window.addEventListener('pageshow', (event) => {
+  // Detect navigation type using modern API
+  const navEntries = performance.getEntriesByType('navigation');
+  const navType = navEntries.length > 0 ? navEntries[0].type : '';
+  const isBackForward = event.persisted || navType === 'back_forward';
+  
   // Clear saved lang-locale on fresh page load (not back/forward)
-  if (!event.persisted) {
+  if (!isBackForward) {
     sessionStorage.removeItem('langLocaleEntries');
   }
   
@@ -322,7 +327,7 @@ window.addEventListener('pageshow', (event) => {
   }
   
   // Restore lang-locale entries from sessionStorage on back/forward navigation
-  if (event.persisted && langLocaleList) {
+  if (isBackForward && langLocaleList) {
     const saved = sessionStorage.getItem('langLocaleEntries');
     if (saved) {
       try {

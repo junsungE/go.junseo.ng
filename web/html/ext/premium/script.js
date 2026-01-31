@@ -321,6 +321,18 @@ shortenUrlBtn.addEventListener("click", async () => {
   shortenUrlBtn.disabled = true;
   shortenUrlBtn.textContent = "Checking...";
 
+  // Validate lang-locale entries first (before network requests)
+  if (conditionalRedirectToggle && conditionalRedirectToggle.checked) {
+    const conditionalData = getConditionalRedirectData();
+    
+    if (conditionalData.hasLangLocaleError) {
+      alert('Please provide a lang-locale code and at least one URL for each lang-locale entry, or remove empty entries.');
+      shortenUrlBtn.disabled = false;
+      shortenUrlBtn.textContent = 'Shorten';
+      return;
+    }
+  }
+
   try {
       // 1. Check for duplicate Target URLs for this user
       const checkRes = await fetch("/api/checkExistingTargetURL", {
@@ -368,14 +380,6 @@ shortenUrlBtn.addEventListener("click", async () => {
   // Add conditional redirect data
   if (conditionalRedirectToggle && conditionalRedirectToggle.checked) {
     const conditionalData = getConditionalRedirectData();
-    
-    // Check for validation errors in lang-locale entries
-    if (conditionalData.hasLangLocaleError) {
-      alert('Please provide a lang-locale code and at least one URL for each lang-locale entry, or remove empty entries.');
-      shortenUrlBtn.disabled = false;
-      shortenUrlBtn.textContent = 'Shorten';
-      return;
-    }
     
     if (Object.keys(conditionalData.platformRedirects).length > 0) {
       data.platformRedirects = conditionalData.platformRedirects;

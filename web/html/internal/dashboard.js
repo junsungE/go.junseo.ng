@@ -15,19 +15,18 @@ const form = document.getElementById("fetchForm");
               return;
           }
 
-          const hasSlugColumn = !data.slug; // Show slug column if searching for all
           const table = document.createElement("table");
           table.className = "stats-table";
           const thead = document.createElement("thead");
           thead.innerHTML = `
             <tr>
-              ${hasSlugColumn ? '<th>Slug</th>' : ''}
-              <th>Timestamp</th>
+              <th>Slug</th>
               <th>IP</th>
               <th>User Agent</th>
               <th>Country</th>
               <th>Language</th>
               <th>Referrer</th>
+              <th>Timestamp</th>
             </tr>`;
           table.appendChild(thead);
 
@@ -35,13 +34,13 @@ const form = document.getElementById("fetchForm");
           result.visits.forEach(v => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
-              ${hasSlugColumn ? `<td>${v.slug}</td>` : ''}
-              <td>${new Date(v.timestamp).toLocaleString()}</td>
+              <td>${v.slug}</td>
               <td>${v.ip}</td>
               <td>${v.userAgent}</td>
               <td>${v.country}</td>
               <td>${v.language || 'Unknown'}</td>
-              <td>${v.referrer || 'Direct'}</td>`;
+              <td>${v.referrer || 'Direct'}</td>
+              <td>${new Date(v.timestamp).toLocaleString()}</td>`;
             tbody.appendChild(tr);
           });
           table.appendChild(tbody);

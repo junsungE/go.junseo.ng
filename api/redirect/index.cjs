@@ -180,32 +180,57 @@ module.exports = async function (context, req) {
       // Detect platform from user-agent
       const userAgent = (req.headers["user-agent"] || "").toLowerCase();
       
-      // Mobile detection (check mobile first as they're more specific)
-      if (userAgent.includes("ipad") && platformRedirects.ipados) {
-        redirectUrl = platformRedirects.ipados;
-      } else if (userAgent.includes("iphone") && platformRedirects.ios) {
-        redirectUrl = platformRedirects.ios;
-      } else if (userAgent.includes("android") && platformRedirects.android) {
-        redirectUrl = platformRedirects.android;
-      }
-      // Desktop detection
-      else if (userAgent.includes("cros") && platformRedirects.chromeos) {
-        redirectUrl = platformRedirects.chromeos;
-      } else if (userAgent.includes("windows") && platformRedirects.windows) {
-        redirectUrl = platformRedirects.windows;
-      } else if (userAgent.includes("mac") && platformRedirects.macos) {
-        redirectUrl = platformRedirects.macos;
-      } else if (userAgent.includes("linux") && platformRedirects.linux) {
-        redirectUrl = platformRedirects.linux;
+      // Helper function to detect platform key from user-agent
+      function detectPlatform(ua) {
+        // Mobile detection (check mobile first as they're more specific)
+        if (ua.includes("ipad")) return "ipados";
+        if (ua.includes("iphone")) return "ios";
+        if (ua.includes("android")) return "android";
+        // Desktop detection
+        if (ua.includes("cros")) return "chromeos";
+        if (ua.includes("windows")) return "windows";
+        if (ua.includes("mac")) return "macos";
+        if (ua.includes("linux")) return "linux";
+        return null;
       }
 
-      // Lang-locale based redirect (override platform-based if matched)
+      const platform = detectPlatform(userAgent);
+
+      // Check lang-locale based redirect first (takes priority)
       const acceptLanguage = req.headers["accept-language"] || "";
+      let localeEntry = null;
+      let matchedLocale = null;
+      
       // Try exact match first, then prefix match
-      for (const [locale, url] of Object.entries(langMap)) {
+      for (const [locale, entry] of Object.entries(langMap)) {
         if (acceptLanguage.toLowerCase().startsWith(locale.toLowerCase())) {
-          redirectUrl = url;
+          // Support both new nested format and legacy simple URL format
+          if (typeof entry === 'object') {
+            localeEntry = entry;
+          } else if (typeof entry === 'string') {
+            // Legacy format: simple URL string
+            localeEntry = { main: entry };
+          }
+          matchedLocale = locale;
           break;
+        }
+      }
+
+      if (localeEntry) {
+        // First try platform-specific URL within the locale
+        if (platform && localeEntry[platform]) {
+          redirectUrl = localeEntry[platform];
+        } else if (localeEntry.main) {
+          // Fall back to locale's main URL
+          redirectUrl = localeEntry.main;
+        }
+        // If no locale-specific URL found, fall through to global platform redirects
+      }
+
+      // If no locale-specific redirect applied, use global platform redirects
+      if (!localeEntry || (!localeEntry.main && !localeEntry[platform])) {
+        if (platform && platformRedirects[platform]) {
+          redirectUrl = platformRedirects[platform];
         }
       }
 
@@ -240,31 +265,54 @@ module.exports = async function (context, req) {
     if (entity.partitionKey === 'premium' && (Object.keys(platformRedirects).length > 0 || Object.keys(langMap).length > 0)) {
       const userAgent = (req.headers["user-agent"] || "").toLowerCase();
       
-      // Mobile detection
-      if (userAgent.includes("ipad") && platformRedirects.ipados) {
-        redirectUrl = platformRedirects.ipados;
-      } else if (userAgent.includes("iphone") && platformRedirects.ios) {
-        redirectUrl = platformRedirects.ios;
-      } else if (userAgent.includes("android") && platformRedirects.android) {
-        redirectUrl = platformRedirects.android;
-      }
-      // Desktop detection
-      else if (userAgent.includes("cros") && platformRedirects.chromeos) {
-        redirectUrl = platformRedirects.chromeos;
-      } else if (userAgent.includes("windows") && platformRedirects.windows) {
-        redirectUrl = platformRedirects.windows;
-      } else if (userAgent.includes("mac") && platformRedirects.macos) {
-        redirectUrl = platformRedirects.macos;
-      } else if (userAgent.includes("linux") && platformRedirects.linux) {
-        redirectUrl = platformRedirects.linux;
+      // Helper function to detect platform key from user-agent
+      function detectPlatformExternal(ua) {
+        // Mobile detection (check mobile first as they're more specific)
+        if (ua.includes("ipad")) return "ipados";
+        if (ua.includes("iphone")) return "ios";
+        if (ua.includes("android")) return "android";
+        // Desktop detection
+        if (ua.includes("cros")) return "chromeos";
+        if (ua.includes("windows")) return "windows";
+        if (ua.includes("mac")) return "macos";
+        if (ua.includes("linux")) return "linux";
+        return null;
       }
 
-      // Lang-locale based redirect
+      const platform = detectPlatformExternal(userAgent);
+
+      // Check lang-locale based redirect first (takes priority)
       const acceptLanguage = req.headers["accept-language"] || "";
-      for (const [locale, url] of Object.entries(langMap)) {
+      let localeEntry = null;
+      
+      // Try exact match first, then prefix match
+      for (const [locale, entry] of Object.entries(langMap)) {
         if (acceptLanguage.toLowerCase().startsWith(locale.toLowerCase())) {
-          redirectUrl = url;
+          // Support both new nested format and legacy simple URL format
+          if (typeof entry === 'object') {
+            localeEntry = entry;
+          } else if (typeof entry === 'string') {
+            // Legacy format: simple URL string
+            localeEntry = { main: entry };
+          }
           break;
+        }
+      }
+
+      if (localeEntry) {
+        // First try platform-specific URL within the locale
+        if (platform && localeEntry[platform]) {
+          redirectUrl = localeEntry[platform];
+        } else if (localeEntry.main) {
+          // Fall back to locale's main URL
+          redirectUrl = localeEntry.main;
+        }
+      }
+
+      // If no locale-specific redirect applied, use global platform redirects
+      if (!localeEntry || (!localeEntry.main && !localeEntry[platform])) {
+        if (platform && platformRedirects[platform]) {
+          redirectUrl = platformRedirects[platform];
         }
       }
     }

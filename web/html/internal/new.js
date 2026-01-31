@@ -275,10 +275,8 @@ fetchExistingTags();
 // Conditional Redirect functionality
 const conditionalRedirectToggle = document.getElementById('conditionalRedirectToggle');
 const conditionalRedirectOptions = document.getElementById('conditionalRedirectOptions');
-const langLocaleToggle = document.getElementById('langLocaleToggle');
 const desktopToggle = document.getElementById('desktopToggle');
 const mobileToggle = document.getElementById('mobileToggle');
-const langLocaleSection = document.getElementById('langLocaleSection');
 const desktopSection = document.getElementById('desktopSection');
 const mobileSection = document.getElementById('mobileSection');
 const langLocaleList = document.getElementById('langLocaleList');
@@ -290,22 +288,12 @@ if (conditionalRedirectToggle) {
     conditionalRedirectOptions.hidden = !conditionalRedirectToggle.checked;
     if (!conditionalRedirectToggle.checked) {
       // Reset all sub-toggles when main toggle is unchecked
-      langLocaleToggle.checked = false;
       desktopToggle.checked = false;
       mobileToggle.checked = false;
-      langLocaleSection.hidden = true;
       desktopSection.hidden = true;
       mobileSection.hidden = true;
-    }
-  });
-}
-
-// Toggle individual sections
-if (langLocaleToggle) {
-  langLocaleToggle.addEventListener('change', () => {
-    langLocaleSection.hidden = !langLocaleToggle.checked;
-    if (langLocaleToggle.checked && langLocaleList.children.length === 0) {
-      addLangLocaleEntry();
+      // Clear lang-locale entries
+      langLocaleList.innerHTML = '';
     }
   });
 }
@@ -325,14 +313,42 @@ if (mobileToggle) {
 // Lang-locale management
 let langLocaleCounter = 0;
 
-function addLangLocaleEntry(locale = '', url = '') {
+function addLangLocaleEntry(localeData = {}) {
+  const locale = localeData.locale || '';
+  const mainUrl = localeData.mainUrl || '';
+  const desktop = localeData.desktop || {};
+  const mobile = localeData.mobile || {};
+
   const li = document.createElement('li');
   li.className = 'lang-locale-item';
   li.dataset.id = langLocaleCounter++;
   li.innerHTML = `
-    <input type="text" placeholder="e.g., en-US, ko-KR" value="${escapeHtml(locale)}" class="lang-locale-code">
-    <input type="url" placeholder="https://example.com/localized" value="${escapeHtml(url)}" class="lang-locale-url">
-    <button type="button" class="remove-lang-locale" title="Remove">×</button>
+    <header>
+      <input type="text" placeholder="e.g., en-US, ko-KR" value="${escapeHtml(locale)}" class="lang-locale-code">
+      <button type="button" class="remove-lang-locale" title="Remove">Remove</button>
+    </header>
+    <label>
+      Main Target URL (optional)
+      <input type="url" placeholder="https://example.com/localized" value="${escapeHtml(mainUrl)}" class="lang-locale-main-url">
+    </label>
+    <section class="lang-locale-subsection">
+      <h5>Desktop (optional)</h5>
+      <fieldset>
+        <label>Windows<input type="url" placeholder="https://..." value="${escapeHtml(desktop.windows || '')}" class="lang-locale-windows"></label>
+        <label>macOS<input type="url" placeholder="https://..." value="${escapeHtml(desktop.macos || '')}" class="lang-locale-macos"></label>
+        <label>Linux<input type="url" placeholder="https://..." value="${escapeHtml(desktop.linux || '')}" class="lang-locale-linux"></label>
+        <label>ChromeOS<input type="url" placeholder="https://..." value="${escapeHtml(desktop.chromeos || '')}" class="lang-locale-chromeos"></label>
+      </fieldset>
+    </section>
+    <section class="lang-locale-subsection">
+      <h5>Mobile (optional)</h5>
+      <fieldset>
+        <label>Android<input type="url" placeholder="https://..." value="${escapeHtml(mobile.android || '')}" class="lang-locale-android"></label>
+        <label>iOS<input type="url" placeholder="https://..." value="${escapeHtml(mobile.ios || '')}" class="lang-locale-ios"></label>
+        <label>iPadOS<input type="url" placeholder="https://..." value="${escapeHtml(mobile.ipados || '')}" class="lang-locale-ipados"></label>
+      </fieldset>
+    </section>
+    <p class="lang-locale-error">Please provide at least one URL for this locale.</p>
   `;
   langLocaleList.appendChild(li);
 
@@ -379,17 +395,45 @@ function getConditionalRedirectData() {
     if (ipadosUrl) data.platformRedirects.ipados = ipadosUrl;
   }
 
-  // Lang-locale redirects
-  if (langLocaleToggle && langLocaleToggle.checked) {
-    langLocaleList.querySelectorAll('.lang-locale-item').forEach(item => {
-      const code = item.querySelector('.lang-locale-code')?.value.trim();
-      const url = item.querySelector('.lang-locale-url')?.value.trim();
-      if (code && url) {
-        data.langMap[code] = url;
-      }
-    });
-  }
+  // Lang-locale redirects (new nested structure)
+  let hasLangLocaleError = false;
+  langLocaleList.querySelectorAll('.lang-locale-item').forEach(item => {
+    const code = item.querySelector('.lang-locale-code')?.value.trim();
+    if (!code) return; // Skip if no locale code
 
+    const mainUrl = item.querySelector('.lang-locale-main-url')?.value.trim();
+    const windowsUrl = item.querySelector('.lang-locale-windows')?.value.trim();
+    const macosUrl = item.querySelector('.lang-locale-macos')?.value.trim();
+    const linuxUrl = item.querySelector('.lang-locale-linux')?.value.trim();
+    const chromeosUrl = item.querySelector('.lang-locale-chromeos')?.value.trim();
+    const androidUrl = item.querySelector('.lang-locale-android')?.value.trim();
+    const iosUrl = item.querySelector('.lang-locale-ios')?.value.trim();
+    const ipadosUrl = item.querySelector('.lang-locale-ipados')?.value.trim();
+
+    // Check if at least one URL is provided
+    const hasAnyUrl = mainUrl || windowsUrl || macosUrl || linuxUrl || chromeosUrl || androidUrl || iosUrl || ipadosUrl;
+    if (!hasAnyUrl) {
+      item.classList.add('has-error');
+      hasLangLocaleError = true;
+      return;
+    }
+    item.classList.remove('has-error');
+
+    // Build locale entry
+    const localeEntry = {};
+    if (mainUrl) localeEntry.main = mainUrl;
+    if (windowsUrl) localeEntry.windows = windowsUrl;
+    if (macosUrl) localeEntry.macos = macosUrl;
+    if (linuxUrl) localeEntry.linux = linuxUrl;
+    if (chromeosUrl) localeEntry.chromeos = chromeosUrl;
+    if (androidUrl) localeEntry.android = androidUrl;
+    if (iosUrl) localeEntry.ios = iosUrl;
+    if (ipadosUrl) localeEntry.ipados = ipadosUrl;
+
+    data.langMap[code] = localeEntry;
+  });
+
+  data.hasLangLocaleError = hasLangLocaleError;
   return data;
 }
 
@@ -440,6 +484,13 @@ if (form) {
     // Add conditional redirect data
     if (conditionalRedirectToggle && conditionalRedirectToggle.checked) {
       const conditionalData = getConditionalRedirectData();
+      
+      // Check for validation errors in lang-locale entries
+      if (conditionalData.hasLangLocaleError) {
+        alert('Please provide at least one URL for each lang-locale entry, or remove empty entries.');
+        return;
+      }
+      
       if (Object.keys(conditionalData.platformRedirects).length > 0) {
         data.platformRedirects = conditionalData.platformRedirects;
       }

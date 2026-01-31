@@ -545,27 +545,42 @@ h1,
 .btn-secondary:hover {
   background: #d1d5db;
 }
+.lang-locale-section {
+  margin-top: 16px;
+  border-top: 1px solid #d1d5db;
+  padding-top: 16px;
+}
+.section-description {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 12px 0;
+}
 .lang-locale-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 .lang-locale-item {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: #fff;
+}
+.lang-locale-item header {
   display: flex;
-  gap: 8px;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
-  flex-wrap: wrap;
+  margin-bottom: 12px;
 }
-.lang-locale-item input[type="text"] {
-  width: 100px;
-  flex-shrink: 0;
+.lang-locale-item header input[type="text"] {
+  width: 120px;
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
 }
-.lang-locale-item input[type="url"] {
-  flex: 1;
-  min-width: 200px;
-}
-.lang-locale-item button {
+.lang-locale-item header button {
   background: #ef4444;
   color: #fff;
   border: none;
@@ -575,8 +590,50 @@ h1,
   font-size: 14px;
   width: auto;
 }
-.lang-locale-item button:hover {
+.lang-locale-item header button:hover {
   background: #dc2626;
+}
+.lang-locale-item label {
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.lang-locale-item label input {
+  margin-top: 4px;
+}
+.lang-locale-subsection {
+  margin-top: 8px;
+}
+.lang-locale-subsection h5 {
+  font-size: 13px;
+  color: #333;
+  margin: 8px 0 8px 0;
+  font-weight: 600;
+}
+.lang-locale-subsection fieldset {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+.lang-locale-subsection fieldset label {
+  margin-bottom: 0;
+}
+.lang-locale-error {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 8px;
+  display: none;
+}
+.lang-locale-item.has-error .lang-locale-error {
+  display: block;
+}
+.lang-locale-item.has-error {
+  border-color: #ef4444;
 }
 
 @media (max-width: 600px) {
@@ -592,11 +649,15 @@ h1,
     min-width: auto;
     margin-bottom: 4px;
   }
-  .lang-locale-item {
+  .lang-locale-subsection fieldset {
+    grid-template-columns: 1fr;
+  }
+  .lang-locale-item header {
     flex-direction: column;
+    gap: 8px;
     align-items: stretch;
   }
-  .lang-locale-item input[type="text"] {
+  .lang-locale-item header input[type="text"] {
     width: 100%;
   }
   .lang-locale-item input[type="url"] {

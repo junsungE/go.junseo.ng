@@ -88,12 +88,6 @@
               <ul class="conditional-category-list">
                 <li>
                   <label class="checkbox-label-inline">
-                    <input type="checkbox" id="langLocaleToggle">
-                    Lang-locale
-                  </label>
-                </li>
-                <li>
-                  <label class="checkbox-label-inline">
                     <input type="checkbox" id="desktopToggle">
                     Desktop
                   </label>
@@ -106,12 +100,6 @@
                 </li>
               </ul>
 
-              <section id="langLocaleSection" class="conditional-section" hidden>
-                <h4>Lang-locale Redirects</h4>
-                <ul id="langLocaleList" class="lang-locale-list"></ul>
-                <button type="button" id="addLangLocaleBtn" class="btn-secondary">+ Add lang-locale</button>
-              </section>
-
               <section id="desktopSection" class="conditional-section" hidden>
                 <h4>Desktop Redirects</h4>
                 <label>
@@ -119,7 +107,7 @@
                   <input type="url" id="windowsUrl" placeholder="https://example.com/windows">
                 </label>
                 <label>
-                  Mac OS:
+                  macOS:
                   <input type="url" id="macosUrl" placeholder="https://example.com/macos">
                 </label>
                 <label>
@@ -146,6 +134,13 @@
                   iPadOS:
                   <input type="url" id="ipadosUrl" placeholder="https://example.com/ipados">
                 </label>
+              </section>
+
+              <section id="langLocaleSection" class="conditional-section lang-locale-section">
+                <h4>Lang-locale Redirects</h4>
+                <p class="section-description">Add conditional redirects based on user's browser language. Each locale requires at least one URL.</p>
+                <ul id="langLocaleList" class="lang-locale-list"></ul>
+                <button type="button" id="addLangLocaleBtn" class="btn-secondary">+ Add lang-locale redirect</button>
               </section>
             </section>
           </fieldset>

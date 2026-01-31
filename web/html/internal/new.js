@@ -302,6 +302,37 @@ if (mobileToggle) {
   });
 }
 
+// Restore conditional redirect visibility on back/forward navigation (bfcache)
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted) {
+    // Page was restored from bfcache - restore visibility based on checkbox states
+    if (conditionalRedirectToggle && conditionalRedirectOptions) {
+      conditionalRedirectOptions.hidden = !conditionalRedirectToggle.checked;
+    }
+    if (desktopToggle && desktopSection) {
+      desktopSection.hidden = !desktopToggle.checked;
+    }
+    if (mobileToggle && mobileSection) {
+      mobileSection.hidden = !mobileToggle.checked;
+    }
+    // Restore lang-locale desktop/mobile section visibility
+    if (langLocaleList) {
+      langLocaleList.querySelectorAll('.lang-locale-item').forEach(item => {
+        const desktopToggleEl = item.querySelector('.lang-locale-desktop-toggle');
+        const mobileToggleEl = item.querySelector('.lang-locale-mobile-toggle');
+        const desktopSectionEl = item.querySelector('.lang-locale-desktop-section');
+        const mobileSectionEl = item.querySelector('.lang-locale-mobile-section');
+        if (desktopToggleEl && desktopSectionEl) {
+          desktopSectionEl.hidden = !desktopToggleEl.checked;
+        }
+        if (mobileToggleEl && mobileSectionEl) {
+          mobileSectionEl.hidden = !mobileToggleEl.checked;
+        }
+      });
+    }
+  }
+});
+
 // Lang-locale management
 let langLocaleCounter = 0;
 

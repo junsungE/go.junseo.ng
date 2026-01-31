@@ -372,6 +372,8 @@ shortenUrlBtn.addEventListener("click", async () => {
     // Check for validation errors in lang-locale entries
     if (conditionalData.hasLangLocaleError) {
       alert('Please provide at least one URL for each lang-locale entry, or remove empty entries.');
+      shortenUrlBtn.disabled = false;
+      shortenUrlBtn.textContent = 'Shorten';
       return;
     }
     

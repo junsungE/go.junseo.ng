@@ -11,39 +11,59 @@ module.exports = async function (context, req) {
     const partition = (type === "internal") ? "internal" : type;
 
     if (slug) {
-        // Individual slug stats
-        let entity;
-        try {
-          entity = await linkTable.getEntity(partition, slug);
-        } catch {
+        // Individual slug stats - case insensitive search
+        const slugLower = slug.toLowerCase();
+        
+        // Find all case variants of this slug in the links table
+        const matchingSlugs = [];
+        let primaryEntity = null;
+        
+        for await (const link of linkTable.listEntities({
+          queryOptions: { filter: `PartitionKey eq '${partition}'` }
+        })) {
+          if (link.rowKey.toLowerCase() === slugLower) {
+            matchingSlugs.push(link.rowKey);
+            // Use the first match as primary entity for stats display
+            if (!primaryEntity) {
+              primaryEntity = link;
+            }
+          }
+        }
+        
+        if (matchingSlugs.length === 0) {
           context.res = jsonResponse(404, { error: "Shortened URL not found." });
           return;
         }
 
-        // Fetch visits for this slug
+        // Fetch visits for all case variants of this slug
         const visits = [];
-        for await (const item of visitsTable.listEntities({
-          queryOptions: { filter: `PartitionKey eq '${slug.replace(/'/g, "''")}'` }
-        })) {
-          visits.push({
-            slug: item.partitionKey,
-            timestamp: item.timestamp,
-            ip: item.ip,
-            userAgent: item.userAgent,
-            country: item.country,
-            language: item.language,
-            referrer: item.referrer
-          });
+        for await (const item of visitsTable.listEntities()) {
+          // Case-insensitive match on partition key
+          if (item.partitionKey.toLowerCase() === slugLower) {
+            visits.push({
+              slug: item.partitionKey, // Show actual case used when accessing
+              timestamp: item.timestamp,
+              ip: item.ip,
+              userAgent: item.userAgent,
+              country: item.country,
+              language: item.language,
+              referrer: item.referrer
+            });
+          }
         }
+        
+        // Sort by timestamp desc
+        visits.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
         context.res = jsonResponse(200, {
           slug,
-          targetUrl: entity.targetUrl,
-          title: entity.title,
-          totalVisits: entity.visits || 0,
-          visitLimit: entity.visitLimit || null,
-          startDate: entity.startDate || null,
-          expiryDate: entity.expiryDate || null,
+          targetUrl: primaryEntity.targetUrl,
+          title: primaryEntity.title,
+          totalVisits: primaryEntity.visits || 0,
+          visitLimit: primaryEntity.visitLimit || null,
+          startDate: primaryEntity.startDate || null,
+          expiryDate: primaryEntity.expiryDate || null,
+          caseVariants: matchingSlugs, // Show all case variants found
           visits
         });
     } else {

@@ -315,7 +315,6 @@ input:focus, select:focus, button:focus{outline:3px solid rgba(0,103,197,0.15);o
   margin-bottom: 12px;
 }
 .lang-locale-item header input[type="text"] {
-  width: 120px;
   padding: 6px 10px;
   border: 1px solid var(--border);
   border-radius: var(--radius);

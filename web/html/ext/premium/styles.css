@@ -569,11 +569,11 @@ h1,
 .lang-locale-item header {
   display: flex;
   justify-content: space-between;
+  gap: 8px;
   align-items: center;
   margin-bottom: 12px;
 }
 .lang-locale-item header input[type="text"] {
-  width: 120px;
   padding: 6px 10px;
   border: 1px solid #d1d5db;
   border-radius: 6px;

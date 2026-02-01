@@ -357,6 +357,10 @@ input:focus, select:focus, button:focus{outline:3px solid rgba(0,103,197,0.15);o
 }
 .lang-locale-subsection {
   margin-top: 8px;
+  margin-bottom: 16px;
+}
+.lang-locale-subsection:last-of-type {
+  margin-bottom: 0;
 }
 .lang-locale-subsection h5 {
   font-size: 13px;

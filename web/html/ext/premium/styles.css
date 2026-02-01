@@ -616,6 +616,10 @@ h1,
 }
 .lang-locale-subsection {
   margin-top: 8px;
+  margin-bottom: 16px;
+}
+.lang-locale-subsection:last-of-type {
+  margin-bottom: 0;
 }
 .lang-locale-subsection h5 {
   font-size: 13px;

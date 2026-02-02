@@ -52,6 +52,10 @@ async function recordVisit(slug, ip, uaString, country = "Unknown", language = "
     const now = new Date().toISOString();
     const deviceInfo = parseUserAgent(uaString);
 
+    // URL-encode the slug for partitionKey - Azure Table Storage doesn't allow
+    // forward slashes, backslashes, #, ? and control characters in keys
+    const encodedSlug = encodeURIComponent(slug);
+
     // If country is unknown and we have a valid IP, try a quick geo lookup
     let detectedLocation = country;
     if ((!country || country === "Unknown") && ip && ip !== "Hidden" && ip !== "::1" && ip !== "127.0.0.1") {
@@ -71,7 +75,7 @@ async function recordVisit(slug, ip, uaString, country = "Unknown", language = "
     }
 
     await visitsTable.createEntity({
-      partitionKey: slug,
+      partitionKey: encodedSlug,
       rowKey: visitId,
       timestamp: now,
       ip: ip || "Hidden",

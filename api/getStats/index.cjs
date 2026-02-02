@@ -12,17 +12,20 @@ module.exports = async function (context, req) {
 
     if (slug) {
         // Individual slug stats - case insensitive search
-        const slugLower = slug.toLowerCase();
+        // Encode the slug for comparison since Visits partitionKey is URL-encoded
+        const encodedSlugLower = encodeURIComponent(slug).toLowerCase();
         
         // Find all case variants of this slug in the links table
+        // Note: rowKey is URL-encoded in the table
         const matchingSlugs = [];
         let primaryEntity = null;
         
         for await (const link of linkTable.listEntities({
           queryOptions: { filter: `PartitionKey eq '${partition}'` }
         })) {
-          if (link.rowKey.toLowerCase() === slugLower) {
-            matchingSlugs.push(link.rowKey);
+          if (link.rowKey.toLowerCase() === encodedSlugLower) {
+            // Store decoded slug for display
+            matchingSlugs.push(decodeURIComponent(link.rowKey));
             // Use the first match as primary entity for stats display
             if (!primaryEntity) {
               primaryEntity = link;
@@ -36,12 +39,13 @@ module.exports = async function (context, req) {
         }
 
         // Fetch visits for all case variants of this slug
+        // Note: Visits partitionKey is URL-encoded
         const visits = [];
         for await (const item of visitsTable.listEntities()) {
-          // Case-insensitive match on partition key
-          if (item.partitionKey.toLowerCase() === slugLower) {
+          // Case-insensitive match on encoded partition key
+          if (item.partitionKey.toLowerCase() === encodedSlugLower) {
             visits.push({
-              slug: item.partitionKey, // Show actual case used when accessing
+              slug: decodeURIComponent(item.partitionKey), // Decode for display
               timestamp: item.timestamp,
               ip: item.ip,
               userAgent: item.userAgent,
@@ -69,11 +73,13 @@ module.exports = async function (context, req) {
     } else {
         // All stats for a specific type
         // 1. Get all slugs for this type (store lowercase for case-insensitive matching)
+        // Note: both rowKey and Visits partitionKey are URL-encoded
         const slugsLower = new Set();
         const linkEntities = linkTable.listEntities({
             queryOptions: { filter: `PartitionKey eq '${partition}'` }
         });
         for await (const link of linkEntities) {
+            // Keep encoded for comparison with Visits partitionKey
             slugsLower.add(link.rowKey.toLowerCase());
         }
 
@@ -84,13 +90,14 @@ module.exports = async function (context, req) {
 
         // 2. Fetch ALL visits and filter by slug set (case-insensitive)
         // Optimization note: Scanning the entire Visits table can be slow if it's large.
+        // Note: Visits partitionKey is URL-encoded
         const allVisits = [];
         const visitEntities = visitsTable.listEntities();
         for await (const visit of visitEntities) {
-            // Case-insensitive match
+            // Case-insensitive match on encoded partition key
             if (slugsLower.has(visit.partitionKey.toLowerCase())) {
                 allVisits.push({
-                    slug: visit.partitionKey, // Show actual case used when accessing
+                    slug: decodeURIComponent(visit.partitionKey), // Decode for display
                     timestamp: visit.timestamp,
                     ip: visit.ip,
                     userAgent: visit.userAgent,

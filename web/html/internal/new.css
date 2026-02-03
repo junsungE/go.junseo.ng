@@ -240,7 +240,6 @@ input:focus, select:focus, button:focus{outline:3px solid rgba(0,103,197,0.15);o
   align-items: center;
   gap: 6px;
   font-size: 14px;
-  color: #333;
   cursor: pointer;
 }
 .checkbox-label-inline input[type="checkbox"] {

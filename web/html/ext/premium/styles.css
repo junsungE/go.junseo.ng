@@ -117,8 +117,8 @@ input[type="number"] {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 14px;
-    color: #333;
+    font-size: 13px;
+    color: var(--muted);
 }
 input[type="checkbox"] {
     margin: 0;
@@ -485,8 +485,8 @@ h1,
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
-  color: #333;
+  font-size: 13px;
+  color: var(--muted);
   cursor: pointer;
 }
 .checkbox-label-inline input[type="checkbox"] {

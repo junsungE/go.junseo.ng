@@ -88,6 +88,7 @@ function renderStatsTable() {
       <th data-sort="country" style="width: 80px;">Country<span></span></th>
       <th data-sort="language" style="width: 85px;">Language<span></span></th>
       <th data-sort="referrer" style="width: 150px;">Referrer<span></span></th>
+      <th data-sort="sourceApp" style="width: 110px;">Source App<span></span></th>
       <th data-sort="timestamp" style="width: 112px;">Timestamp<span></span></th>
     </tr>`;
   table.appendChild(thead);
@@ -111,6 +112,7 @@ function renderStatsTable() {
       <td>${escapeHtml(v.country)}</td>
       <td>${escapeHtml(v.language || 'Unknown')}</td>
       <td>${escapeHtml(v.referrer || 'Direct')}</td>
+      <td>${escapeHtml(v.sourceApp || '-')}</td>
       <td>${new Date(v.timestamp).toLocaleString()}</td>`;
     tbody.appendChild(tr);
   });

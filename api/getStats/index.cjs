@@ -51,7 +51,8 @@ module.exports = async function (context, req) {
               userAgent: item.userAgent,
               country: item.country,
               language: item.language,
-              referrer: item.referrer
+              referrer: item.referrer,
+              sourceApp: item.sourceApp || null
             });
           }
         }
@@ -103,7 +104,8 @@ module.exports = async function (context, req) {
                     userAgent: visit.userAgent,
                     country: visit.country,
                     language: visit.language,
-                    referrer: visit.referrer
+                    referrer: visit.referrer,
+                    sourceApp: visit.sourceApp || null
                 });
             }
         }

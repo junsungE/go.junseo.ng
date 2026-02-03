@@ -44,6 +44,101 @@ function parseUserAgent(uaString) {
   };
 }
 
+// Detect source app from User-Agent string
+// This helps identify which app the user clicked the link from
+function detectSourceApp(uaString) {
+  if (!uaString) return null;
+  const ua = uaString.toLowerCase();
+  
+  // In-app browsers and messaging apps (check these first as they're more specific)
+  // Microsoft apps
+  if (ua.includes('teams')) return 'Microsoft Teams';
+  if (ua.includes('outlook')) return 'Microsoft Outlook';
+  if (ua.includes('yammer')) return 'Microsoft Yammer';
+  
+  // Google apps (check before generic browser detection)
+  if (ua.includes('gsa/')) return 'Google Search App';  // Google Search App
+  if (ua.includes('google-chat')) return 'Google Chat';
+  if (ua.includes('googledocs')) return 'Google Docs';
+  if (ua.includes('googlesheets')) return 'Google Sheets';
+  if (ua.includes('googleslides')) return 'Google Slides';
+  if (ua.includes('googledrive')) return 'Google Drive';
+  if (ua.includes('googlecalendar')) return 'Google Calendar';
+  if (ua.includes('googlemeet')) return 'Google Meet';
+  if (ua.includes('gmailapp') || ua.includes('gmail/')) return 'Gmail App';
+  if (ua.includes('youtube')) return 'YouTube';
+  if (ua.includes('googlemaps') || ua.includes('google maps')) return 'Google Maps';
+  if (ua.includes('googleclassroom')) return 'Google Classroom';
+  if (ua.includes('googlenews')) return 'Google News';
+  if (ua.includes('googlekeep')) return 'Google Keep';
+  if (ua.includes('googlephotos')) return 'Google Photos';
+  
+  // Apple apps (check before generic browser detection)
+  if (ua.includes('apple news') || ua.includes('applenews')) return 'Apple News';
+  if (ua.includes('apple mail') || ua.includes('applemail')) return 'Apple Mail';
+  if (ua.includes('apple notes') || ua.includes('applenotes') || ua.includes('notes/')) return 'Apple Notes';
+  if (ua.includes('apple music') || ua.includes('applemusic')) return 'Apple Music';
+  if (ua.includes('apple podcasts') || ua.includes('applepodcasts')) return 'Apple Podcasts';
+  if (ua.includes('apple maps') || ua.includes('applemaps')) return 'Apple Maps';
+  if (ua.includes('facetime')) return 'FaceTime';
+  if (ua.includes('imessage')) return 'iMessage';
+  if (ua.includes('apple tv') || ua.includes('appletv')) return 'Apple TV';
+  if (ua.includes('apple books') || ua.includes('applebooks') || ua.includes('ibooks')) return 'Apple Books';
+  if (ua.includes('apple reminders') || ua.includes('applereminders')) return 'Apple Reminders';
+  if (ua.includes('apple calendar') || ua.includes('applecalendar') || ua.includes('dataaccessd')) return 'Apple Calendar';
+  if (ua.includes('apple files') || ua.includes('applefiles')) return 'Apple Files';
+  if (ua.includes('apple freeform') || ua.includes('applefreeform')) return 'Apple Freeform';
+  if (ua.includes('safari viewservice') || ua.includes('safarivs')) return 'Safari View (In-App)';
+  
+  // Social media apps
+  if (ua.includes('fban') || ua.includes('fbav') || ua.includes('fb_iab')) return 'Facebook';
+  if (ua.includes('instagram')) return 'Instagram';
+  if (ua.includes('twitter') || ua.includes(' x/')) return 'Twitter/X';
+  if (ua.includes('linkedin')) return 'LinkedIn';
+  if (ua.includes('pinterest')) return 'Pinterest';
+  if (ua.includes('snapchat')) return 'Snapchat';
+  if (ua.includes('tiktok')) return 'TikTok';
+  if (ua.includes('reddit')) return 'Reddit';
+  
+  // Messaging apps
+  if (ua.includes('whatsapp')) return 'WhatsApp';
+  if (ua.includes('telegram')) return 'Telegram';
+  if (ua.includes('discord')) return 'Discord';
+  if (ua.includes('slack')) return 'Slack';
+  if (ua.includes('messenger')) return 'Messenger';
+  if (ua.includes('viber')) return 'Viber';
+  if (ua.includes('line/')) return 'LINE';
+  if (ua.includes('wechat') || ua.includes('micromessenger')) return 'WeChat';
+  if (ua.includes('kakaotalk')) return 'KakaoTalk';
+  if (ua.includes('signal')) return 'Signal';
+  if (ua.includes('zalo')) return 'Zalo';
+  
+  // Email apps
+  if (ua.includes('thunderbird')) return 'Thunderbird';
+  if (ua.includes('yahoo') && ua.includes('mail')) return 'Yahoo Mail';
+  
+  // Other apps
+  if (ua.includes('notion')) return 'Notion';
+  if (ua.includes('evernote')) return 'Evernote';
+  if (ua.includes('pocket')) return 'Pocket';
+  if (ua.includes('flipboard')) return 'Flipboard';
+  
+  // Bots and crawlers
+  if (ua.includes('googlebot')) return 'Googlebot';
+  if (ua.includes('bingbot')) return 'Bingbot';
+  if (ua.includes('slurp')) return 'Yahoo Bot';
+  if (ua.includes('duckduckbot')) return 'DuckDuckGo Bot';
+  if (ua.includes('facebookexternalhit')) return 'Facebook Bot';
+  if (ua.includes('twitterbot')) return 'Twitter Bot';
+  if (ua.includes('linkedinbot')) return 'LinkedIn Bot';
+  if (ua.includes('slackbot')) return 'Slack Bot';
+  if (ua.includes('discordbot')) return 'Discord Bot';
+  if (ua.includes('telegrambot')) return 'Telegram Bot';
+  if (ua.includes('applebot')) return 'Apple Bot';
+  
+  return null; // No specific app detected
+}
+
 // Store a visit record
 async function recordVisit(slug, ip, uaString, country = "Unknown", language = "Unknown", referrer = "Direct") {
   try {
@@ -74,6 +169,20 @@ async function recordVisit(slug, ip, uaString, country = "Unknown", language = "
       }
     }
 
+    // Detect source app from User-Agent (useful when referrer is Direct/empty)
+    const sourceApp = detectSourceApp(uaString);
+    
+    // Enhance referrer information with detected source app
+    let finalReferrer = referrer || "Direct";
+    if ((!referrer || referrer === "Direct") && sourceApp) {
+      // If no website referrer but we detected an app, show the app as source
+      finalReferrer = `App: ${sourceApp}`;
+    } else if (referrer && referrer !== "Direct" && sourceApp) {
+      // If we have both referrer and app detection, include both
+      // (e.g., link shared in Teams that opens in Teams browser)
+      finalReferrer = `${referrer} (via ${sourceApp})`;
+    }
+
     await visitsTable.createEntity({
       partitionKey: encodedSlug,
       rowKey: visitId,
@@ -82,7 +191,8 @@ async function recordVisit(slug, ip, uaString, country = "Unknown", language = "
       userAgent: `${deviceInfo.browser} on ${deviceInfo.os}`,
       country: detectedLocation || "Unknown",
       language,
-      referrer: referrer || "Direct"
+      referrer: finalReferrer,
+      sourceApp: sourceApp || null // Store separately for filtering/analysis
     });
   } catch (err) {
     console.error("Error saving visit:", err);

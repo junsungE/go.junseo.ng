@@ -83,6 +83,7 @@ function renderStatsTable() {
     <tr>
       <th data-sort="type" style="width: 82px;">Type<span></span></th>
       <th data-sort="slug" style="width: 120px;">Slug<span></span></th>
+      <th data-sort="visitType" style="width: 90px;">Visit Type<span></span></th>
       <th data-sort="ip" style="width: 105px;">IP<span></span></th>
       <th data-sort="country" style="width: 80px;">Country<span></span></th>
       <th data-sort="language" style="width: 85px;">Language<span></span></th>
@@ -104,9 +105,15 @@ function renderStatsTable() {
   const tbody = document.createElement("tbody");
   statsVisits.forEach(v => {
     const tr = document.createElement("tr");
+    // Determine visit type display
+    const visitTypeDisplay = v.visitType || 'valid';
+    const visitTypeClass = visitTypeDisplay === 'valid' ? 'visit-valid' : 
+                          visitTypeDisplay === 'notfound' ? 'visit-notfound' : 
+                          visitTypeDisplay === 'inactive' ? 'visit-inactive' : '';
     tr.innerHTML = `
       <td><span class="type-badge type-${v.type}">${v.type}</span></td>
       <td>${escapeHtml(v.slug)}</td>
+      <td><span class="visit-type-badge ${visitTypeClass}">${visitTypeDisplay}</span></td>
       <td>${escapeHtml(v.ip)}</td>
       <td>${escapeHtml(v.country)}</td>
       <td>${escapeHtml(v.language || 'Unknown')}</td>

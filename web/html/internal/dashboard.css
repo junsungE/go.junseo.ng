@@ -155,6 +155,19 @@ table.stats-table th:hover {
 .type-internal { background-color: #c62828; color: white; }
 .type-premium { background-color: #7c3aed; color: white; }
 .type-free { background-color: #059669; color: white; }
+.type-orphan { background-color: #6b7280; color: white; }
+
+/* Visit Type badges */
+.visit-type-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75em;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+.visit-valid { background-color: #059669; color: white; }
+.visit-notfound { background-color: #dc2626; color: white; }
+.visit-inactive { background-color: #d97706; color: white; }
 
 /* Action Buttons & Status Badges */
 .action-btn {

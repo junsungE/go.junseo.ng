@@ -140,7 +140,8 @@ function detectSourceApp(uaString) {
 }
 
 // Store a visit record
-async function recordVisit(slug, ip, uaString, country = "Unknown", language = "Unknown", referrer = "Direct") {
+// visitType: "valid" (successful redirect), "notfound" (slug doesn't exist), "inactive" (link inactive/expired)
+async function recordVisit(slug, ip, uaString, country = "Unknown", language = "Unknown", referrer = "Direct", visitType = "valid") {
   try {
     const visitsTable = getTableClient("Visits");
     const visitId = uuidv4();
@@ -192,7 +193,8 @@ async function recordVisit(slug, ip, uaString, country = "Unknown", language = "
       country: detectedLocation || "Unknown",
       language,
       referrer: finalReferrer,
-      sourceApp: sourceApp || null // Store separately for filtering/analysis
+      sourceApp: sourceApp || null, // Store separately for filtering/analysis
+      visitType: visitType // "valid", "notfound", or "inactive"
     });
   } catch (err) {
     console.error("Error saving visit:", err);

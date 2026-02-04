@@ -2,11 +2,49 @@ const { getTableClient, jsonResponse } = require("../shared.cjs");
 
 module.exports = async function (context, req) {
   const slug = req.query.slug;
-  const type = req.query.type || "external"; // internal | premium | free
+  const type = req.query.type || "external"; // internal | premium | free | orphan
 
   try {
-    const mainTable = (type === "internal") ? "InternalLinks" : "ExternalLinks";
     const visitsTable = getTableClient("Visits");
+    
+    // Special handling for orphan visits (visits to non-existent or inactive links)
+    if (type === "orphan") {
+      const orphanVisits = [];
+      const visitEntities = visitsTable.listEntities();
+      
+      for await (const visit of visitEntities) {
+        // Filter for orphan visits (notfound or inactive)
+        if (visit.visitType === "notfound" || visit.visitType === "inactive") {
+          // If slug filter provided, check if it matches
+          if (slug) {
+            const encodedSlugLower = encodeURIComponent(slug).toLowerCase();
+            if (visit.partitionKey.toLowerCase() !== encodedSlugLower) {
+              continue;
+            }
+          }
+          
+          orphanVisits.push({
+            slug: decodeURIComponent(visit.partitionKey),
+            timestamp: visit.timestamp,
+            ip: visit.ip,
+            userAgent: visit.userAgent,
+            country: visit.country,
+            language: visit.language,
+            referrer: visit.referrer,
+            sourceApp: visit.sourceApp || null,
+            visitType: visit.visitType // "notfound" or "inactive"
+          });
+        }
+      }
+      
+      // Sort by timestamp desc
+      orphanVisits.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      
+      context.res = jsonResponse(200, { visits: orphanVisits });
+      return;
+    }
+    
+    const mainTable = (type === "internal") ? "InternalLinks" : "ExternalLinks";
     const linkTable = getTableClient(mainTable);
     const partition = (type === "internal") ? "internal" : type;
 
@@ -43,7 +81,9 @@ module.exports = async function (context, req) {
         const visits = [];
         for await (const item of visitsTable.listEntities()) {
           // Case-insensitive match on encoded partition key
-          if (item.partitionKey.toLowerCase() === encodedSlugLower) {
+          // Only include valid visits (exclude orphan visits)
+          if (item.partitionKey.toLowerCase() === encodedSlugLower && 
+              (!item.visitType || item.visitType === "valid")) {
             visits.push({
               slug: decodeURIComponent(item.partitionKey), // Decode for display
               timestamp: item.timestamp,
@@ -52,7 +92,8 @@ module.exports = async function (context, req) {
               country: item.country,
               language: item.language,
               referrer: item.referrer,
-              sourceApp: item.sourceApp || null
+              sourceApp: item.sourceApp || null,
+              visitType: item.visitType || "valid"
             });
           }
         }
@@ -96,7 +137,9 @@ module.exports = async function (context, req) {
         const visitEntities = visitsTable.listEntities();
         for await (const visit of visitEntities) {
             // Case-insensitive match on encoded partition key
-            if (slugsLower.has(visit.partitionKey.toLowerCase())) {
+            // Only include valid visits (exclude orphan visits)
+            if (slugsLower.has(visit.partitionKey.toLowerCase()) &&
+                (!visit.visitType || visit.visitType === "valid")) {
                 allVisits.push({
                     slug: decodeURIComponent(visit.partitionKey), // Decode for display
                     timestamp: visit.timestamp,
@@ -105,7 +148,8 @@ module.exports = async function (context, req) {
                     country: visit.country,
                     language: visit.language,
                     referrer: visit.referrer,
-                    sourceApp: visit.sourceApp || null
+                    sourceApp: visit.sourceApp || null,
+                    visitType: visit.visitType || "valid"
                 });
             }
         }

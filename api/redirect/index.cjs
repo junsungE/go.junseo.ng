@@ -105,7 +105,8 @@ module.exports = async function (context, req) {
             try {
               entity = await table.getEntity("premium", encodedLowerSlug);
             } catch {
-              // Not found anywhere
+              // Not found anywhere - log orphan visit
+              await recordVisit(slug, ip, ua, country, lang, referrer, "notfound");
               context.res = {
                 status: 302,
                 headers: { Location: "/error" }
@@ -113,6 +114,8 @@ module.exports = async function (context, req) {
               return;
             }
           } else {
+            // Not found - log orphan visit
+            await recordVisit(slug, ip, ua, country, lang, referrer, "notfound");
             context.res = {
               status: 302,
               headers: { Location: "/error" }
@@ -127,6 +130,8 @@ module.exports = async function (context, req) {
     if (entity.isCaseSensitive) {
       const storedSlug = entity.originalSlug || decodeURIComponent(entity.rowKey);
       if (storedSlug !== slug) {
+        // Case mismatch - log orphan visit
+        await recordVisit(slug, ip, ua, country, lang, referrer, "notfound");
         context.res = {
           status: 302,
           headers: { Location: "/error" }
@@ -137,6 +142,8 @@ module.exports = async function (context, req) {
 
     // Check validity
     if (!isLinkActive(entity)) {
+      // Link is inactive/expired - log orphan visit
+      await recordVisit(slug, ip, ua, country, lang, referrer, "inactive");
       context.res = { status: 410, body: "This link is inactive or has expired." };
       return;
     }

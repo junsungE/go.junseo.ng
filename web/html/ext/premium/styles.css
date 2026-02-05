@@ -695,19 +695,6 @@ h1,
   gap: 8px;
 }
 
-.pagination-right {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.pagination-right li {
-  display: contents;
-}
-
 .rows-per-page-input {
   width: 60px;
   padding: 4px 8px;
@@ -718,6 +705,20 @@ h1,
 
 .pagination-info {
   margin-left: 12px;
+}
+
+.pagination-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pagination-right li {
+  display: contents;
 }
 
 .pagination-btn {

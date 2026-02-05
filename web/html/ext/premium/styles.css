@@ -126,7 +126,7 @@ input[type="checkbox"] {
     height: 16px;
 }
 
-.url-label, .startDateLabel, .expiryDateLabel, .visitLimitLabel {
+.url-label, .startDateLabel, .expiryDateLabel, .visitLimitLabel, .tags-fieldset legend, .pagination-left {
   font-size: 13px;
   color: var(--muted);
 }
@@ -358,8 +358,6 @@ h1,
   margin: 0 0 12px 0;
 }
 .tags-fieldset legend {
-  font-size: 13px;
-  color: var(--muted);
   padding: 0 6px;
 }
 .tags-container {
@@ -719,8 +717,6 @@ h1,
 }
 
 .pagination-info {
-  font-size: 13px;
-  color: var(--muted);
   margin-left: 12px;
 }
 
@@ -733,6 +729,7 @@ h1,
   font-size: 13px;
   min-width: 32px;
   transition: background 0.15s, border-color 0.15s;
+  color: #333;
 }
 
 .pagination-btn:hover:not(:disabled) {

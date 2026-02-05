@@ -82,10 +82,8 @@ function createPaginationNav(currentPage, totalRows, rowsPerPage, onPageChange, 
       pages.push('...');
     }
     
-    // Always show last 3 pages
-    for (let i = Math.max(totalPages - 2, 2); i <= totalPages; i++) {
-      if (!pages.includes(i)) pages.push(i);
-    }
+    // Always show last page
+    if (!pages.includes(totalPages)) pages.push(totalPages);
   }
   
   // << button
@@ -312,15 +310,25 @@ function renderLinks() {
     };
 
     // Get the table container
-    const tableContainer = myLinksBody.closest('.table-container') || myLinksBody.closest('table').parentElement;
+    const tableContainer = myLinksBody.closest('.links-table-container') || myLinksBody.closest('table').parentElement;
+    const table = tableContainer.querySelector('table');
+
+    // Wrap table in scrollable element if not already
+    let tableScroll = tableContainer.querySelector('.table-scroll');
+    if (!tableScroll) {
+        tableScroll = document.createElement('figure');
+        tableScroll.className = 'table-scroll';
+        table.parentNode.insertBefore(tableScroll, table);
+        tableScroll.appendChild(table);
+    }
 
     // Create top pagination nav
-    const topNav = createPaginationNav(linksCurrentPage, totalPages, totalRows, startIdx, endIdx, linksRowsPerPage, handlePageChange, handleRowsChange);
+    const topNav = createPaginationNav(linksCurrentPage, totalRows, linksRowsPerPage, handlePageChange, handleRowsChange);
     topNav.classList.add('links-pagination');
-    tableContainer.insertBefore(topNav, tableContainer.querySelector('table'));
+    tableContainer.insertBefore(topNav, tableScroll);
 
     // Create bottom pagination nav
-    const bottomNav = createPaginationNav(linksCurrentPage, totalPages, totalRows, startIdx, endIdx, linksRowsPerPage, handlePageChange, handleRowsChange);
+    const bottomNav = createPaginationNav(linksCurrentPage, totalRows, linksRowsPerPage, handlePageChange, handleRowsChange);
     bottomNav.classList.add('links-pagination');
     tableContainer.appendChild(bottomNav);
 

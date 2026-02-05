@@ -57,10 +57,8 @@ function createPaginationNav(currentPage, totalRows, rowsPerPage, onPageChange, 
       pages.push('...');
     }
     
-    // Always show last 3 pages
-    for (let i = Math.max(totalPages - 2, 2); i <= totalPages; i++) {
-      if (!pages.includes(i)) pages.push(i);
-    }
+    // Always show last page
+    if (!pages.includes(totalPages)) pages.push(totalPages);
   }
   
   // << button
@@ -215,6 +213,10 @@ function renderStatsTable() {
   const topNav = createPaginationNav(statsCurrentPage, totalRows, statsRowsPerPage, handlePageChange, handleRowsPerPageChange);
   statsSection.appendChild(topNav);
   
+  // Create scrollable wrapper for just the table
+  const tableScroll = document.createElement("figure");
+  tableScroll.className = "table-scroll";
+  
   const table = document.createElement("table");
   table.className = "stats-table";
   table.id = "statsTable";
@@ -266,7 +268,8 @@ function renderStatsTable() {
   });
   table.appendChild(tbody);
   
-  statsSection.appendChild(table);
+  tableScroll.appendChild(table);
+  statsSection.appendChild(tableScroll);
   
   // Bottom pagination
   const bottomNav = createPaginationNav(statsCurrentPage, totalRows, statsRowsPerPage, handlePageChange, handleRowsPerPageChange);

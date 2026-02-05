@@ -96,7 +96,11 @@ button[type="submit"]:hover{filter:brightness(0.95)}
 /* Table wrapper for horizontal scroll */
 .table-wrapper {
   margin-top: 12px;
+}
+
+.table-scroll {
   overflow-x: auto;
+  margin: 0;
 }
 
 /* Table styles used by dashboard script */

@@ -193,6 +193,7 @@ button[disabled] {
 /* My Links Table */
 .links-table-container {
   margin-top: 12px;
+  overflow-x: auto;
 }
 
 .table-scroll {

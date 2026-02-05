@@ -32,6 +32,122 @@ let userLinks = []; // Store links locally for sorting
 let sortCol = "createdAt";
 let sortAsc = false; // default desc
 
+// Pagination state for My Links table
+let linksCurrentPage = 1;
+let linksRowsPerPage = 20;
+
+// Helper function to create pagination navigation
+function createPaginationNav(currentPage, totalRows, rowsPerPage, onPageChange, onRowsPerPageChange) {
+  const totalPages = Math.ceil(totalRows / rowsPerPage);
+  const from = totalRows === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
+  const to = Math.min(currentPage * rowsPerPage, totalRows);
+  
+  const nav = document.createElement("nav");
+  nav.className = "table-pagination";
+  nav.setAttribute("aria-label", "Table pagination");
+  
+  // Left side: rows per page and range info
+  const leftSide = document.createElement("section");
+  leftSide.className = "pagination-left";
+  leftSide.innerHTML = `
+    <label>
+      Rows per page:
+      <input type="number" class="rows-per-page-input" value="${rowsPerPage}" min="1" max="1000">
+    </label>
+    <output class="pagination-info">${from}-${to} of ${totalRows}</output>
+  `;
+  
+  // Right side: page buttons
+  const rightSide = document.createElement("menu");
+  rightSide.className = "pagination-right";
+  
+  // Generate page buttons
+  const pages = [];
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
+  } else {
+    // Always show first page
+    pages.push(1);
+    
+    if (currentPage > 3) {
+      pages.push('...');
+    }
+    
+    // Show pages around current
+    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+      if (!pages.includes(i)) pages.push(i);
+    }
+    
+    if (currentPage < totalPages - 2) {
+      pages.push('...');
+    }
+    
+    // Always show last 3 pages
+    for (let i = Math.max(totalPages - 2, 2); i <= totalPages; i++) {
+      if (!pages.includes(i)) pages.push(i);
+    }
+  }
+  
+  // << button
+  const firstLi = document.createElement("li");
+  const firstBtn = document.createElement("button");
+  firstBtn.type = "button";
+  firstBtn.className = "pagination-btn";
+  firstBtn.textContent = "<<";
+  firstBtn.setAttribute("aria-label", "First page");
+  firstBtn.disabled = currentPage === 1;
+  firstBtn.addEventListener("click", () => onPageChange(1));
+  firstLi.appendChild(firstBtn);
+  rightSide.appendChild(firstLi);
+  
+  // Page number buttons
+  pages.forEach(p => {
+    if (p === '...') {
+      const ellipsis = document.createElement("li");
+      ellipsis.className = "pagination-ellipsis";
+      ellipsis.setAttribute("aria-hidden", "true");
+      ellipsis.textContent = "...";
+      rightSide.appendChild(ellipsis);
+    } else {
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "pagination-btn" + (p === currentPage ? " active" : "");
+      btn.textContent = p;
+      if (p === currentPage) btn.setAttribute("aria-current", "page");
+      btn.addEventListener("click", () => onPageChange(p));
+      li.appendChild(btn);
+      rightSide.appendChild(li);
+    }
+  });
+  
+  // >> button
+  const lastLi = document.createElement("li");
+  const lastBtn = document.createElement("button");
+  lastBtn.type = "button";
+  lastBtn.className = "pagination-btn";
+  lastBtn.textContent = ">>";
+  lastBtn.setAttribute("aria-label", "Last page");
+  lastBtn.disabled = currentPage === totalPages || totalPages === 0;
+  lastBtn.addEventListener("click", () => onPageChange(totalPages));
+  lastLi.appendChild(lastBtn);
+  rightSide.appendChild(lastLi);
+  
+  nav.appendChild(leftSide);
+  nav.appendChild(rightSide);
+  
+  // Add event listener for rows per page input
+  const rowsInput = nav.querySelector(".rows-per-page-input");
+  rowsInput.addEventListener("change", (e) => {
+    const val = parseInt(e.target.value, 10);
+    if (val > 0) {
+      onRowsPerPageChange(val);
+    }
+  });
+  
+  return nav;
+}
+
 
 // Get logged in user info (assumes auth.js or other updated localStorage)
 // Note: premium-nav.js or auth.js might have set simple user info.
@@ -86,6 +202,7 @@ async function fetchMyLinks() {
         const res = await fetch(`/api/myLinks?email=${encodeURIComponent(user.email)}`);
         if (res.ok) {
             userLinks = await res.json();
+            linksCurrentPage = 1; // Reset to first page on new data
             // Extract existing tags from user's links
             const tagMap = new Map();
             userLinks.forEach(link => {
@@ -109,6 +226,10 @@ async function fetchMyLinks() {
 
 // Render sorted links
 function renderLinks() {
+    // Remove any existing pagination navs
+    const existingNavs = document.querySelectorAll('.links-pagination');
+    existingNavs.forEach(nav => nav.remove());
+
     if (userLinks.length === 0) {
         myLinksBody.innerHTML = "<tr><td colspan='11'>No links found. Create one!</td></tr>";
         return;
@@ -167,8 +288,44 @@ function renderLinks() {
         }
     });
 
+    // Pagination calculations
+    const totalRows = userLinks.length;
+    const totalPages = Math.ceil(totalRows / linksRowsPerPage);
+    if (linksCurrentPage > totalPages) linksCurrentPage = totalPages;
+    if (linksCurrentPage < 1) linksCurrentPage = 1;
+    
+    const startIdx = (linksCurrentPage - 1) * linksRowsPerPage;
+    const endIdx = Math.min(startIdx + linksRowsPerPage, totalRows);
+    const pageData = userLinks.slice(startIdx, endIdx);
+
+    // Pagination change handler
+    const handlePageChange = (newPage) => {
+        linksCurrentPage = newPage;
+        renderLinks();
+    };
+
+    // Rows per page change handler
+    const handleRowsChange = (newRows) => {
+        linksRowsPerPage = newRows;
+        linksCurrentPage = 1;
+        renderLinks();
+    };
+
+    // Get the table container
+    const tableContainer = myLinksBody.closest('.table-container') || myLinksBody.closest('table').parentElement;
+
+    // Create top pagination nav
+    const topNav = createPaginationNav(linksCurrentPage, totalPages, totalRows, startIdx, endIdx, linksRowsPerPage, handlePageChange, handleRowsChange);
+    topNav.classList.add('links-pagination');
+    tableContainer.insertBefore(topNav, tableContainer.querySelector('table'));
+
+    // Create bottom pagination nav
+    const bottomNav = createPaginationNav(linksCurrentPage, totalPages, totalRows, startIdx, endIdx, linksRowsPerPage, handlePageChange, handleRowsChange);
+    bottomNav.classList.add('links-pagination');
+    tableContainer.appendChild(bottomNav);
+
     myLinksBody.innerHTML = "";
-    userLinks.forEach(link => {
+    pageData.forEach(link => {
         const tr = document.createElement("tr");
         const status = getStatus(link);
         const fullUrl = `${window.location.origin}/ext/${link.slug}`;

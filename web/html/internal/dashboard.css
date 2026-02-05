@@ -199,6 +199,81 @@ table.stats-table th:hover {
 
 /* Message */
 #error{margin-top:8px;color:#c62828}
+
+/* Table Pagination */
+.table-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.pagination-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.pagination-left label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--muted);
+}
+.rows-per-page-input {
+  width: 60px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+}
+.pagination-info {
+  font-size: 14px;
+  color: var(--muted);
+}
+.pagination-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.pagination-right li {
+  display: contents;
+}
+.pagination-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+}
+.pagination-btn:hover:not(:disabled) {
+  background: #f3f4f6;
+  border-color: var(--accent);
+}
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.pagination-btn.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.pagination-ellipsis {
+  padding: 0 4px;
+  color: var(--muted);
+}
+
 /* Responsive adjustments */
 @media (max-width:450px){
   main{padding:14px}
@@ -216,6 +291,11 @@ table.stats-table th:hover {
   
   .type-checkboxes {
     flex-wrap: wrap;
+  }
+  
+  .table-pagination {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 /* Accessibility focus outlines */

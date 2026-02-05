@@ -203,9 +203,8 @@ button[disabled] {
 .links-table {
   border-collapse: collapse;
   font-size: 14px;
-  table-layout: fixed;
-  width: max-content; /* Ensure table width is determined by columns */
-  min-width: 100%;     /* But at least fill the container */
+  table-layout: auto;
+  width: 100%;
 }
 
 .links-table th, .links-table td {

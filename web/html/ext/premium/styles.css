@@ -733,6 +733,7 @@ h1,
 
 .pagination-btn:hover:not(:disabled) {
   background: #f3f7fb;
+  color: black;
   border-color: var(--accent);
 }
 

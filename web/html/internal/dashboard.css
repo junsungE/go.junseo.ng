@@ -258,6 +258,7 @@ table.stats-table th:hover {
 }
 .pagination-btn:hover:not(:disabled) {
   background: #f3f4f6;
+  color: black;
   border-color: var(--accent);
 }
 .pagination-btn:disabled {

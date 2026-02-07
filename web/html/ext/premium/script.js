@@ -623,6 +623,8 @@ shortenUrlBtn.addEventListener("click", async () => {
       shortenUrlBtn.disabled = true;
       if (tagInput) tagInput.disabled = true;
       if (conditionalRedirectToggle) conditionalRedirectToggle.disabled = true;
+      const crFieldset = document.getElementById('conditionalRedirectFieldset');
+      if (crFieldset) crFieldset.disabled = true;
 
       // Refresh list
       fetchMyLinks();
@@ -716,6 +718,8 @@ shortenAnotherBtn.addEventListener("click", () => {
   shortenAnotherBtn.hidden = true;
   if (tagInput) tagInput.disabled = false;
   if (conditionalRedirectToggle) conditionalRedirectToggle.disabled = false;
+  const crFieldset = document.getElementById('conditionalRedirectFieldset');
+  if (crFieldset) crFieldset.disabled = false;
   
   urlInput.focus();
 });

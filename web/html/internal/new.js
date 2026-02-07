@@ -3,7 +3,8 @@ const msg = document.getElementById("message");
 
 const startDateInput = form ? form.querySelector('input[name="startDate"]') : null;
 const expiryDateInput = form ? form.querySelector('input[name="expiryDate"]') : null;
-const todayIso = new Date().toISOString().split("T")[0];
+const _now = new Date();
+const todayIso = `${_now.getFullYear()}-${String(_now.getMonth()+1).padStart(2,'0')}-${String(_now.getDate()).padStart(2,'0')}`;
 if (startDateInput) startDateInput.min = todayIso;
 if (expiryDateInput) expiryDateInput.min = todayIso;
 
@@ -573,6 +574,7 @@ if (form) {
     data.isCaseSensitive = form.isCaseSensitive.checked;
     data.type = "internal";
     data.origin = window.location.origin; // Tell backend which domain we're on
+    data.clientToday = todayIso;
 
     // Add tags to the data
     if (selectedTags.length > 0) {

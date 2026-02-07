@@ -11,7 +11,8 @@ const copiedSpan = document.getElementById("copied");
 
 let currentFullUrl = "";
 
-const todayIso = new Date().toISOString().split("T")[0];
+const _now = new Date();
+const todayIso = `${_now.getFullYear()}-${String(_now.getMonth()+1).padStart(2,'0')}-${String(_now.getDate()).padStart(2,'0')}`;
 if (startDateInput) startDateInput.min = todayIso;
 if (expiryDateInput) expiryDateInput.min = todayIso;
 
@@ -37,7 +38,8 @@ shortenUrlBtn.addEventListener("click", async () => {
   const data = {
     type: "external",
     targetUrl: targetUrl,
-    origin: window.location.origin // Tell backend which domain we're on
+    origin: window.location.origin, // Tell backend which domain we're on
+    clientToday: todayIso
   };
 
   if (startDateInput.value) {

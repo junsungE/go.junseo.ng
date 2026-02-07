@@ -20,7 +20,8 @@ module.exports = async function (context, req) {
     tags,
     isCaseSensitive = false,
     createdBy = "anonymous",
-    origin // Frontend will send window.location.origin
+    origin, // Frontend will send window.location.origin
+    clientToday
   } = body;
 
   if (!targetUrl) {
@@ -28,15 +29,24 @@ module.exports = async function (context, req) {
     return;
   }
 
-  const todayIso = new Date().toISOString().split("T")[0];
   const isValidDate = (value) => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
 
-  if (startDate && (!isValidDate(startDate) || startDate < todayIso)) {
+  // Use client's local date for "today", with a sanity check (must be within 26 hours of server UTC)
+  const serverUtcIso = new Date().toISOString().split("T")[0];
+  let baselineToday = serverUtcIso;
+  if (isValidDate(clientToday)) {
+    const diff = Math.abs(new Date(clientToday) - new Date(serverUtcIso));
+    if (diff <= 26 * 60 * 60 * 1000) {
+      baselineToday = clientToday;
+    }
+  }
+
+  if (startDate && (!isValidDate(startDate) || startDate < baselineToday)) {
     context.res = jsonResponse(400, { error: "Start date must be today or later." });
     return;
   }
 
-  if (expiryDate && (!isValidDate(expiryDate) || expiryDate < todayIso)) {
+  if (expiryDate && (!isValidDate(expiryDate) || expiryDate < baselineToday)) {
     context.res = jsonResponse(400, { error: "Expiry date must be today or later." });
     return;
   }

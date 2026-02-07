@@ -560,7 +560,15 @@ if (form) {
     const formData = new FormData(form);
     const start = formData.get("startDate");
     const end = formData.get("expiryDate");
-    
+
+    if (start && start < todayIso) {
+        alert("Start date must be today or later.");
+        return;
+    }
+    if (end && end < todayIso) {
+        alert("Expiry date must be today or later.");
+        return;
+    }
     if (start && end && new Date(end) <= new Date(start)) {
         alert("Expiry date must be later than the start date.");
         return;

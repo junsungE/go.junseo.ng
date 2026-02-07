@@ -482,6 +482,14 @@ shortenUrlBtn.addEventListener("click", async () => {
     return;
   }
   // Date validation
+  if (startDateInput.value && startDateInput.value < todayIso) {
+    alert("Start date must be today or later.");
+    return;
+  }
+  if (expiryDateInput.value && expiryDateInput.value < todayIso) {
+    alert("Expiry date must be today or later.");
+    return;
+  }
   if (startDateInput.value && expiryDateInput.value) {
     if (new Date(expiryDateInput.value) <= new Date(startDateInput.value)) {
         alert("Expiry date must be later than the start date.");

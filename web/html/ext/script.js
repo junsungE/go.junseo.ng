@@ -27,10 +27,15 @@ shortenUrlBtn.addEventListener("click", async () => {
   // Date validation
   if (startDateInput.value && startDateInput.value < todayIso) {
     alert("Start date must be today or later.");
+  // Date validation (native browser tooltip)
+  //if (startDateInput.value && !startDateInput.checkValidity()) {
+  //  startDateInput.reportValidity();
     return;
   }
   if (expiryDateInput.value && expiryDateInput.value < todayIso) {
     alert("Expiry date must be today or later.");
+  //if (expiryDateInput.value && !expiryDateInput.checkValidity()) {
+  //  expiryDateInput.reportValidity();
     return;
   }
   if (startDateInput.value && expiryDateInput.value) {

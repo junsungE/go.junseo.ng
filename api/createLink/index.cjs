@@ -38,7 +38,14 @@ module.exports = async function (context, req) {
 
   // Validate URL format
   try {
-    new URL(targetUrl);
+    const parsed = new URL(targetUrl);
+    // Extra check for valid domain-like structure if it's http/https
+    if (['http:', 'https:'].includes(parsed.protocol)) {
+       // Must have a dot (e.g. example.com) or be exactly localhost
+       if (!parsed.hostname.includes('.') && parsed.hostname !== 'localhost') {
+           throw new Error("Invalid hostname");
+       }
+    }
   } catch {
     context.res = jsonResponse(400, { error: "Invalid target URL. Please provide a valid URL (e.g., https://example.com)." });
     return;

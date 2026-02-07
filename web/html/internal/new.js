@@ -598,7 +598,13 @@ if (form) {
     // Validate URL format
     if (data.targetUrl) {
       try {
-        new URL(data.targetUrl);
+        const parsed = new URL(data.targetUrl);
+        // Extra check for valid domain-like structure if it's http/https
+        if (['http:', 'https:'].includes(parsed.protocol)) {
+          if (!parsed.hostname.includes('.') && parsed.hostname !== 'localhost') {
+             throw new Error("Invalid hostname");
+          }
+        }
       } catch {
         alert("Please enter a valid URL (e.g., https://example.com).");
         if (submitBtn) submitBtn.disabled = false;

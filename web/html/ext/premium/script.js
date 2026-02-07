@@ -500,7 +500,13 @@ shortenUrlBtn.addEventListener("click", async () => {
 
   // Validate URL format
   try {
-    new URL(targetUrl);
+    const parsed = new URL(targetUrl);
+    // Extra check for valid domain-like structure if it's http/https
+    if (['http:', 'https:'].includes(parsed.protocol)) {
+      if (!parsed.hostname.includes('.') && parsed.hostname !== 'localhost') {
+         throw new Error("Invalid hostname");
+      }
+    }
   } catch {
     alert("Please enter a valid URL (e.g., https://example.com).");
     return;

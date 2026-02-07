@@ -598,6 +598,8 @@ if (form) {
     // Validate URL format
     if (data.targetUrl) {
       try {
+        new URL(data.targetUrl);
+        /* Commenting out extra hostname check for now since it can cause valid URLs to be rejected (e.g., localhost, intranet URLs without dots, or new gTLDs)
         const parsed = new URL(data.targetUrl);
         // Extra check for valid domain-like structure if it's http/https
         if (['http:', 'https:'].includes(parsed.protocol)) {
@@ -605,6 +607,7 @@ if (form) {
              throw new Error("Invalid hostname");
           }
         }
+        */
       } catch {
         alert("Please enter a valid URL (e.g., https://example.com).");
         if (submitBtn) submitBtn.disabled = false;

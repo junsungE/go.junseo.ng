@@ -38,6 +38,8 @@ module.exports = async function (context, req) {
 
   // Validate URL format
   try {
+    new URL(targetUrl);
+    /* Commenting out extra hostname check for now since it can cause valid URLs to be rejected (e.g., localhost, intranet URLs without dots, or new gTLDs)
     const parsed = new URL(targetUrl);
     // Extra check for valid domain-like structure if it's http/https
     if (['http:', 'https:'].includes(parsed.protocol)) {
@@ -46,6 +48,7 @@ module.exports = async function (context, req) {
            throw new Error("Invalid hostname");
        }
     }
+    */
   } catch {
     context.res = jsonResponse(400, { error: "Invalid target URL. Please provide a valid URL (e.g., https://example.com)." });
     return;

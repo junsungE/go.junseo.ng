@@ -625,6 +625,8 @@ shortenUrlBtn.addEventListener("click", async () => {
       if (conditionalRedirectToggle) conditionalRedirectToggle.disabled = true;
       const crFieldset = document.getElementById('conditionalRedirectFieldset');
       if (crFieldset) crFieldset.disabled = true;
+      const addLangBtn = document.getElementById('addLangLocaleBtn');
+      if (addLangBtn) addLangBtn.disabled = true;
 
       // Refresh list
       fetchMyLinks();
@@ -679,11 +681,11 @@ shortenAnotherBtn.addEventListener("click", () => {
     if (conditionalRedirectOptions) conditionalRedirectOptions.hidden = true;
     if (desktopToggle) desktopToggle.checked = false;
     if (mobileToggle) mobileToggle.checked = false;
-    const langLocaleSection = document.getElementById('langLocaleSection');
-    if (langLocaleSection) langLocaleSection.hidden = true;
     if (desktopSection) desktopSection.hidden = true;
     if (mobileSection) mobileSection.hidden = true;
     if (langLocaleList) langLocaleList.innerHTML = '';
+    const addLangBtn = document.getElementById('addLangLocaleBtn');
+    if (addLangBtn) addLangBtn.disabled = false;
     // Reset desktop URLs
     const windowsUrl = document.getElementById('windowsUrl');
     const macosUrl = document.getElementById('macosUrl');

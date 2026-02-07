@@ -11,7 +11,7 @@ const resultSection = document.querySelector(".result");
 const copyUrlBtn = document.getElementById("copyUrl");
 const copiedSpan = document.getElementById("copied");
 const myLinksBody = document.getElementById("myLinksBody");
-const tableHeaders = document.querySelectorAll(".links-table th");
+const tableHeaders = document.querySelectorAll(".links-table th[data-sort]");
 
 const _now = new Date();
 const todayIso = `${_now.getFullYear()}-${String(_now.getMonth()+1).padStart(2,'0')}-${String(_now.getDate()).padStart(2,'0')}`;

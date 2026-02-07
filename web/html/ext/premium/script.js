@@ -197,7 +197,7 @@ function checkAccountStatus() {
 async function fetchMyLinks() {
     const user = getUser();
     if (!user || !user.email) {
-        myLinksBody.innerHTML = "<tr><td colspan='11'>Please log in to see your links.</td></tr>";
+        myLinksBody.innerHTML = "<tr><td colspan='12'>Please log in to see your links.</td></tr>";
         return;
     }
 
@@ -220,10 +220,10 @@ async function fetchMyLinks() {
             existingTags = Array.from(tagMap.values());
             renderLinks();
         } else {
-            myLinksBody.innerHTML = "<tr><td colspan='11'>Failed to load links.</td></tr>";
+            myLinksBody.innerHTML = "<tr><td colspan='12'>Failed to load links.</td></tr>";
         }
     } catch (err) {
-        myLinksBody.innerHTML = `<tr><td colspan='11'>Error: ${err.message}</td></tr>`;
+        myLinksBody.innerHTML = `<tr><td colspan='12'>Error: ${err.message}</td></tr>`;
     }
 }
 
@@ -234,7 +234,7 @@ function renderLinks() {
     existingNavs.forEach(nav => nav.remove());
 
     if (userLinks.length === 0) {
-        myLinksBody.innerHTML = "<tr><td colspan='11'>No links found. Create one!</td></tr>";
+        myLinksBody.innerHTML = "<tr><td colspan='12'>No links found. Create one!</td></tr>";
         return;
     }
 
@@ -375,7 +375,21 @@ function renderLinks() {
             <td>${status}</td>
             <td>${lastVisitedDisplay}</td>
             <td>${new Date(link.createdAt).toLocaleString()}</td>
+            <td class="actions-cell">
+              <button type="button" class="action-btn edit-btn" title="Edit">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+              </button>
+              <button type="button" class="action-btn delete-btn" title="Delete" data-slug="${escapeHtml(link.slug)}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+              </button>
+            </td>
         `;
+
+        // Attach delete button handler
+        tr.querySelector('.delete-btn').addEventListener('click', () => {
+          showDeleteModal(link.slug);
+        });
+
         myLinksBody.appendChild(tr);
     });
 }
@@ -1200,3 +1214,81 @@ function getConditionalRedirectData() {
   data.hasLangLocaleError = hasLangLocaleError;
   return data;
 }
+
+// --- Delete Link Modal ---
+function createDeleteModal() {
+  const dialog = document.createElement('dialog');
+  dialog.id = 'deleteModalOverlay';
+  dialog.className = 'modal-dialog';
+  dialog.innerHTML = `
+    <h3 id="deleteModalTitle">Confirm Delete</h3>
+    <p id="deleteModalMessage"></p>
+    <footer class="modal-actions">
+      <button type="button" id="deleteModalCancel" class="modal-btn modal-btn-cancel">Cancel</button>
+      <button type="button" id="deleteModalConfirm" class="modal-btn modal-btn-danger">Yes, Delete</button>
+    </footer>
+  `;
+  document.body.appendChild(dialog);
+
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) hideDeleteModal();
+  });
+  document.getElementById('deleteModalCancel').addEventListener('click', hideDeleteModal);
+}
+createDeleteModal();
+
+let pendingDeleteSlug = null;
+
+function showDeleteModal(slug) {
+  pendingDeleteSlug = slug;
+  const dialog = document.getElementById('deleteModalOverlay');
+  const msg = document.getElementById('deleteModalMessage');
+  msg.textContent = `Are you sure you want to delete slug: "${slug}"? This action is permanent and irreversible.`;
+  dialog.showModal();
+}
+
+function hideDeleteModal() {
+  const dialog = document.getElementById('deleteModalOverlay');
+  dialog.close();
+  pendingDeleteSlug = null;
+}
+
+document.getElementById('deleteModalConfirm').addEventListener('click', async () => {
+  if (!pendingDeleteSlug) return;
+  const slug = pendingDeleteSlug;
+  const confirmBtn = document.getElementById('deleteModalConfirm');
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = 'Deleting...';
+
+  const user = getUser();
+  if (!user || !user.email) {
+    alert('You must be logged in to delete links.');
+    hideDeleteModal();
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = 'Yes, Delete';
+    return;
+  }
+
+  try {
+    const res = await fetch('/api/deleteLink', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slug, email: user.email, type: 'premium' })
+    });
+
+    if (res.ok) {
+      hideDeleteModal();
+      // Remove from local array and re-render
+      userLinks = userLinks.filter(l => l.slug !== slug);
+      renderLinks();
+    } else {
+      const data = await res.json().catch(() => ({}));
+      alert(data.error || 'Failed to delete the link.');
+    }
+  } catch (err) {
+    alert('Error deleting link: ' + err.message);
+  } finally {
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = 'Yes, Delete';
+  }
+});

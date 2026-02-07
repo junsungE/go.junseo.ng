@@ -18,9 +18,25 @@ if (expiryDateInput) expiryDateInput.min = todayIso;
 
 // Shorten URL button
 shortenUrlBtn.addEventListener("click", async () => {
-  const targetUrl = urlInput.value.trim();
+  let targetUrl = urlInput.value.trim();
   if (!targetUrl) {
     alert("Please enter a URL to shorten");
+    return;
+  }
+
+  // Auto-prepend https:// if no valid URI scheme detected
+  try {
+    new URL(targetUrl);
+  } catch {
+    targetUrl = "https://" + targetUrl;
+    urlInput.value = targetUrl;
+  }
+
+  // Validate URL format
+  try {
+    new URL(targetUrl);
+  } catch {
+    alert("Please enter a valid URL (e.g., https://example.com).");
     return;
   }
 

@@ -584,6 +584,29 @@ if (form) {
     data.origin = window.location.origin; // Tell backend which domain we're on
     data.clientToday = todayIso;
 
+    // Auto-prepend https:// if no valid URI scheme detected
+    if (data.targetUrl) {
+      try {
+        new URL(data.targetUrl);
+      } catch {
+        data.targetUrl = "https://" + data.targetUrl;
+        const urlField = form.querySelector('[name="targetUrl"]');
+        if (urlField) urlField.value = data.targetUrl;
+      }
+    }
+
+    // Validate URL format
+    if (data.targetUrl) {
+      try {
+        new URL(data.targetUrl);
+      } catch {
+        alert("Please enter a valid URL (e.g., https://example.com).");
+        if (submitBtn) submitBtn.disabled = false;
+        msg.textContent = '';
+        return;
+      }
+    }
+
     // Add tags to the data
     if (selectedTags.length > 0) {
       data.tags = selectedTags;

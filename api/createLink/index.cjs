@@ -29,6 +29,21 @@ module.exports = async function (context, req) {
     return;
   }
 
+  // Normalize URL: auto-prepend https:// if no valid URI scheme detected
+  try {
+    new URL(targetUrl);
+  } catch {
+    targetUrl = "https://" + targetUrl;
+  }
+
+  // Validate URL format
+  try {
+    new URL(targetUrl);
+  } catch {
+    context.res = jsonResponse(400, { error: "Invalid target URL. Please provide a valid URL (e.g., https://example.com)." });
+    return;
+  }
+
   const isValidDate = (value) => typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
 
   // Use client's local date for "today", with a sanity check (must be within 26 hours of server UTC)

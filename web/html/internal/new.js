@@ -1,6 +1,12 @@
 const form = document.getElementById("createForm");
 const msg = document.getElementById("message");
 
+const startDateInput = form ? form.querySelector('input[name="startDate"]') : null;
+const expiryDateInput = form ? form.querySelector('input[name="expiryDate"]') : null;
+const todayIso = new Date().toISOString().split("T")[0];
+if (startDateInput) startDateInput.min = todayIso;
+if (expiryDateInput) expiryDateInput.min = todayIso;
+
 // Toggle password field when Mode is changed
 const modeSelect = form && form.mode; // <select name="mode">
 const passwordRow = document.getElementById('passwordRow');

@@ -11,6 +11,10 @@ const copiedSpan = document.getElementById("copied");
 
 let currentFullUrl = "";
 
+const todayIso = new Date().toISOString().split("T")[0];
+if (startDateInput) startDateInput.min = todayIso;
+if (expiryDateInput) expiryDateInput.min = todayIso;
+
 // Shorten URL button
 shortenUrlBtn.addEventListener("click", async () => {
   const targetUrl = urlInput.value.trim();

@@ -13,6 +13,10 @@ const copiedSpan = document.getElementById("copied");
 const myLinksBody = document.getElementById("myLinksBody");
 const tableHeaders = document.querySelectorAll(".links-table th");
 
+const todayIso = new Date().toISOString().split("T")[0];
+if (startDateInput) startDateInput.min = todayIso;
+if (expiryDateInput) expiryDateInput.min = todayIso;
+
 // Tags functionality
 const tagInput = document.getElementById('tagInput');
 const selectedTagsList = document.getElementById('selectedTags');

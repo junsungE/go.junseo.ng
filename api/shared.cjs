@@ -1,6 +1,6 @@
 // Shared utility for all Azure Functions (CommonJS version)
 const { TableClient, AzureNamedKeyCredential } = require("@azure/data-tables");
-const { EmailClient } = require("@azure/communication-email");
+// const { EmailClient } = require("@azure/communication-email");
 const { v4: uuidv4 } = require("uuid");
 const UAParser = require("ua-parser-js");
 
@@ -26,11 +26,72 @@ function getTableClient(tableName) {
 }
 
 function getEmailClient() {
-  const connectionString = process.env.COMMUNICATION_SERVICES_CONNECTION_STRING;
-  if (!connectionString) {
-    throw new Error("COMMUNICATION_SERVICES_CONNECTION_STRING is not set");
+  // Old Azure Communication Services implementation (kept for easy rollback):
+  // const connectionString = process.env.COMMUNICATION_SERVICES_CONNECTION_STRING;
+  // if (!connectionString) {
+  //   throw new Error("COMMUNICATION_SERVICES_CONNECTION_STRING is not set");
+  // }
+  // return new EmailClient(connectionString);
+
+  // New Resend-backed implementation with ACS-compatible shape.
+  // This keeps existing call sites unchanged:
+  //   const emailClient = getEmailClient();
+  //   const poller = await emailClient.beginSend(emailMessage);
+  //   await poller.pollUntilDone();
+  const resendApiKey = process.env.RESEND_API_KEY;
+  if (!resendApiKey) {
+    throw new Error("RESEND_API_KEY is not set");
   }
-  return new EmailClient(connectionString);
+
+  return {
+    async beginSend(emailMessage) {
+      const to = (emailMessage?.recipients?.to || [])
+        .map((r) => r && r.address)
+        .filter(Boolean);
+
+      if (!to.length) {
+        throw new Error("No recipient address was provided");
+      }
+
+      const resendPayload = {
+        from: emailMessage.senderAddress,
+        to,
+        subject: emailMessage?.content?.subject || "",
+        text: emailMessage?.content?.plainText || undefined,
+        html: emailMessage?.content?.html || undefined
+      };
+
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${resendApiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(resendPayload)
+      });
+
+      const responseBody = await response.text();
+      let parsedBody;
+      try {
+        parsedBody = responseBody ? JSON.parse(responseBody) : {};
+      } catch {
+        parsedBody = { raw: responseBody };
+      }
+
+      if (!response.ok) {
+        throw new Error(`Resend API error (${response.status}): ${responseBody}`);
+      }
+
+      return {
+        async pollUntilDone() {
+          return {
+            status: "Succeeded",
+            id: parsedBody.id
+          };
+        }
+      };
+    }
+  };
 }
 
 // Parse user agent to identify device/platform

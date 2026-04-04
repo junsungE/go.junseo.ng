@@ -54,7 +54,7 @@ function getEmailClient() {
       }
 
       const resendPayload = {
-        from: emailMessage.senderAddress,
+        from: `Go.junseo.ng <${emailMessage.senderAddress}>`,
         to,
         subject: emailMessage?.content?.subject || "",
         text: emailMessage?.content?.plainText || undefined,

@@ -65,6 +65,7 @@ module.exports = async function (context, req) {
                 <p>Your verification code to register for Premium Go URL Shortener(ext) is: <strong>${verificationCode}</strong></p>
                 <p>Alternatively, <a href="${linkUrl}">click this link</a> to continue your sign up.</p>
                 <p>This code will expire in 1 hour.</p>
+                <p>Best regards,<br>Go.junseo.ng/ext/premium/signup</p>
               </body>
             </html>
           `,

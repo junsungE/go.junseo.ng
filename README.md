@@ -19,3 +19,33 @@ My Links table:
 - Default sort for numeric/date columns (Created, Visits, Last Visited, Expiry) is Descending (most recent/highest first).
 - Secondary Sort: If values are equal (e.g., same visit count), records are sorted by "Created" date (newest first).
 - Visits Sorting: Sorts purely by the raw visit count number, ignoring the limit display (e.g., "5/10" is sorted as 5).
+
+### Environment variables
+- ADMIN_EMAIL
+- ADMIN_SECRET
+- DOMAIN
+- TRUSTED_DOMAINS
+- STORAGE_CONN (for Azure Table storage)
+
+Common (for sending email):
+- EMAIL_PROVIDER (acs or resend or graph or smtp)
+- SENDER_EMAIL (need to change depends on EMAIL_PROVIDER)
+
+For acs:
+- COMMUNICATION_SERVICES_CONNECTION_STRING
+
+For resend:
+- RESEND_API_KEY
+
+For graph:
+- M365_TENANT_ID (your tenant id)
+- M365_CLIENT_ID (app client id)
+- M365_CLIENT_SECRET (app secret value)
+- M365_SENDER_USER (sender mailbox UPN)
+
+For smtp:
+- SMTP_HOST (smtp.office365.com)
+- SMTP_PORT (587)
+- SMTP_SECURE (false)
+- SMTP_USER (mailbox username)
+- SMTP_PASS (mailbox password or approved credential method)

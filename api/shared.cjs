@@ -1,6 +1,7 @@
 // Shared utility for all Azure Functions (CommonJS version)
 const { TableClient, AzureNamedKeyCredential } = require("@azure/data-tables");
-// const { EmailClient } = require("@azure/communication-email");
+const { EmailClient } = require("@azure/communication-email");
+const nodemailer = require("nodemailer");
 const { v4: uuidv4 } = require("uuid");
 const UAParser = require("ua-parser-js");
 
@@ -26,18 +27,22 @@ function getTableClient(tableName) {
 }
 
 function getEmailClient() {
-  // Old Azure Communication Services implementation (kept for easy rollback):
-  // const connectionString = process.env.COMMUNICATION_SERVICES_CONNECTION_STRING;
-  // if (!connectionString) {
-  //   throw new Error("COMMUNICATION_SERVICES_CONNECTION_STRING is not set");
-  // }
-  // return new EmailClient(connectionString);
+  // Old Azure Communication Services-only implementation before implementing Resend-only (kept for easy rollback):
+  /*
+  const connectionString = process.env.COMMUNICATION_SERVICES_CONNECTION_STRING;
+  if (!connectionString) {
+    throw new Error("COMMUNICATION_SERVICES_CONNECTION_STRING is not set");
+  }
+  return new EmailClient(connectionString);
+  */
 
+  // Old Resend-only implementation before implementing EMAIL_PROVIDER selector (kept for rollback):
   // New Resend-backed implementation with ACS-compatible shape.
   // This keeps existing call sites unchanged:
   //   const emailClient = getEmailClient();
   //   const poller = await emailClient.beginSend(emailMessage);
   //   await poller.pollUntilDone();
+  /*
   const resendApiKey = process.env.RESEND_API_KEY;
   if (!resendApiKey) {
     throw new Error("RESEND_API_KEY is not set");
@@ -81,7 +86,7 @@ function getEmailClient() {
       if (!response.ok) {
         throw new Error(`Resend API error (${response.status}): ${responseBody}`);
       }
-
+        
       return {
         async pollUntilDone() {
           return {
@@ -90,6 +95,199 @@ function getEmailClient() {
           };
         }
       };
+    }
+  };
+  */
+
+  const provider = (process.env.EMAIL_PROVIDER || "resend").toLowerCase();
+
+  if (provider === "acs") {
+    const connectionString = process.env.COMMUNICATION_SERVICES_CONNECTION_STRING;
+    if (!connectionString) {
+      throw new Error("COMMUNICATION_SERVICES_CONNECTION_STRING is not set");
+    }
+    return new EmailClient(connectionString);
+  }
+
+  return {
+    async beginSend(emailMessage) {
+      const to = (emailMessage?.recipients?.to || [])
+        .map((r) => r && r.address)
+        .filter(Boolean);
+
+      if (!to.length) {
+        throw new Error("No recipient address was provided");
+      }
+
+      if (provider === "resend") {
+        const resendApiKey = process.env.RESEND_API_KEY;
+        if (!resendApiKey) {
+          throw new Error("RESEND_API_KEY is not set");
+        }
+
+        const resendPayload = {
+          from: `Go.junseo.ng <${emailMessage.senderAddress}>`,
+          to,
+          subject: emailMessage?.content?.subject || "",
+          text: emailMessage?.content?.plainText || undefined,
+          html: emailMessage?.content?.html || undefined
+        };
+
+        const response = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${resendApiKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(resendPayload)
+        });
+
+        const responseBody = await response.text();
+        let parsedBody;
+        try {
+          parsedBody = responseBody ? JSON.parse(responseBody) : {};
+        } catch {
+          parsedBody = { raw: responseBody };
+        }
+
+        if (!response.ok) {
+          throw new Error(`Resend API error (${response.status}): ${responseBody}`);
+        }
+
+        return {
+          async pollUntilDone() {
+            return {
+              status: "Succeeded",
+              id: parsedBody.id || uuidv4()
+            };
+          }
+        };
+      }
+
+      if (provider === "graph") {
+        const tenantId = process.env.M365_TENANT_ID;
+        const clientId = process.env.M365_CLIENT_ID;
+        const clientSecret = process.env.M365_CLIENT_SECRET;
+        const senderUser = process.env.M365_SENDER_USER || emailMessage.senderAddress;
+
+        if (!tenantId || !clientId || !clientSecret || !senderUser) {
+          throw new Error("Graph config is incomplete. Set M365_TENANT_ID, M365_CLIENT_ID, M365_CLIENT_SECRET, and M365_SENDER_USER.");
+        }
+
+        const tokenResponse = await fetch(
+          `https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+              grant_type: "client_credentials",
+              client_id: clientId,
+              client_secret: clientSecret,
+              scope: "https://graph.microsoft.com/.default"
+            }).toString()
+          }
+        );
+
+        const tokenBodyText = await tokenResponse.text();
+        let tokenBody;
+        try {
+          tokenBody = tokenBodyText ? JSON.parse(tokenBodyText) : {};
+        } catch {
+          tokenBody = { raw: tokenBodyText };
+        }
+
+        if (!tokenResponse.ok || !tokenBody.access_token) {
+          throw new Error(`Graph token request failed (${tokenResponse.status}): ${tokenBodyText}`);
+        }
+
+        const html = emailMessage?.content?.html || "";
+        const plainText = emailMessage?.content?.plainText || "";
+        const graphPayload = {
+          message: {
+            subject: emailMessage?.content?.subject || "",
+            body: {
+              contentType: html ? "HTML" : "Text",
+              content: html || plainText
+            },
+            toRecipients: to.map((address) => ({
+              emailAddress: { address }
+            }))
+          },
+          saveToSentItems: "true"
+        };
+
+        const sendResponse = await fetch(
+          `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(senderUser)}/sendMail`,
+          {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${tokenBody.access_token}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(graphPayload)
+          }
+        );
+
+        const sendBodyText = await sendResponse.text();
+        if (!sendResponse.ok) {
+          throw new Error(`Graph sendMail failed (${sendResponse.status}): ${sendBodyText}`);
+        }
+
+        const graphRequestId =
+          sendResponse.headers.get("request-id") ||
+          sendResponse.headers.get("x-ms-request-id") ||
+          uuidv4();
+
+        return {
+          async pollUntilDone() {
+            return {
+              status: "Succeeded",
+              id: graphRequestId
+            };
+          }
+        };
+      }
+
+      if (provider === "smtp") {
+        const smtpHost = process.env.SMTP_HOST;
+        const smtpPort = Number(process.env.SMTP_PORT || 587);
+        const smtpSecure = (process.env.SMTP_SECURE || "false").toLowerCase() === "true";
+        const smtpUser = process.env.SMTP_USER;
+        const smtpPass = process.env.SMTP_PASS;
+
+        if (!smtpHost || !smtpUser || !smtpPass) {
+          throw new Error("SMTP config is incomplete. Set SMTP_HOST, SMTP_USER, and SMTP_PASS.");
+        }
+
+        const transporter = nodemailer.createTransport({
+          host: smtpHost,
+          port: smtpPort,
+          secure: smtpSecure,
+          auth: {
+            user: smtpUser,
+            pass: smtpPass
+          }
+        });
+
+        const info = await transporter.sendMail({
+          from: `Go.junseo.ng <${emailMessage.senderAddress}>`,
+          to: to.join(","),
+          subject: emailMessage?.content?.subject || "",
+          text: emailMessage?.content?.plainText || undefined,
+          html: emailMessage?.content?.html || undefined
+        });
+
+        return {
+          async pollUntilDone() {
+            return {
+              status: "Succeeded",
+              id: info.messageId || uuidv4()
+            };
+          }
+        };
+      }
+
+      throw new Error(`Unsupported EMAIL_PROVIDER '${provider}'. Use one of: acs, resend, graph, smtp.`);
     }
   };
 }

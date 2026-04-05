@@ -28,7 +28,7 @@ My Links table:
 - STORAGE_CONN (for Azure Table storage)
 
 Common (for sending email):
-- EMAIL_PROVIDER (acs or resend or graph or smtp)
+- EMAIL_PROVIDER (acs or resend or graph or smtp or powerautomate)
 - SENDER_EMAIL (need to change depends on EMAIL_PROVIDER)
 
 For acs:
@@ -49,3 +49,8 @@ For smtp:
 - SMTP_SECURE (false)
 - SMTP_USER (mailbox username)
 - SMTP_PASS (mailbox password or approved credential method)
+
+For Power Automate relay:
+- POWER_AUTOMATE_URL (HTTP trigger URL)
+- POWER_AUTOMATE_METHOD (post or get, default: post)
+- POWER_AUTOMATE_SECRET (optional shared secret for Authorization header)

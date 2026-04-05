@@ -109,6 +109,95 @@ function getEmailClient() {
     return new EmailClient(connectionString);
   }
 
+  //PowerAutomate code starts
+  if (provider === "powerautomate") {
+    return {
+      async beginSend(emailMessage) {
+        const to = (emailMessage?.recipients?.to || [])
+          .map((r) => r && r.address)
+          .filter(Boolean);
+
+        if (!to.length) {
+          throw new Error("No recipient address was provided");
+        }
+
+        const webhookUrl = process.env.POWER_AUTOMATE_URL;
+        if (!webhookUrl) {
+          throw new Error("POWER_AUTOMATE_URL is not set");
+        }
+
+        const webhookMethod = (process.env.POWER_AUTOMATE_METHOD || "post").toLowerCase();
+        const webhookSecret = process.env.POWER_AUTOMATE_SECRET || "";
+        const payload = {
+          eventType: "email.send",
+          provider: "powerautomate",
+          correlationId: uuidv4(),
+          senderAddress: emailMessage.senderAddress || null,
+          subject: emailMessage?.content?.subject || "",
+          to,
+          plainText: emailMessage?.content?.plainText || "",
+          html: emailMessage?.content?.html || "",
+          requestedAt: new Date().toISOString()
+        };
+
+        let requestUrl = webhookUrl;
+        let requestOptions = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        };
+
+        if (webhookSecret) {
+          requestOptions.headers.Authorization = `Bearer ${webhookSecret}`;
+        }
+
+        if (webhookMethod === "get") {
+          const query = new URLSearchParams({
+            eventType: payload.eventType,
+            provider: payload.provider,
+            correlationId: payload.correlationId,
+            senderAddress: payload.senderAddress || "",
+            subject: payload.subject,
+            to: payload.to.join(","),
+            plainText: payload.plainText,
+            html: payload.html,
+            requestedAt: payload.requestedAt
+          });
+          requestUrl = `${webhookUrl}${webhookUrl.includes("?") ? "&" : "?"}${query.toString()}`;
+          requestOptions = {
+            method: "GET",
+            headers: {}
+          };
+          if (webhookSecret) {
+            requestOptions.headers.Authorization = `Bearer ${webhookSecret}`;
+          }
+        } else if (webhookMethod !== "post") {
+          throw new Error("POWER_AUTOMATE_METHOD must be 'post' or 'get'");
+        } else {
+          requestOptions.body = JSON.stringify(payload);
+        }
+
+        const response = await fetch(requestUrl, requestOptions);
+        const responseBody = await response.text();
+
+        if (!response.ok) {
+          throw new Error(`Power Automate webhook failed (${response.status}): ${responseBody}`);
+        }
+
+        return {
+          async pollUntilDone() {
+            return {
+              status: "Succeeded",
+              id: response.headers.get("x-correlation-id") || payload.correlationId || uuidv4()
+            };
+          }
+        };
+      }
+    };
+  }
+  //PowerAutomate code ends
+
   return {
     async beginSend(emailMessage) {
       const to = (emailMessage?.recipients?.to || [])
